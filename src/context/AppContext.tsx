@@ -1,14 +1,16 @@
 'use client';
 
 import React, { createContext, useContext, useState } from 'react';
-import { Vehicle, Driver, User, Branch, ActivityLog, Trip } from '../types';
+import { Vehicle, Driver, User, Branch, ActivityLog, Trip, FuelLog, TripExpense } from '../types';
 import {
   INITIAL_VEHICLES,
   INITIAL_DRIVERS,
   INITIAL_USERS,
   INITIAL_BRANCHES,
   INITIAL_ACTIVITY_LOGS,
-  INITIAL_TRIPS
+  INITIAL_TRIPS,
+  INITIAL_FUEL_LOGS,
+  INITIAL_EXPENSES
 } from '../data/mockData';
 
 interface AppContextType {
@@ -18,6 +20,8 @@ interface AppContextType {
   branches: Branch[];
   activityLogs: ActivityLog[];
   trips: Trip[];
+  fuelLogs: FuelLog[];
+  expenses: TripExpense[];
   addVehicle: (vehicle: Omit<Vehicle, 'id'>) => void;
   updateVehicle: (id: string, updated: Partial<Vehicle>) => void;
   deleteVehicle: (id: string) => void;
@@ -28,6 +32,7 @@ interface AppContextType {
   addTrip: (trip: Omit<Trip, 'id'>) => void;
   updateTrip: (id: string, updated: Partial<Trip>) => void;
   deleteTrip: (id: string) => void;
+  addFuelLog: (log: Omit<FuelLog, 'id'>) => void;
   currentUser: {
     name: string;
     email: string;
@@ -45,6 +50,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [branches, setBranches] = useState<Branch[]>(INITIAL_BRANCHES);
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>(INITIAL_ACTIVITY_LOGS);
   const [trips, setTrips] = useState<Trip[]>(INITIAL_TRIPS);
+  const [fuelLogs, setFuelLogs] = useState<FuelLog[]>(INITIAL_FUEL_LOGS);
+  const [expenses, setExpenses] = useState<TripExpense[]>(INITIAL_EXPENSES);
 
   const currentUser = {
     name: 'Sylborn Furtado',
@@ -123,6 +130,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     logActivity(`Cancelled trip ${id}`, 'Trip Management');
   };
 
+  const addFuelLog = (log: Omit<FuelLog, 'id'>) => {
+    const newLog: FuelLog = { ...log, id: `fl-${Date.now()}` };
+    setFuelLogs(prev => [newLog, ...prev]);
+    logActivity(`Added fuel refuel log for vehicle ${log.vehicleReg}`, 'Fuel Telemetry');
+  };
+
   const logActivity = (action: string, module: string) => {
     const newLog: ActivityLog = {
       id: `act-${Date.now()}`,
@@ -144,6 +157,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         branches,
         activityLogs,
         trips,
+        fuelLogs,
+        expenses,
         addVehicle,
         updateVehicle,
         deleteVehicle,
@@ -154,6 +169,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addTrip,
         updateTrip,
         deleteTrip,
+        addFuelLog,
         currentUser
       }}
     >

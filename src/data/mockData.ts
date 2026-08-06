@@ -1,4 +1,4 @@
-import { Vehicle, Driver, User, Branch, ActivityLog, Trip } from '../types';
+import { Vehicle, Driver, User, Branch, ActivityLog, Trip, FuelLog, TripExpense } from '../types';
 
 export const INITIAL_VEHICLES: Vehicle[] = [
 
@@ -532,8 +532,140 @@ export const INITIAL_TRIPS: Trip[] = [
     ewayBillNumber: '6612-4410-8819',
     ewayBillExpiry: '2026-08-04 23:59',
     tollSpendINR: 1120,
+    fuelSpendINR: 4200,
+    driverAdvanceINR: 1500,
+    freightRevenueINR: 28000,
+    fuelEfficiencyKmpl: 4.5,
     podReceived: true,
     podNotes: 'Gate-in receipt uploaded.'
+  }
+];
+
+export const INITIAL_FUEL_LOGS: FuelLog[] = [
+  {
+    id: 'fl-1',
+    vehicleId: 'v-1',
+    vehicleReg: 'MH-12-Q-4521',
+    date: '2026-08-06',
+    fuelLevelPercent: 78,
+    fuelLiters: 234,
+    avgKmpl: 4.2,
+    lastRefuelStation: 'HPCL Highway Plaza - Khalapur (NH 48)',
+    lastRefuelLiters: 120,
+    lastRefuelCostINR: 11400,
+    theftAlert: false
+  },
+  {
+    id: 'fl-2',
+    vehicleId: 'v-2',
+    vehicleReg: 'KA-01-EA-9011',
+    date: '2026-08-06',
+    fuelLevelPercent: 32,
+    fuelLiters: 96,
+    avgKmpl: 3.8,
+    lastRefuelStation: 'IOCL Freight Hub - Hosur Express',
+    lastRefuelLiters: 90,
+    lastRefuelCostINR: 8550,
+    theftAlert: true,
+    theftDetails: 'Critical: Sudden 28L drop detected at 02:45 AM while parked at Hosur RTO Checkpost.'
+  },
+  {
+    id: 'fl-3',
+    vehicleId: 'v-3',
+    vehicleReg: 'GJ-06-ZZ-3342',
+    date: '2026-08-05',
+    fuelLevelPercent: 88,
+    fuelLiters: 264,
+    avgKmpl: 4.8,
+    lastRefuelStation: 'BPCL Sanand Industrial Outlet',
+    lastRefuelLiters: 150,
+    lastRefuelCostINR: 14250,
+    theftAlert: false
+  },
+  {
+    id: 'fl-4',
+    vehicleId: 'v-4',
+    vehicleReg: 'HR-55-AB-1290',
+    date: '2026-08-06',
+    fuelLevelPercent: 15,
+    fuelLiters: 45,
+    avgKmpl: 3.1,
+    lastRefuelStation: 'Reliance Petroleum - Neemrana',
+    lastRefuelLiters: 70,
+    lastRefuelCostINR: 6650,
+    theftAlert: false
+  },
+  {
+    id: 'fl-5',
+    vehicleId: 'v-5',
+    vehicleReg: 'MH-04-JK-7810',
+    date: '2026-08-06',
+    fuelLevelPercent: 65,
+    fuelLiters: 195,
+    avgKmpl: 4.4,
+    lastRefuelStation: 'HPCL Ennore Port Terminal Outlet',
+    lastRefuelLiters: 110,
+    lastRefuelCostINR: 10450,
+    theftAlert: false
+  }
+];
+
+export const INITIAL_EXPENSES: TripExpense[] = [
+  {
+    id: 'exp-1',
+    tripId: 'trp-1',
+    tripCode: 'TRP-2026-0142',
+    vehicleReg: 'MH-12-Q-4521',
+    driverName: 'Ramesh Kumar',
+    freightRevenue: 24000,
+    fuelCost: 7200,
+    tollCost: 850,
+    driverAllowance: 1200,
+    otherExpenses: 450,
+    netProfit: 14300,
+    profitMarginPercent: 59.58
+  },
+  {
+    id: 'exp-2',
+    tripId: 'trp-2',
+    tripCode: 'TRP-2026-0143',
+    vehicleReg: 'KA-01-EA-9011',
+    driverName: 'Suresh Patil',
+    freightRevenue: 45000,
+    fuelCost: 16800,
+    tollCost: 1420,
+    driverAllowance: 2500,
+    otherExpenses: 1200,
+    netProfit: 23080,
+    profitMarginPercent: 51.28
+  },
+  {
+    id: 'exp-3',
+    tripId: 'trp-3',
+    tripCode: 'TRP-2026-0144',
+    vehicleReg: 'MH-04-JK-7810',
+    driverName: 'Mahesh Sharma',
+    freightRevenue: 58000,
+    fuelCost: 24500,
+    tollCost: 2350,
+    driverAllowance: 3200,
+    otherExpenses: 800,
+    netProfit: 27150,
+    profitMarginPercent: 46.81
+  },
+  {
+    id: 'exp-4',
+    tripId: 'trp-4',
+    tripCode: 'TRP-2026-0140',
+    vehicleReg: 'GJ-06-ZZ-3342',
+    driverName: 'Vikram Singh',
+    freightRevenue: 62000,
+    fuelCost: 22400,
+    tollCost: 2680,
+    driverAllowance: 3500,
+    otherExpenses: 950,
+    netProfit: 32470,
+    profitMarginPercent: 52.37
   }
 ];
 

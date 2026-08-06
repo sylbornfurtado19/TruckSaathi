@@ -110,6 +110,42 @@ export interface Trip {
   ewayBillNumber?: string;
   ewayBillExpiry?: string;
   tollSpendINR?: number;
+  fuelSpendINR?: number;
+  driverAdvanceINR?: number;
+  freightRevenueINR?: number;
   podReceived: boolean;
   podNotes?: string;
+  podImageUrl?: string;
+  fuelEfficiencyKmpl?: number;
 }
+
+export interface FuelLog {
+  id: string;
+  vehicleId: string;
+  vehicleReg: string;
+  date: string;
+  fuelLevelPercent: number; // 0-100
+  fuelLiters: number;
+  avgKmpl: number;
+  lastRefuelStation: string;
+  lastRefuelLiters: number;
+  lastRefuelCostINR: number;
+  theftAlert: boolean;
+  theftDetails?: string;
+}
+
+export interface TripExpense {
+  id: string;
+  tripId: string;
+  tripCode: string;
+  vehicleReg: string;
+  driverName: string;
+  freightRevenue: number;
+  fuelCost: number;
+  tollCost: number;
+  driverAllowance: number;
+  otherExpenses: number;
+  netProfit: number;
+  profitMarginPercent: number;
+}
+

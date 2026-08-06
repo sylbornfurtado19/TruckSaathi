@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Truck, Users, LayoutDashboard, ShieldCheck, Building2, Settings, Route, Wrench, ShieldAlert, FileText, ArrowRight } from 'lucide-react';
+import { Search, Truck, Users, LayoutDashboard, ShieldCheck, Building2, Settings, Route, Wrench, ShieldAlert, FileText, Fuel, DollarSign, Bot, Smartphone, ArrowRight } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { Badge } from '@/components/ui';
 
@@ -21,10 +21,14 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const pages = [
     { name: 'Dashboard Overview', href: '/dashboard', type: 'Page', icon: LayoutDashboard },
     { name: 'Trip & Dispatch Management', href: '/trips', type: 'Page', icon: Route },
+    { name: 'AI Smart Dispatch Engine', href: '/ai-dispatch', type: 'Page', icon: Bot },
     { name: 'Vehicle Assets Registry', href: '/vehicles', type: 'Page', icon: Truck },
     { name: 'Predictive Maintenance Telemetry', href: '/maintenance', type: 'Page', icon: Wrench },
+    { name: 'Fuel Telemetry & Theft Analytics', href: '/fuel', type: 'Page', icon: Fuel },
+    { name: 'Trip Expenses & Financial P&L', href: '/expenses', type: 'Page', icon: DollarSign },
     { name: 'Driver Human Capital', href: '/drivers', type: 'Page', icon: Users },
     { name: 'AI Safety Center', href: '/safety', type: 'Page', icon: ShieldAlert },
+    { name: 'Driver Field Portal & POD Upload', href: '/driver-portal', type: 'Page', icon: Smartphone },
     { name: 'Reporting & Telemetry Exports', href: '/reports', type: 'Page', icon: FileText },
     { name: 'Company Profile & Hubs', href: '/company', type: 'Page', icon: Building2 },
     { name: 'User Management', href: '/users', type: 'Page', icon: Users },

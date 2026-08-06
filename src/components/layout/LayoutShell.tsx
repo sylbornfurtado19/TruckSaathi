@@ -16,6 +16,10 @@ import {
   Wrench,
   ShieldAlert,
   FileText,
+  Fuel,
+  DollarSign,
+  Bot,
+  Smartphone,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -38,10 +42,14 @@ export const Sidebar: React.FC<{
   const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Trips & Dispatch', href: '/trips', icon: Route },
+    { name: 'AI Smart Dispatch', href: '/ai-dispatch', icon: Bot },
     { name: 'Vehicles', href: '/vehicles', icon: Truck },
     { name: 'Predictive Maintenance', href: '/maintenance', icon: Wrench },
+    { name: 'Fuel Telemetry', href: '/fuel', icon: Fuel },
+    { name: 'Trip Expenses & P&L', href: '/expenses', icon: DollarSign },
     { name: 'Drivers', href: '/drivers', icon: UserCheck },
     { name: 'AI Safety Center', href: '/safety', icon: ShieldAlert },
+    { name: 'Driver Field Portal', href: '/driver-portal', icon: Smartphone },
     { name: 'Reports & Exports', href: '/reports', icon: FileText },
     { name: 'Company Profile', href: '/company', icon: Building2 },
     { name: 'User Management', href: '/users', icon: Users },
@@ -160,10 +168,14 @@ export const Header: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
   const getBreadcrumb = () => {
     if (pathname === '/dashboard') return 'Dashboard / Telemetry Control';
     if (pathname?.startsWith('/trips')) return 'Fleet Operations / Trip & Dispatch';
+    if (pathname?.startsWith('/ai-dispatch')) return 'AI Intelligence / Smart Auto-Dispatch';
     if (pathname?.startsWith('/vehicles')) return 'Fleet Assets / Vehicles Registry';
     if (pathname?.startsWith('/maintenance')) return 'Fleet Telemetry / Predictive Maintenance';
+    if (pathname?.startsWith('/fuel')) return 'Fleet Telemetry / Fuel & Theft Analytics';
+    if (pathname?.startsWith('/expenses')) return 'Financial Settlement / Trip Expenses & P&L';
     if (pathname?.startsWith('/drivers')) return 'Human Capital / Driver Directory';
     if (pathname?.startsWith('/safety')) return 'Driver Telemetry / AI Safety Center';
+    if (pathname?.startsWith('/driver-portal')) return 'Mobile Operations / Driver Field Portal';
     if (pathname?.startsWith('/reports')) return 'Reporting / Telemetry Export Center';
     if (pathname?.startsWith('/company')) return 'Organization / Company Profile';
     if (pathname?.startsWith('/users')) return 'Administration / User Management';

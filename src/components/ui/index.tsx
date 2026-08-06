@@ -205,7 +205,7 @@ export const AnimatedNumber: React.FC<{ value: number }> = ({ value }) => {
 
 export const KPICard: React.FC<{
   title: string;
-  value: number;
+  value: string | number;
   subtext?: string;
   trend?: { direction: 'up' | 'down'; value: string };
   icon: React.ReactNode;
@@ -226,7 +226,7 @@ export const KPICard: React.FC<{
       <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shadow-lg ${iconBg}`}>{icon}</div>
     </div>
     <div className="mt-3 text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-slate-50 via-slate-100 to-slate-300 tracking-tight flex items-baseline justify-between">
-      <AnimatedNumber value={value} />
+      {typeof value === 'number' ? <AnimatedNumber value={value} /> : <span className="tabular-nums font-mono">{value}</span>}
       {trend && (
         <span
           className={`text-xs font-semibold font-mono flex items-center gap-0.5 px-2 py-0.5 rounded-full border ${
