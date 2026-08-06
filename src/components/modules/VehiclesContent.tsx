@@ -11,12 +11,14 @@ import {
   XCircle,
   X,
   FileText,
-  ShieldCheck
+  ShieldCheck,
+  Download
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
 import { Vehicle } from '@/types';
 import { PageHeader, Card, Button, Badge, AnimatedPage, itemVariants } from '@/components/ui';
+import { exportToCSV } from '@/lib/csvExport';
 
 export function VehiclesContent() {
   const { vehicles, addVehicle, deleteVehicle } = useApp();
@@ -46,6 +48,23 @@ export function VehiclesContent() {
     const matchesDoc = docFilter === 'All' || v.docStatus === docFilter;
     return matchesSearch && matchesCat && matchesDoc;
   });
+
+  const handleExportCSV = () => {
+    const exportData = filteredVehicles.map(v => ({
+      Registration: v.regNumber,
+      Category: v.category,
+      Make: v.make,
+      Model: v.model,
+      CapacityTons: v.capacityTons,
+      AssignedDriver: v.assignedDriver || 'Unassigned',
+      DocumentStatus: v.docStatus,
+      MaintenanceStatus: v.maintenanceStatus,
+      RCExpiry: v.rcExpiry,
+      InsuranceExpiry: v.insuranceExpiry,
+      FitnessExpiry: v.fitnessExpiry
+    }));
+    exportToCSV(exportData, `vehicles_export_${new Date().toISOString().slice(0, 10)}`);
+  };
 
   const handleCreateVehicle = (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,14 +99,24 @@ export function VehiclesContent() {
           title="Vehicle Asset Registry"
           description="Commercial vehicle database, payload specs, and document compliance vault."
           actions={
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setIsModalOpen(true)}
-              icon={<Plus className="w-4 h-4" />}
-            >
-              Register Vehicle
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportCSV}
+                icon={<Download className="w-4 h-4" />}
+              >
+                Export CSV
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setIsModalOpen(true)}
+                icon={<Plus className="w-4 h-4" />}
+              >
+                Register Vehicle
+              </Button>
+            </div>
           }
         />
       </motion.div>

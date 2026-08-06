@@ -8,12 +8,14 @@ import {
   AlertTriangle,
   Phone,
   X,
-  UserPlus
+  UserPlus,
+  Download
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
 import { Driver } from '@/types';
 import { PageHeader, Card, Button, Badge, AnimatedPage, itemVariants } from '@/components/ui';
+import { exportToCSV } from '@/lib/csvExport';
 
 export function DriversContent() {
   const { drivers, addDriver } = useApp();
@@ -35,6 +37,22 @@ export function DriversContent() {
       d.licenseNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       d.phone.includes(searchTerm)
   );
+
+  const handleExportCSV = () => {
+    const exportData = filteredDrivers.map(d => ({
+      FullName: d.fullName,
+      Phone: d.phone,
+      LicenseNumber: d.licenseNumber,
+      LicenseCategory: d.licenseCategory,
+      LicenseExpiry: d.licenseExpiry,
+      ExperienceYears: d.experienceYears,
+      AssignedVehicle: d.assignedVehicle || 'Unassigned',
+      Status: d.status,
+      VerificationStatus: d.verificationStatus,
+      SafetyScore: d.safetyScore || 90
+    }));
+    exportToCSV(exportData, `drivers_export_${new Date().toISOString().slice(0, 10)}`);
+  };
 
   const handleOnboardDriver = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,14 +89,24 @@ export function DriversContent() {
           title="Human Capital & Drivers Directory"
           description="Commercial driver profiles, license verification status, and vehicle assignments."
           actions={
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setIsModalOpen(true)}
-              icon={<UserPlus className="w-4 h-4" />}
-            >
-              Onboard Driver
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportCSV}
+                icon={<Download className="w-4 h-4" />}
+              >
+                Export CSV
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setIsModalOpen(true)}
+                icon={<UserPlus className="w-4 h-4" />}
+              >
+                Onboard Driver
+              </Button>
+            </div>
           }
         />
       </motion.div>

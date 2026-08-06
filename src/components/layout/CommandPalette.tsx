@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Truck, Users, LayoutDashboard, ShieldCheck, Building2, Settings, Route, Wrench, ShieldAlert, ArrowRight } from 'lucide-react';
+import { Search, Truck, Users, LayoutDashboard, ShieldCheck, Building2, Settings, Route, Wrench, ShieldAlert, FileText, ArrowRight } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { Badge } from '@/components/ui';
 
@@ -25,6 +25,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
     { name: 'Predictive Maintenance Telemetry', href: '/maintenance', type: 'Page', icon: Wrench },
     { name: 'Driver Human Capital', href: '/drivers', type: 'Page', icon: Users },
     { name: 'AI Safety Center', href: '/safety', type: 'Page', icon: ShieldAlert },
+    { name: 'Reporting & Telemetry Exports', href: '/reports', type: 'Page', icon: FileText },
     { name: 'Company Profile & Hubs', href: '/company', type: 'Page', icon: Building2 },
     { name: 'User Management', href: '/users', type: 'Page', icon: Users },
     { name: 'Roles & RBAC Matrix', href: '/roles', type: 'Page', icon: ShieldCheck },

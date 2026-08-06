@@ -18,11 +18,13 @@ import {
   ArrowRight,
   ShieldCheck,
   CheckSquare,
-  CreditCard
+  CreditCard,
+  Download
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { Trip } from '@/types';
 import { PageHeader, Card, Button, Badge, AnimatedPage, KPICard, itemVariants } from '@/components/ui';
+import { exportToCSV } from '@/lib/csvExport';
 
 export function TripsContent() {
   const { trips, vehicles, drivers, addTrip, updateTrip } = useApp();
@@ -145,6 +147,27 @@ export function TripsContent() {
     }
   };
 
+  const handleExportCSV = () => {
+    const exportData = filteredTrips.map(t => ({
+      TripCode: t.tripCode,
+      VehicleReg: t.vehicleReg,
+      DriverName: t.driverName,
+      OriginCity: t.origin.city,
+      OriginAddress: t.origin.address,
+      DestinationCity: t.destination.city,
+      DestinationAddress: t.destination.address,
+      CargoDescription: t.cargoDescription,
+      CargoWeightTons: t.cargoWeightTons,
+      Status: t.status,
+      DistanceKm: t.distanceKm,
+      EwayBillNumber: t.ewayBillNumber || '',
+      EwayBillExpiry: t.ewayBillExpiry || '',
+      TollSpendINR: t.tollSpendINR || 0,
+      PODReceived: t.podReceived
+    }));
+    exportToCSV(exportData, `trips_export_${new Date().toISOString().slice(0, 10)}`);
+  };
+
   return (
     <AnimatedPage>
       {/* 1. Page Header */}
@@ -153,14 +176,24 @@ export function TripsContent() {
           title="Trip & Dispatch Management"
           description="Operational job assignments, route tracking, cargo manifests, and POD verification."
           actions={
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setIsModalOpen(true)}
-              icon={<Plus className="w-4 h-4" />}
-            >
-              Dispatch New Trip
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportCSV}
+                icon={<Download className="w-4 h-4" />}
+              >
+                Export CSV
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setIsModalOpen(true)}
+                icon={<Plus className="w-4 h-4" />}
+              >
+                Dispatch New Trip
+              </Button>
+            </div>
           }
         />
       </motion.div>

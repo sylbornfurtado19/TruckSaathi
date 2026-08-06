@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { UserPlus, Search, Mail, CheckCircle2, Clock, X } from 'lucide-react';
+import { UserPlus, Search, Mail, CheckCircle2, Clock, X, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
 import { PageHeader, Card, Button, Badge, AnimatedPage, itemVariants } from '@/components/ui';
+import { exportToCSV } from '@/lib/csvExport';
 
 export function UsersContent() {
   const { users, addUser } = useApp();
@@ -23,6 +24,19 @@ export function UsersContent() {
       u.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleExportCSV = () => {
+    const exportData = filteredUsers.map(u => ({
+      FullName: u.fullName,
+      Email: u.email,
+      Phone: u.phone,
+      Role: u.role,
+      Department: u.department,
+      Status: u.status,
+      LastActive: u.lastActive
+    }));
+    exportToCSV(exportData, `users_export_${new Date().toISOString().slice(0, 10)}`);
+  };
 
   const handleInviteUser = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,14 +65,24 @@ export function UsersContent() {
           title="Team & User Directory"
           description="System account provisioning, administrative credentials, and departmental roles."
           actions={
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setIsModalOpen(true)}
-              icon={<UserPlus className="w-4 h-4" />}
-            >
-              Invite User
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportCSV}
+                icon={<Download className="w-4 h-4" />}
+              >
+                Export CSV
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setIsModalOpen(true)}
+                icon={<UserPlus className="w-4 h-4" />}
+              >
+                Invite User
+              </Button>
+            </div>
           }
         />
       </motion.div>
