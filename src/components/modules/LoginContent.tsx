@@ -28,7 +28,7 @@ export function LoginContent() {
           <img
             src="/logo-dark.png"
             alt="TruckSaathi Logo"
-            className="h-12 w-auto object-contain mx-auto drop-shadow-xl"
+            className="h-14 w-auto object-contain mx-auto filter brightness-125 contrast-125 drop-shadow-[0_0_20px_rgba(59,130,246,0.6)]"
           />
           <p className="text-xs text-slate-400 font-medium">Your AI Companion for Every Truck</p>
         </div>

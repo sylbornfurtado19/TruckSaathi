@@ -65,11 +65,15 @@ export const Sidebar: React.FC<{
     >
       {/* Brand Header */}
       <div className="h-16 flex items-center px-4 border-b border-[#202736]/80 justify-between">
-        <div className="flex items-center gap-2 overflow-hidden">
+        <div className="flex items-center gap-2 overflow-hidden py-1">
           <img
             src="/logo-dark.png"
             alt="TruckSaathi Logo"
-            className={`${collapsed ? 'h-8 w-8 object-contain object-left' : 'h-8 w-auto object-contain'}`}
+            className={`transition-all duration-300 ${
+              collapsed
+                ? 'h-9 w-9 object-cover object-left filter brightness-115 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]'
+                : 'h-9 max-w-[180px] object-contain filter brightness-115 contrast-125 drop-shadow-[0_0_12px_rgba(59,130,246,0.35)]'
+            }`}
           />
         </div>
         <button
