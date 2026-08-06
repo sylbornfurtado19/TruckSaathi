@@ -14,6 +14,7 @@ import {
   Settings,
   Route,
   Wrench,
+  ShieldAlert,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -39,6 +40,7 @@ export const Sidebar: React.FC<{
     { name: 'Vehicles', href: '/vehicles', icon: Truck },
     { name: 'Predictive Maintenance', href: '/maintenance', icon: Wrench },
     { name: 'Drivers', href: '/drivers', icon: UserCheck },
+    { name: 'AI Safety Center', href: '/safety', icon: ShieldAlert },
     { name: 'Company Profile', href: '/company', icon: Building2 },
     { name: 'User Management', href: '/users', icon: Users },
     { name: 'Roles & Permissions', href: '/roles', icon: ShieldCheck },
@@ -159,6 +161,7 @@ export const Header: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
     if (pathname?.startsWith('/vehicles')) return 'Fleet Assets / Vehicles Registry';
     if (pathname?.startsWith('/maintenance')) return 'Fleet Telemetry / Predictive Maintenance';
     if (pathname?.startsWith('/drivers')) return 'Human Capital / Driver Directory';
+    if (pathname?.startsWith('/safety')) return 'Driver Telemetry / AI Safety Center';
     if (pathname?.startsWith('/company')) return 'Organization / Company Profile';
     if (pathname?.startsWith('/users')) return 'Administration / User Management';
     if (pathname?.startsWith('/roles')) return 'Security / Roles & RBAC Matrix';

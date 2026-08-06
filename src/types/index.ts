@@ -49,6 +49,14 @@ export interface Driver {
     phone: string;
     relation: string;
   };
+  safetyScore?: number; // 0-100
+  safetyEvents?: {
+    overspeedCount: number;
+    harshBrakingCount: number;
+    rapidAccelCount: number;
+    fatigueAlertCount: number;
+    seatbeltViolationCount: number;
+  };
 }
 
 export interface User {

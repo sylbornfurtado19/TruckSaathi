@@ -160,6 +160,14 @@ export const INITIAL_DRIVERS: Driver[] = [
       name: 'Sunita Kumar',
       phone: '+91 98765 43211',
       relation: 'Wife'
+    },
+    safetyScore: 94,
+    safetyEvents: {
+      overspeedCount: 1,
+      harshBrakingCount: 2,
+      rapidAccelCount: 0,
+      fatigueAlertCount: 0,
+      seatbeltViolationCount: 0
     }
   },
   {
@@ -178,6 +186,14 @@ export const INITIAL_DRIVERS: Driver[] = [
       name: 'Prakash Patil',
       phone: '+91 98123 90813',
       relation: 'Brother'
+    },
+    safetyScore: 68,
+    safetyEvents: {
+      overspeedCount: 8,
+      harshBrakingCount: 14,
+      rapidAccelCount: 6,
+      fatigueAlertCount: 5,
+      seatbeltViolationCount: 2
     }
   },
   {
@@ -196,6 +212,14 @@ export const INITIAL_DRIVERS: Driver[] = [
       name: 'Manju Singh',
       phone: '+91 97654 32110',
       relation: 'Wife'
+    },
+    safetyScore: 98,
+    safetyEvents: {
+      overspeedCount: 0,
+      harshBrakingCount: 1,
+      rapidAccelCount: 0,
+      fatigueAlertCount: 0,
+      seatbeltViolationCount: 0
     }
   },
   {
@@ -214,6 +238,14 @@ export const INITIAL_DRIVERS: Driver[] = [
       name: 'Rajeev Sharma',
       phone: '+91 99887 76656',
       relation: 'Father'
+    },
+    safetyScore: 85,
+    safetyEvents: {
+      overspeedCount: 3,
+      harshBrakingCount: 4,
+      rapidAccelCount: 2,
+      fatigueAlertCount: 1,
+      seatbeltViolationCount: 0
     }
   }
 ];
