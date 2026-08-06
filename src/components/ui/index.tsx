@@ -244,6 +244,15 @@ export const KPICard: React.FC<{
   </Card>
 );
 
+export const itemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.35 } }
+};
+
+export const RouteDivider: React.FC<{ className?: string }> = ({ className = '' }) => (
+  <div className={`route-line-divider my-6 ${className}`} />
+);
+
 export const AnimatedPage: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const shouldReduceMotion = useReducedMotion();
 

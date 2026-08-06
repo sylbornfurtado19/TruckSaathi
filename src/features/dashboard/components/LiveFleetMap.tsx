@@ -12,8 +12,9 @@ const LeafletMapInner = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-full bg-[#090d16] flex items-center justify-center text-xs text-slate-500 font-mono">
-        Initializing Live Fleet Command Telemetry...
+      <div className="w-full h-full bg-[#090d16] flex flex-col items-center justify-center p-6 space-y-3">
+        <div className="text-xs text-blue-400 font-mono font-bold">Acquiring Pan-India Telemetry Signals...</div>
+        <div className="route-line-divider max-w-xs" />
       </div>
     )
   }

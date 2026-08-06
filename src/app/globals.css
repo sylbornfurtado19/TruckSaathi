@@ -116,24 +116,44 @@ body::before {
 .leaflet-popup-close-button {
   color: var(--text-secondary) !important;
 }
+/* Leaflet Zoom Control Dark Overrides */
+.leaflet-control-zoom {
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6) !important;
+}
+.leaflet-control-zoom a {
+  background: var(--bg-surface-elevated) !important;
+  color: var(--text-primary) !important;
+  border: none !important;
+  transition: background 0.2s ease;
+}
+.leaflet-control-zoom a:hover {
+  background: var(--bg-surface-hover) !important;
+  color: var(--primary-blue) !important;
+}
+.leaflet-control-zoom-in {
+  border-bottom: 1px solid var(--border-subtle) !important;
+}
 
-/* Custom Marker Pulse Keyframes */
-@keyframes markerPulse {
+/* Route Line Keyframes & Utility */
+@keyframes routeLineDash {
   0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7);
-  }
-  70% {
-    transform: scale(1.1);
-    box-shadow: 0 0 0 10px rgba(244, 63, 94, 0);
+    background-position: 0 0;
   }
   100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+    background-position: 40px 0;
   }
 }
 
-.marker-pulse-critical {
-  animation: markerPulse 2s infinite;
+.route-line-divider {
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(90deg, #3b82f6 50%, transparent 50%);
+  background-size: 20px 2px;
+  animation: routeLineDash 2s linear infinite;
+  opacity: 0.4;
 }
+
 

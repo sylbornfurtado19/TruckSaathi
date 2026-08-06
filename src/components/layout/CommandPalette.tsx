@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, Truck, Users, LayoutDashboard, ShieldCheck, Building2, Settings, ArrowRight } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
@@ -16,21 +16,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const { vehicles, drivers } = useApp();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
-
-  // Keyboard shortcut listener
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        if (isOpen) onClose();
-        else setQuery('');
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
+  const selectedItemRef = useRef<HTMLDivElement | null>(null);
 
   const pages = [
     { name: 'Dashboard Overview', href: '/dashboard', type: 'Page', icon: LayoutDashboard },
@@ -51,6 +37,46 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
     .map(d => ({ name: `${d.fullName} (${d.phone})`, href: '/drivers', type: 'Driver', icon: Users }));
 
   const results = [...pages.filter(p => p.name.toLowerCase().includes(query.toLowerCase())), ...matchedVehicles, ...matchedDrivers];
+
+  // Reset selectedIndex whenever query changes
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [query]);
+
+  // Scroll active item into view
+  useEffect(() => {
+    if (selectedItemRef.current) {
+      selectedItemRef.current.scrollIntoView({ block: 'nearest' });
+    }
+  }, [selectedIndex]);
+
+  // Scoped keyboard navigation for ArrowUp, ArrowDown, Enter, Escape
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedIndex(i => Math.min(i + 1, results.length - 1));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedIndex(i => Math.max(i - 1, 0));
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (results[selectedIndex]) {
+          handleSelect(results[selectedIndex].href);
+        }
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, results, selectedIndex]);
+
+  if (!isOpen) return null;
 
   const handleSelect = (href: string) => {
     router.push(href);
@@ -83,12 +109,15 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
           ) : (
             results.map((item, index) => {
               const Icon = item.icon;
+              const isSelected = selectedIndex === index;
               return (
                 <div
                   key={index}
+                  ref={isSelected ? selectedItemRef : null}
                   onClick={() => handleSelect(item.href)}
+                  onMouseEnter={() => setSelectedIndex(index)}
                   className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-colors ${
-                    selectedIndex === index ? 'bg-blue-600/20 text-white border border-blue-500/30' : 'text-slate-300 hover:bg-[#1c2333]/50'
+                    isSelected ? 'bg-blue-600/20 text-white border border-blue-500/30' : 'text-slate-300 hover:bg-[#1c2333]/50'
                   }`}
                 >
                   <div className="flex items-center gap-3">

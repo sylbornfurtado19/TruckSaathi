@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -137,6 +137,17 @@ export const Header: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
   const pathname = usePathname();
   const [isCmdOpen, setIsCmdOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCmdOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const getBreadcrumb = () => {
     if (pathname === '/dashboard') return 'Dashboard / Telemetry Control';

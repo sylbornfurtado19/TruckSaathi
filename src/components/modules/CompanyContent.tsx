@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import { Building2, Plus, MapPin, Phone, X } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
-import { PageHeader, Card, Button, AnimatedPage } from '@/components/ui';
+import { PageHeader, Card, Button, AnimatedPage, itemVariants } from '@/components/ui';
 
 export function CompanyContent() {
   const { branches, addBranch } = useApp();
@@ -39,25 +40,28 @@ export function CompanyContent() {
   return (
     <AnimatedPage>
       {/* Page Header */}
-      <PageHeader
-        title="Company Profile & Branch Depots"
-        description="Organization registration credentials, tax identifiers, and operational hubs."
-        actions={
-          activeTab === 'branches' && (
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setIsBranchModalOpen(true)}
-              icon={<Plus className="w-4 h-4" />}
-            >
-              Add Branch Hub
-            </Button>
-          )
-        }
-      />
+      <motion.div variants={itemVariants}>
+        <PageHeader
+          title="Company Profile & Branch Depots"
+          description="Organization registration credentials, tax identifiers, and operational hubs."
+          actions={
+            activeTab === 'branches' && (
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setIsBranchModalOpen(true)}
+                icon={<Plus className="w-4 h-4" />}
+              >
+                Add Branch Hub
+              </Button>
+            )
+          }
+        />
+      </motion.div>
 
-      {/* Tabs Header */}
-      <div className="flex border-b border-[#202736] gap-6 text-sm font-medium text-slate-400">
+      {/* Tabs Header & Content */}
+      <motion.div variants={itemVariants} className="space-y-6">
+        <div className="flex border-b border-[#202736] gap-6 text-sm font-medium text-slate-400">
         <button
           onClick={() => setActiveTab('profile')}
           className={`pb-3 border-b-2 transition-colors ${
@@ -173,6 +177,7 @@ export function CompanyContent() {
           ))}
         </div>
       )}
+      </motion.div>
 
       {/* Add Branch Modal */}
       {isBranchModalOpen && (

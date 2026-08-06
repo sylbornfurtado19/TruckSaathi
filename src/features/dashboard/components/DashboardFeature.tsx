@@ -15,7 +15,7 @@ import {
   Bot
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
-import { KPICard, PageHeader, Card, Button, Badge } from '@/components/ui';
+import { KPICard, PageHeader, Card, Button, Badge, RouteDivider } from '@/components/ui';
 import { LiveFleetMap } from './LiveFleetMap';
 import Link from 'next/link';
 
@@ -111,6 +111,9 @@ export function DashboardFeature() {
           glow="amber"
         />
       </motion.div>
+
+      {/* Brand Route Line Divider */}
+      <RouteDivider />
 
       {/* 4. Middle Section: Distribution & AI Recommendation */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-6">

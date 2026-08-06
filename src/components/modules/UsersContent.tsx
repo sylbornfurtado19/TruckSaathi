@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import { UserPlus, Search, Mail, CheckCircle2, Clock, X } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
-import { PageHeader, Card, Button, Badge, AnimatedPage } from '@/components/ui';
+import { PageHeader, Card, Button, Badge, AnimatedPage, itemVariants } from '@/components/ui';
 
 export function UsersContent() {
   const { users, addUser } = useApp();
@@ -45,37 +46,41 @@ export function UsersContent() {
   return (
     <AnimatedPage>
       {/* Page Header */}
-      <PageHeader
-        title="Team & User Directory"
-        description="System account provisioning, administrative credentials, and departmental roles."
-        actions={
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => setIsModalOpen(true)}
-            icon={<UserPlus className="w-4 h-4" />}
-          >
-            Invite User
-          </Button>
-        }
-      />
+      <motion.div variants={itemVariants}>
+        <PageHeader
+          title="Team & User Directory"
+          description="System account provisioning, administrative credentials, and departmental roles."
+          actions={
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsModalOpen(true)}
+              icon={<UserPlus className="w-4 h-4" />}
+            >
+              Invite User
+            </Button>
+          }
+        />
+      </motion.div>
 
       {/* Search Bar */}
-      <Card glow="blue" className="p-4 flex items-center justify-between">
-        <div className="w-full md:w-96 relative">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            placeholder="Search full name, work email..."
-            className="w-full bg-[#1c2333]/80 border border-[#2e374a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 transition-all backdrop-blur-md"
-          />
-        </div>
-      </Card>
+      <motion.div variants={itemVariants}>
+        <Card glow="blue" className="p-4 flex items-center justify-between">
+          <div className="w-full md:w-96 relative">
+            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              placeholder="Search full name, work email..."
+              className="w-full bg-[#1c2333]/80 border border-[#2e374a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 transition-all backdrop-blur-md"
+            />
+          </div>
+        </Card>
+      </motion.div>
 
       {/* User Data Table */}
-      <div className="glass-panel rounded-xl overflow-hidden shadow-2xl">
+      <motion.div variants={itemVariants} className="glass-panel rounded-xl overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
@@ -134,7 +139,7 @@ export function UsersContent() {
             </tbody>
           </table>
         </div>
-      </div>
+      </motion.div>
 
       {/* Invite User Modal */}
       {isModalOpen && (

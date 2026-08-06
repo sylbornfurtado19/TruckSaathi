@@ -13,9 +13,10 @@ import {
   FileText,
   ShieldCheck
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
 import { Vehicle } from '@/types';
-import { PageHeader, Card, Button, Badge, AnimatedPage } from '@/components/ui';
+import { PageHeader, Card, Button, Badge, AnimatedPage, itemVariants } from '@/components/ui';
 
 export function VehiclesContent() {
   const { vehicles, addVehicle, deleteVehicle } = useApp();
@@ -74,67 +75,71 @@ export function VehiclesContent() {
   return (
     <AnimatedPage>
       {/* Title & Action Header */}
-      <PageHeader
-        title="Vehicle Asset Registry"
-        description="Commercial vehicle database, payload specs, and document compliance vault."
-        actions={
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => setIsModalOpen(true)}
-            icon={<Plus className="w-4 h-4" />}
-          >
-            Register Vehicle
-          </Button>
-        }
-      />
+      <motion.div variants={itemVariants}>
+        <PageHeader
+          title="Vehicle Asset Registry"
+          description="Commercial vehicle database, payload specs, and document compliance vault."
+          actions={
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsModalOpen(true)}
+              icon={<Plus className="w-4 h-4" />}
+            >
+              Register Vehicle
+            </Button>
+          }
+        />
+      </motion.div>
 
       {/* Filter & Search Bar */}
-      <Card glow="blue" className="p-4 flex flex-col md:flex-row gap-3 items-center justify-between">
-        <div className="w-full md:w-96 relative">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            placeholder="Search plate number, make, model..."
-            className="w-full bg-[#1c2333]/80 border border-[#2e374a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 transition-all backdrop-blur-md"
-          />
-        </div>
-
-        <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-          <div className="flex items-center gap-1.5 text-xs text-slate-400">
-            <Filter className="w-3.5 h-3.5" />
-            <span>Category:</span>
+      <motion.div variants={itemVariants}>
+        <Card glow="blue" className="p-4 flex flex-col md:flex-row gap-3 items-center justify-between">
+          <div className="w-full md:w-96 relative">
+            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              placeholder="Search plate number, make, model..."
+              className="w-full bg-[#1c2333]/80 border border-[#2e374a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 transition-all backdrop-blur-md"
+            />
           </div>
-          <select
-            value={categoryFilter}
-            onChange={e => setCategoryFilter(e.target.value)}
-            className="bg-[#1c2333]/80 border border-[#2e374a] rounded-lg text-xs text-slate-200 px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/80"
-          >
-            <option value="All">All Categories</option>
-            <option value="Container">Container</option>
-            <option value="Trailer">Trailer</option>
-            <option value="Open Body">Open Body</option>
-            <option value="Refrigerated">Refrigerated</option>
-            <option value="Tanker">Tanker</option>
-          </select>
 
-          <select
-            value={docFilter}
-            onChange={e => setDocFilter(e.target.value)}
-            className="bg-[#1c2333]/80 border border-[#2e374a] rounded-lg text-xs text-slate-200 px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/80"
-          >
-            <option value="All">All Document Statuses</option>
-            <option value="Compliant">Compliant</option>
-            <option value="Expiring Soon">Expiring Soon</option>
-            <option value="Expired">Expired</option>
-          </select>
-        </div>
-      </Card>
+          <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+            <div className="flex items-center gap-1.5 text-xs text-slate-400">
+              <Filter className="w-3.5 h-3.5" />
+              <span>Category:</span>
+            </div>
+            <select
+              value={categoryFilter}
+              onChange={e => setCategoryFilter(e.target.value)}
+              className="bg-[#1c2333]/80 border border-[#2e374a] rounded-lg text-xs text-slate-200 px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/80"
+            >
+              <option value="All">All Categories</option>
+              <option value="Container">Container</option>
+              <option value="Trailer">Trailer</option>
+              <option value="Open Body">Open Body</option>
+              <option value="Refrigerated">Refrigerated</option>
+              <option value="Tanker">Tanker</option>
+            </select>
+
+            <select
+              value={docFilter}
+              onChange={e => setDocFilter(e.target.value)}
+              className="bg-[#1c2333]/80 border border-[#2e374a] rounded-lg text-xs text-slate-200 px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/80"
+            >
+              <option value="All">All Document Statuses</option>
+              <option value="Compliant">Compliant</option>
+              <option value="Expiring Soon">Expiring Soon</option>
+              <option value="Expired">Expired</option>
+            </select>
+          </div>
+        </Card>
+      </motion.div>
 
       {/* Styled Data Table */}
-      <div className="glass-panel rounded-xl overflow-hidden shadow-2xl">
+      <motion.div variants={itemVariants} className="glass-panel rounded-xl overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
@@ -219,7 +224,7 @@ export function VehiclesContent() {
             </tbody>
           </table>
         </div>
-      </div>
+      </motion.div>
 
       {/* Register Vehicle Modal */}
       {isModalOpen && (

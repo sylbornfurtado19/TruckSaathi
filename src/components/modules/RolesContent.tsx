@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { ShieldCheck, Save } from 'lucide-react';
-import { PageHeader, Card, Button, AnimatedPage } from '@/components/ui';
+import { motion } from 'framer-motion';
+import { PageHeader, Card, Button, AnimatedPage, itemVariants } from '@/components/ui';
 
 export function RolesContent() {
   const [selectedRole, setSelectedRole] = useState<'Company Admin' | 'Fleet Manager' | 'Dispatcher'>('Fleet Manager');
@@ -29,18 +30,20 @@ export function RolesContent() {
   return (
     <AnimatedPage>
       {/* Page Header */}
-      <PageHeader
-        title="Roles & Granular Permissions Matrix (RBAC)"
-        description="Configure security authorization bounds and CRUD capabilities per enterprise role."
-        actions={
-          <Button variant="primary" size="sm" icon={<Save className="w-3.5 h-3.5" />}>
-            Save Matrix
-          </Button>
-        }
-      />
+      <motion.div variants={itemVariants}>
+        <PageHeader
+          title="Roles & Granular Permissions Matrix (RBAC)"
+          description="Configure security authorization bounds and CRUD capabilities per enterprise role."
+          actions={
+            <Button variant="primary" size="sm" icon={<Save className="w-3.5 h-3.5" />}>
+              Save Matrix
+            </Button>
+          }
+        />
+      </motion.div>
 
       {/* Role Selector Tabs */}
-      <div className="flex border-b border-[#202736] gap-4">
+      <motion.div variants={itemVariants} className="flex border-b border-[#202736] gap-4">
         {(['Company Admin', 'Fleet Manager', 'Dispatcher'] as const).map(role => (
           <button
             key={role}
@@ -55,10 +58,11 @@ export function RolesContent() {
             <span>{role}</span>
           </button>
         ))}
-      </div>
+      </motion.div>
 
       {/* Permission Table */}
-      <Card glow="blue" className="p-6 space-y-6">
+      <motion.div variants={itemVariants}>
+        <Card glow="blue" className="p-6 space-y-6">
         <div className="flex items-center justify-between border-b border-[#202736] pb-4">
           <div>
             <h2 className="text-base font-bold text-slate-100">Capability Matrix for {selectedRole}</h2>
@@ -109,6 +113,7 @@ export function RolesContent() {
           </table>
         </div>
       </Card>
+      </motion.div>
     </AnimatedPage>
   );
 }

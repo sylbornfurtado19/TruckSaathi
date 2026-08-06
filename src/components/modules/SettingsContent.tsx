@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import { Bell, Shield, Clock } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
-import { PageHeader, Card, Button, AnimatedPage } from '@/components/ui';
+import { PageHeader, Card, Button, AnimatedPage, itemVariants } from '@/components/ui';
 
 export function SettingsContent() {
   const { activityLogs } = useApp();
@@ -12,13 +13,16 @@ export function SettingsContent() {
   return (
     <AnimatedPage>
       {/* Page Header */}
-      <PageHeader
-        title="System Settings & Audit Logs"
-        description="Organization thresholds, compliance alerts, security preferences, and audit trails."
-      />
+      <motion.div variants={itemVariants}>
+        <PageHeader
+          title="System Settings & Audit Logs"
+          description="Organization thresholds, compliance alerts, security preferences, and audit trails."
+        />
+      </motion.div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-[#202736] gap-6 text-sm font-medium text-slate-400">
+      {/* Tabs & Content Container */}
+      <motion.div variants={itemVariants} className="space-y-6">
+        <div className="flex border-b border-[#202736] gap-6 text-sm font-medium text-slate-400">
         <button
           onClick={() => setActiveTab('general')}
           className={`pb-3 border-b-2 transition-colors ${
@@ -121,6 +125,7 @@ export function SettingsContent() {
           </div>
         </Card>
       )}
+      </motion.div>
     </AnimatedPage>
   );
 }
