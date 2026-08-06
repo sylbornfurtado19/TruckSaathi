@@ -109,6 +109,7 @@ export interface Trip {
   distanceKm: number;
   ewayBillNumber?: string;
   ewayBillExpiry?: string;
+  tollSpendINR?: number;
   podReceived: boolean;
   podNotes?: string;
 }

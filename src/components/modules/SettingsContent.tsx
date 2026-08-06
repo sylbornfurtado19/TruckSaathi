@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Bell, Shield, Clock } from 'lucide-react';
+import { Bell, Shield, Clock, FileCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
-import { PageHeader, Card, Button, AnimatedPage, itemVariants } from '@/components/ui';
+import { PageHeader, Card, Button, Badge, AnimatedPage, itemVariants } from '@/components/ui';
 
 export function SettingsContent() {
-  const { activityLogs } = useApp();
+  const { activityLogs, vehicles, drivers, trips } = useApp();
   const [activeTab, setActiveTab] = useState<'general' | 'audit'>('general');
 
   return (
@@ -125,6 +125,87 @@ export function SettingsContent() {
           </div>
         </Card>
       )}
+
+      {/* Cross-Cutting Document Expiry Digest */}
+      <Card glow="blue" className="p-6 space-y-4">
+        <div className="flex items-center justify-between border-b border-[#202736] pb-4">
+          <div>
+            <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
+              <FileCheck className="w-4 h-4 text-blue-400" />
+              Unified Document Expiry Compliance Digest
+            </h2>
+            <p className="text-xs text-slate-400">Prioritized cross-cutting compliance overview across Vehicles (RC/Insurance/Fitness), Drivers (DL), and Trips (E-Way Bills)</p>
+          </div>
+        </div>
+
+        <div className="divide-y divide-[#202736]/60">
+          {(() => {
+            const allDocs: Array<{
+              entity: string;
+              type: string;
+              name: string;
+              expiry: string;
+              status: { label: string; variant: 'success' | 'warning' | 'danger' | 'info' | 'neutral' };
+            }> = [];
+
+            const now = new Date('2026-08-06').getTime();
+
+            const calcStatus = (dateStr: string) => {
+              const exp = new Date(dateStr).getTime();
+              const diffDays = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
+              if (diffDays < 0) return { label: 'Expired', variant: 'danger' as const, days: diffDays };
+              if (diffDays <= 30) return { label: 'Expiring Soon', variant: 'warning' as const, days: diffDays };
+              return { label: 'Compliant', variant: 'success' as const, days: diffDays };
+            };
+
+            vehicles.forEach(v => {
+              if (v.rcExpiry) {
+                const st = calcStatus(v.rcExpiry);
+                allDocs.push({ entity: 'Vehicle', type: 'RC Certificate', name: v.regNumber, expiry: v.rcExpiry, status: st });
+              }
+              if (v.insuranceExpiry) {
+                const st = calcStatus(v.insuranceExpiry);
+                allDocs.push({ entity: 'Vehicle', type: 'Insurance Policy', name: v.regNumber, expiry: v.insuranceExpiry, status: st });
+              }
+              if (v.fitnessExpiry) {
+                const st = calcStatus(v.fitnessExpiry);
+                allDocs.push({ entity: 'Vehicle', type: 'Fitness Certificate', name: v.regNumber, expiry: v.fitnessExpiry, status: st });
+              }
+            });
+
+            drivers.forEach(d => {
+              if (d.licenseExpiry) {
+                const st = calcStatus(d.licenseExpiry);
+                allDocs.push({ entity: 'Driver', type: 'Commercial License', name: d.fullName, expiry: d.licenseExpiry, status: st });
+              }
+            });
+
+            trips.forEach(t => {
+              if (t.ewayBillExpiry) {
+                const st = calcStatus(t.ewayBillExpiry);
+                allDocs.push({ entity: 'Trip', type: 'E-Way Bill', name: t.tripCode, expiry: t.ewayBillExpiry, status: st });
+              }
+            });
+
+            const sortedDocs = allDocs.sort((a, b) => new Date(a.expiry).getTime() - new Date(b.expiry).getTime());
+
+            return sortedDocs.map((doc, i) => (
+              <div key={i} className="py-3 flex items-center justify-between text-xs hover:bg-[#1c2333]/40 px-2.5 rounded-lg transition-colors">
+                <div className="flex items-center gap-3">
+                  <Badge variant={doc.status.variant}>{doc.status.label}</Badge>
+                  <div>
+                    <span className="font-bold text-slate-200">{doc.name}</span>
+                    <span className="text-slate-400"> — {doc.type} ({doc.entity})</span>
+                  </div>
+                </div>
+                <div className="font-mono text-slate-300 font-medium">
+                  Expires: {doc.expiry}
+                </div>
+              </div>
+            ));
+          })()}
+        </div>
+      </Card>
       </motion.div>
     </AnimatedPage>
   );

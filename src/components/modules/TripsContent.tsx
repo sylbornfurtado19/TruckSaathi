@@ -17,7 +17,8 @@ import {
   User,
   ArrowRight,
   ShieldCheck,
-  CheckSquare
+  CheckSquare,
+  CreditCard
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { Trip } from '@/types';
@@ -59,11 +60,26 @@ export function TripsContent() {
   const availableVehicles = vehicles.filter(v => v.maintenanceStatus === 'In Service' && !activeTripVehicleIds.has(v.id));
   const availableDrivers = drivers.filter(d => d.status === 'Active' && !activeTripDriverIds.has(d.id));
 
+  // Helper for E-Way Bill expiry status (Compliant / Expiring Soon / Expired)
+  const getEwayBillStatus = (expiryDateStr?: string) => {
+    if (!expiryDateStr) return { label: 'No E-Way Bill', variant: 'neutral' as const };
+    const expiry = new Date(expiryDateStr).getTime();
+    const now = new Date('2026-08-06').getTime();
+    const diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return { label: 'Expired', variant: 'danger' as const };
+    if (diffDays <= 2) return { label: 'Expiring Soon', variant: 'warning' as const };
+    return { label: 'Compliant', variant: 'success' as const };
+  };
+
   // KPIs
   const activeTripsCount = trips.filter(t => t.status === 'In Transit').length;
   const delayedTripsCount = trips.filter(t => t.status === 'Delayed').length;
   const deliveredTodayCount = trips.filter(t => t.status === 'Delivered').length;
-  const avgTransitHours = 14;
+  const totalTollSpendINR = trips.reduce((acc, t) => acc + (t.tollSpendINR || 0), 0);
+
+  const selectedVehicleObj = vehicles.find(v => v.id === vehicleId);
+  const isOverloaded = selectedVehicleObj && cargoWeight > selectedVehicleObj.capacityTons;
 
   const filteredTrips = trips.filter(t => {
     const matchesSearch =
@@ -176,10 +192,10 @@ export function TripsContent() {
           glow="emerald"
         />
         <KPICard
-          title="Avg. Transit Time"
-          value={avgTransitHours}
-          subtext="Hours per inter-state leg"
-          icon={<Clock className="w-4 h-4" />}
+          title="FASTag Toll Spend"
+          value={totalTollSpendINR}
+          subtext="Total FASTag highway tolls (₹)"
+          icon={<CreditCard className="w-4 h-4" />}
           iconBg="bg-indigo-500/10 text-indigo-400 border-indigo-500/30"
           glow="blue"
         />
@@ -231,8 +247,8 @@ export function TripsContent() {
                 <th className="py-3.5 px-4">Assigned Driver</th>
                 <th className="py-3.5 px-4">Route Path</th>
                 <th className="py-3.5 px-4">Status</th>
-                <th className="py-3.5 px-4">Sched. Arrival</th>
-                <th className="py-3.5 px-4">Distance</th>
+                <th className="py-3.5 px-4">E-Way Bill Status</th>
+                <th className="py-3.5 px-4">Distance / Toll</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#202736]/60 text-slate-200">
@@ -243,56 +259,65 @@ export function TripsContent() {
                   </td>
                 </tr>
               ) : (
-                filteredTrips.map(trip => (
-                  <tr
-                    key={trip.id}
-                    onClick={() => {
-                      setSelectedTrip(trip);
-                      setPodNotes(trip.podNotes || '');
-                    }}
-                    className="hover:bg-[#1c2333]/50 transition-colors cursor-pointer group relative border-l-2 border-transparent hover:border-blue-500"
-                  >
-                    <td className="py-3.5 px-4 font-mono font-bold text-slate-100 flex items-center gap-2">
-                      <span className="bg-[#1c2333] border border-[#2e374a] px-2 py-1 rounded text-xs text-blue-400">
-                        {trip.tripCode}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 font-mono text-slate-200 font-semibold">{trip.vehicleReg}</td>
-                    <td className="py-3.5 px-4 text-slate-300 font-medium">{trip.driverName}</td>
-                    <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-1.5 font-medium text-slate-200">
-                        <span className="text-blue-400">{trip.origin.city}</span>
-                        <ArrowRight className="w-3 h-3 text-slate-500" />
-                        <span className="text-emerald-400">{trip.destination.city}</span>
-                      </div>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      {trip.status === 'In Transit' && (
-                        <Badge variant="info">
-                          <Route className="w-3 h-3" /> In Transit
+                filteredTrips.map(trip => {
+                  const ewayStatus = getEwayBillStatus(trip.ewayBillExpiry);
+                  return (
+                    <tr
+                      key={trip.id}
+                      onClick={() => {
+                        setSelectedTrip(trip);
+                        setPodNotes(trip.podNotes || '');
+                      }}
+                      className="hover:bg-[#1c2333]/50 transition-colors cursor-pointer group relative border-l-2 border-transparent hover:border-blue-500"
+                    >
+                      <td className="py-3.5 px-4 font-mono font-bold text-slate-100 flex items-center gap-2">
+                        <span className="bg-[#1c2333] border border-[#2e374a] px-2 py-1 rounded text-xs text-blue-400">
+                          {trip.tripCode}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 font-mono text-slate-200 font-semibold">{trip.vehicleReg}</td>
+                      <td className="py-3.5 px-4 text-slate-300 font-medium">{trip.driverName}</td>
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-1.5 font-medium text-slate-200">
+                          <span className="text-blue-400">{trip.origin.city}</span>
+                          <ArrowRight className="w-3 h-3 text-slate-500" />
+                          <span className="text-emerald-400">{trip.destination.city}</span>
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        {trip.status === 'In Transit' && (
+                          <Badge variant="info">
+                            <Route className="w-3 h-3" /> In Transit
+                          </Badge>
+                        )}
+                        {trip.status === 'Scheduled' && (
+                          <Badge variant="neutral">
+                            <Clock className="w-3 h-3" /> Scheduled
+                          </Badge>
+                        )}
+                        {trip.status === 'Delayed' && (
+                          <Badge variant="warning" pulse>
+                            <AlertTriangle className="w-3 h-3" /> Delayed
+                          </Badge>
+                        )}
+                        {trip.status === 'Delivered' && (
+                          <Badge variant="success">
+                            <CheckCircle2 className="w-3 h-3" /> Delivered
+                          </Badge>
+                        )}
+                        {trip.status === 'Cancelled' && <Badge variant="danger">Cancelled</Badge>}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <Badge variant={ewayStatus.variant}>
+                          <FileText className="w-3 h-3" /> {ewayStatus.label}
                         </Badge>
-                      )}
-                      {trip.status === 'Scheduled' && (
-                        <Badge variant="neutral">
-                          <Clock className="w-3 h-3" /> Scheduled
-                        </Badge>
-                      )}
-                      {trip.status === 'Delayed' && (
-                        <Badge variant="warning" pulse>
-                          <AlertTriangle className="w-3 h-3" /> Delayed
-                        </Badge>
-                      )}
-                      {trip.status === 'Delivered' && (
-                        <Badge variant="success">
-                          <CheckCircle2 className="w-3 h-3" /> Delivered
-                        </Badge>
-                      )}
-                      {trip.status === 'Cancelled' && <Badge variant="danger">Cancelled</Badge>}
-                    </td>
-                    <td className="py-3.5 px-4 font-mono text-slate-400">{trip.scheduledArrival}</td>
-                    <td className="py-3.5 px-4 font-mono text-slate-300">{trip.distanceKm} km</td>
-                  </tr>
-                ))
+                      </td>
+                      <td className="py-3.5 px-4 font-mono text-slate-300">
+                        {trip.distanceKm} km {trip.tollSpendINR ? `(₹${trip.tollSpendINR})` : ''}
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -393,6 +418,13 @@ export function TripsContent() {
                     onChange={e => setCargoWeight(Number(e.target.value))}
                     className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
                   />
+                  {isOverloaded && (
+                    <div className="mt-1.5">
+                      <Badge variant="danger" pulse>
+                        <AlertTriangle className="w-3 h-3" /> Overloading Warning: Cargo exceeds vehicle capacity ({selectedVehicleObj.capacityTons}T)
+                      </Badge>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -502,7 +534,18 @@ export function TripsContent() {
                       <FileText className="w-4 h-4 text-blue-400" />
                       <span className="font-mono">{selectedTrip.ewayBillNumber}</span>
                     </div>
-                    <Badge variant="success">E-Way Active</Badge>
+                    {(() => {
+                      const st = getEwayBillStatus(selectedTrip.ewayBillExpiry);
+                      return <Badge variant={st.variant}>{st.label}</Badge>;
+                    })()}
+                  </div>
+                )}
+                {selectedTrip.tollSpendINR && (
+                  <div className="flex items-center justify-between pt-2 border-t border-[#202736] text-[11px]">
+                    <span className="text-slate-400 flex items-center gap-1.5">
+                      <CreditCard className="w-3.5 h-3.5 text-indigo-400" /> FASTag Toll Spend:
+                    </span>
+                    <span className="font-mono font-bold text-slate-200">₹{selectedTrip.tollSpendINR}</span>
                   </div>
                 )}
               </div>

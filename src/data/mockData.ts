@@ -380,6 +380,7 @@ export const INITIAL_TRIPS: Trip[] = [
     distanceKm: 148,
     ewayBillNumber: '3819-0921-4412',
     ewayBillExpiry: '2026-08-08 23:59',
+    tollSpendINR: 850,
     podReceived: false
   },
   {
@@ -400,6 +401,7 @@ export const INITIAL_TRIPS: Trip[] = [
     distanceKm: 346,
     ewayBillNumber: '8910-4412-0921',
     ewayBillExpiry: '2026-08-07 23:59',
+    tollSpendINR: 1420,
     podReceived: false,
     podNotes: 'Stuck at Hosur Checkpost due to RTO inspection clearance'
   },
@@ -421,6 +423,7 @@ export const INITIAL_TRIPS: Trip[] = [
     distanceKm: 625,
     ewayBillNumber: '7721-0091-8823',
     ewayBillExpiry: '2026-08-09 23:59',
+    tollSpendINR: 2350,
     podReceived: false
   },
   {
@@ -442,6 +445,7 @@ export const INITIAL_TRIPS: Trip[] = [
     distanceKm: 670,
     ewayBillNumber: '1109-8823-4412',
     ewayBillExpiry: '2026-08-07 23:59',
+    tollSpendINR: 2680,
     podReceived: true,
     podNotes: 'Delivered in full. Signed copy verified by consignee.'
   },
@@ -462,6 +466,7 @@ export const INITIAL_TRIPS: Trip[] = [
     distanceKm: 440,
     ewayBillNumber: '5541-0923-1122',
     ewayBillExpiry: '2026-08-10 23:59',
+    tollSpendINR: 1750,
     podReceived: false
   },
   {
@@ -483,6 +488,7 @@ export const INITIAL_TRIPS: Trip[] = [
     distanceKm: 365,
     ewayBillNumber: '9921-3341-0012',
     ewayBillExpiry: '2026-08-05 23:59',
+    tollSpendINR: 1390,
     podReceived: true,
     podNotes: 'Clean POD stamped by warehouse manager.'
   },
@@ -503,6 +509,7 @@ export const INITIAL_TRIPS: Trip[] = [
     distanceKm: 500,
     ewayBillNumber: '4412-7712-9901',
     ewayBillExpiry: '2026-08-11 23:59',
+    tollSpendINR: 1980,
     podReceived: false
   },
   {
@@ -524,6 +531,7 @@ export const INITIAL_TRIPS: Trip[] = [
     distanceKm: 280,
     ewayBillNumber: '6612-4410-8819',
     ewayBillExpiry: '2026-08-04 23:59',
+    tollSpendINR: 1120,
     podReceived: true,
     podNotes: 'Gate-in receipt uploaded.'
   }
