@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Truck, Users, LayoutDashboard, ShieldCheck, Building2, Settings, Route, ArrowRight } from 'lucide-react';
+import { Search, Truck, Users, LayoutDashboard, ShieldCheck, Building2, Settings, Route, Wrench, ArrowRight } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { Badge } from '@/components/ui';
 
@@ -22,6 +22,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
     { name: 'Dashboard Overview', href: '/dashboard', type: 'Page', icon: LayoutDashboard },
     { name: 'Trip & Dispatch Management', href: '/trips', type: 'Page', icon: Route },
     { name: 'Vehicle Assets Registry', href: '/vehicles', type: 'Page', icon: Truck },
+    { name: 'Predictive Maintenance Telemetry', href: '/maintenance', type: 'Page', icon: Wrench },
     { name: 'Driver Human Capital', href: '/drivers', type: 'Page', icon: Users },
     { name: 'Company Profile & Hubs', href: '/company', type: 'Page', icon: Building2 },
     { name: 'User Management', href: '/users', type: 'Page', icon: Users },

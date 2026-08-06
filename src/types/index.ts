@@ -19,6 +19,16 @@ export interface Vehicle {
     lng: number;
     city: string;
   };
+  componentHealth?: {
+    brakes: number; // 0-100
+    battery: number;
+    engine: number;
+    tyres: number;
+    lastServiceDate: string;
+    predictedNextServiceDate: string;
+    predictedIssue?: string;
+    predictionConfidence?: number; // 0-100
+  };
 }
 
 export interface Driver {

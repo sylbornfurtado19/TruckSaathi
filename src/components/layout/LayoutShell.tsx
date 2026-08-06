@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   Settings,
   Route,
+  Wrench,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -36,6 +37,7 @@ export const Sidebar: React.FC<{
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Trips & Dispatch', href: '/trips', icon: Route },
     { name: 'Vehicles', href: '/vehicles', icon: Truck },
+    { name: 'Predictive Maintenance', href: '/maintenance', icon: Wrench },
     { name: 'Drivers', href: '/drivers', icon: UserCheck },
     { name: 'Company Profile', href: '/company', icon: Building2 },
     { name: 'User Management', href: '/users', icon: Users },
@@ -155,6 +157,7 @@ export const Header: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
     if (pathname === '/dashboard') return 'Dashboard / Telemetry Control';
     if (pathname?.startsWith('/trips')) return 'Fleet Operations / Trip & Dispatch';
     if (pathname?.startsWith('/vehicles')) return 'Fleet Assets / Vehicles Registry';
+    if (pathname?.startsWith('/maintenance')) return 'Fleet Telemetry / Predictive Maintenance';
     if (pathname?.startsWith('/drivers')) return 'Human Capital / Driver Directory';
     if (pathname?.startsWith('/company')) return 'Organization / Company Profile';
     if (pathname?.startsWith('/users')) return 'Administration / User Management';

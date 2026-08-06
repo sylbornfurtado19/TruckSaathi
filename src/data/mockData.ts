@@ -18,7 +18,17 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     rcExpiry: '2027-08-15',
     insuranceExpiry: '2026-11-20',
     fitnessExpiry: '2026-12-10',
-    lastKnownLocation: { lat: 19.0760, lng: 72.8777, city: 'Mumbai (Bhiwandi Hub)' }
+    lastKnownLocation: { lat: 19.0760, lng: 72.8777, city: 'Mumbai (Bhiwandi Hub)' },
+    componentHealth: {
+      brakes: 82,
+      battery: 90,
+      engine: 88,
+      tyres: 75,
+      lastServiceDate: '2026-05-10',
+      predictedNextServiceDate: '2026-09-15',
+      predictedIssue: 'Front brake pad wear expected within 3,500 km',
+      predictionConfidence: 91
+    }
   },
   {
     id: 'v-2',
@@ -36,7 +46,17 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     rcExpiry: '2026-08-10',
     insuranceExpiry: '2026-08-05',
     fitnessExpiry: '2027-01-14',
-    lastKnownLocation: { lat: 12.9716, lng: 77.5946, city: 'Bengaluru (Nelamangala Yard)' }
+    lastKnownLocation: { lat: 12.9716, lng: 77.5946, city: 'Bengaluru (Nelamangala Yard)' },
+    componentHealth: {
+      brakes: 64,
+      battery: 48,
+      engine: 72,
+      tyres: 55,
+      lastServiceDate: '2026-04-01',
+      predictedNextServiceDate: '2026-08-14',
+      predictedIssue: 'Battery voltage drop detected during cold starts',
+      predictionConfidence: 87
+    }
   },
   {
     id: 'v-3',
@@ -54,7 +74,17 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     rcExpiry: '2028-03-30',
     insuranceExpiry: '2027-02-18',
     fitnessExpiry: '2026-10-05',
-    lastKnownLocation: { lat: 23.0225, lng: 72.5714, city: 'Ahmedabad (Sanand Hub)' }
+    lastKnownLocation: { lat: 23.0225, lng: 72.5714, city: 'Ahmedabad (Sanand Hub)' },
+    componentHealth: {
+      brakes: 42,
+      battery: 80,
+      engine: 60,
+      tyres: 38,
+      lastServiceDate: '2026-03-15',
+      predictedNextServiceDate: '2026-08-09',
+      predictedIssue: 'Rear tyre tread depth below safety limit (2.1mm)',
+      predictionConfidence: 94
+    }
   },
   {
     id: 'v-4',
@@ -71,7 +101,17 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     rcExpiry: '2026-06-01',
     insuranceExpiry: '2026-05-15',
     fitnessExpiry: '2026-07-10',
-    lastKnownLocation: { lat: 28.4595, lng: 77.0266, city: 'Gurugram (NCR Hub)' }
+    lastKnownLocation: { lat: 28.4595, lng: 77.0266, city: 'Gurugram (NCR Hub)' },
+    componentHealth: {
+      brakes: 28,
+      battery: 15,
+      engine: 35,
+      tyres: 22,
+      lastServiceDate: '2026-01-20',
+      predictedNextServiceDate: '2026-08-07',
+      predictedIssue: 'Critical Engine coolant leak & alternator failure',
+      predictionConfidence: 98
+    }
   },
   {
     id: 'v-5',
@@ -89,7 +129,17 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     rcExpiry: '2027-10-12',
     insuranceExpiry: '2026-12-01',
     fitnessExpiry: '2027-04-18',
-    lastKnownLocation: { lat: 13.0827, lng: 80.2707, city: 'Chennai Port Yard' }
+    lastKnownLocation: { lat: 13.0827, lng: 80.2707, city: 'Chennai Port Yard' },
+    componentHealth: {
+      brakes: 91,
+      battery: 95,
+      engine: 94,
+      tyres: 88,
+      lastServiceDate: '2026-06-25',
+      predictedNextServiceDate: '2026-11-20',
+      predictedIssue: 'Optimal telemetry. Routine oil change due in Nov',
+      predictionConfidence: 90
+    }
   }
 ];
 
