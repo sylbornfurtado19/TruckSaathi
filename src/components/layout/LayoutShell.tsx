@@ -12,6 +12,7 @@ import {
   Building2,
   ShieldCheck,
   Settings,
+  Route,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -33,6 +34,7 @@ export const Sidebar: React.FC<{
 
   const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Trips & Dispatch', href: '/trips', icon: Route },
     { name: 'Vehicles', href: '/vehicles', icon: Truck },
     { name: 'Drivers', href: '/drivers', icon: UserCheck },
     { name: 'Company Profile', href: '/company', icon: Building2 },
@@ -151,6 +153,7 @@ export const Header: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
 
   const getBreadcrumb = () => {
     if (pathname === '/dashboard') return 'Dashboard / Telemetry Control';
+    if (pathname?.startsWith('/trips')) return 'Fleet Operations / Trip & Dispatch';
     if (pathname?.startsWith('/vehicles')) return 'Fleet Assets / Vehicles Registry';
     if (pathname?.startsWith('/drivers')) return 'Human Capital / Driver Directory';
     if (pathname?.startsWith('/company')) return 'Organization / Company Profile';

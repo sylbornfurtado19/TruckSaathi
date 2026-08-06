@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Truck, Users, LayoutDashboard, ShieldCheck, Building2, Settings, ArrowRight } from 'lucide-react';
+import { Search, Truck, Users, LayoutDashboard, ShieldCheck, Building2, Settings, Route, ArrowRight } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { Badge } from '@/components/ui';
 
@@ -13,13 +13,14 @@ interface CommandPaletteProps {
 
 export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const router = useRouter();
-  const { vehicles, drivers } = useApp();
+  const { vehicles, drivers, trips } = useApp();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const selectedItemRef = useRef<HTMLDivElement | null>(null);
 
   const pages = [
     { name: 'Dashboard Overview', href: '/dashboard', type: 'Page', icon: LayoutDashboard },
+    { name: 'Trip & Dispatch Management', href: '/trips', type: 'Page', icon: Route },
     { name: 'Vehicle Assets Registry', href: '/vehicles', type: 'Page', icon: Truck },
     { name: 'Driver Human Capital', href: '/drivers', type: 'Page', icon: Users },
     { name: 'Company Profile & Hubs', href: '/company', type: 'Page', icon: Building2 },
@@ -27,6 +28,10 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
     { name: 'Roles & RBAC Matrix', href: '/roles', type: 'Page', icon: ShieldCheck },
     { name: 'System Settings & Audit Logs', href: '/settings', type: 'Page', icon: Settings },
   ];
+
+  const matchedTrips = trips
+    .filter(t => t.tripCode.toLowerCase().includes(query.toLowerCase()) || t.origin.city.toLowerCase().includes(query.toLowerCase()) || t.destination.city.toLowerCase().includes(query.toLowerCase()))
+    .map(t => ({ name: `${t.tripCode} (${t.origin.city} → ${t.destination.city})`, href: '/trips', type: 'Trip', icon: Route }));
 
   const matchedVehicles = vehicles
     .filter(v => v.regNumber.toLowerCase().includes(query.toLowerCase()) || v.make.toLowerCase().includes(query.toLowerCase()))
@@ -36,7 +41,12 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
     .filter(d => d.fullName.toLowerCase().includes(query.toLowerCase()) || d.phone.includes(query))
     .map(d => ({ name: `${d.fullName} (${d.phone})`, href: '/drivers', type: 'Driver', icon: Users }));
 
-  const results = [...pages.filter(p => p.name.toLowerCase().includes(query.toLowerCase())), ...matchedVehicles, ...matchedDrivers];
+  const results = [
+    ...pages.filter(p => p.name.toLowerCase().includes(query.toLowerCase())),
+    ...matchedTrips,
+    ...matchedVehicles,
+    ...matchedDrivers
+  ];
 
   // Reset selectedIndex whenever query changes
   useEffect(() => {

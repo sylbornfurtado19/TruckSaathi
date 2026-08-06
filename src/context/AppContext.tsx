@@ -1,13 +1,14 @@
 'use client';
 
 import React, { createContext, useContext, useState } from 'react';
-import { Vehicle, Driver, User, Branch, ActivityLog } from '../types';
+import { Vehicle, Driver, User, Branch, ActivityLog, Trip } from '../types';
 import {
   INITIAL_VEHICLES,
   INITIAL_DRIVERS,
   INITIAL_USERS,
   INITIAL_BRANCHES,
-  INITIAL_ACTIVITY_LOGS
+  INITIAL_ACTIVITY_LOGS,
+  INITIAL_TRIPS
 } from '../data/mockData';
 
 interface AppContextType {
@@ -16,6 +17,7 @@ interface AppContextType {
   users: User[];
   branches: Branch[];
   activityLogs: ActivityLog[];
+  trips: Trip[];
   addVehicle: (vehicle: Omit<Vehicle, 'id'>) => void;
   updateVehicle: (id: string, updated: Partial<Vehicle>) => void;
   deleteVehicle: (id: string) => void;
@@ -23,6 +25,9 @@ interface AppContextType {
   updateDriver: (id: string, updated: Partial<Driver>) => void;
   addUser: (user: Omit<User, 'id'>) => void;
   addBranch: (branch: Omit<Branch, 'id'>) => void;
+  addTrip: (trip: Omit<Trip, 'id'>) => void;
+  updateTrip: (id: string, updated: Partial<Trip>) => void;
+  deleteTrip: (id: string) => void;
   currentUser: {
     name: string;
     email: string;
@@ -39,6 +44,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [users, setUsers] = useState<User[]>(INITIAL_USERS);
   const [branches, setBranches] = useState<Branch[]>(INITIAL_BRANCHES);
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>(INITIAL_ACTIVITY_LOGS);
+  const [trips, setTrips] = useState<Trip[]>(INITIAL_TRIPS);
 
   const currentUser = {
     name: 'Sylborn Furtado',
@@ -98,6 +104,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     logActivity(`Added branch depot ${newBranch.name}`, 'Company Management');
   };
 
+  const addTrip = (tripData: Omit<Trip, 'id'>) => {
+    const newTrip: Trip = {
+      ...tripData,
+      id: `trp-${Date.now()}`
+    };
+    setTrips(prev => [newTrip, ...prev]);
+    logActivity(`Dispatched new trip ${newTrip.tripCode} (${newTrip.origin.city} → ${newTrip.destination.city})`, 'Trip Management');
+  };
+
+  const updateTrip = (id: string, updated: Partial<Trip>) => {
+    setTrips(prev => prev.map(t => (t.id === id ? { ...t, ...updated } : t)));
+    logActivity(`Updated trip ${id}`, 'Trip Management');
+  };
+
+  const deleteTrip = (id: string) => {
+    setTrips(prev => prev.filter(t => t.id !== id));
+    logActivity(`Cancelled trip ${id}`, 'Trip Management');
+  };
+
   const logActivity = (action: string, module: string) => {
     const newLog: ActivityLog = {
       id: `act-${Date.now()}`,
@@ -118,6 +143,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         users,
         branches,
         activityLogs,
+        trips,
         addVehicle,
         updateVehicle,
         deleteVehicle,
@@ -125,6 +151,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateDriver,
         addUser,
         addBranch,
+        addTrip,
+        updateTrip,
+        deleteTrip,
         currentUser
       }}
     >

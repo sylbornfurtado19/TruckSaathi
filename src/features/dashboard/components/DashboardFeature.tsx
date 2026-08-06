@@ -4,15 +4,16 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import {
   Truck,
-  CheckCircle2,
   Users,
   Wrench,
+  CheckCircle2,
   ShieldAlert,
   ArrowUpRight,
   Clock,
   Sparkles,
   Zap,
-  Bot
+  Bot,
+  Route
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { KPICard, PageHeader, Card, Button, Badge, RouteDivider } from '@/components/ui';
@@ -20,7 +21,7 @@ import { LiveFleetMap } from './LiveFleetMap';
 import Link from 'next/link';
 
 export function DashboardFeature() {
-  const { vehicles, drivers, activityLogs } = useApp();
+  const { vehicles, drivers, activityLogs, trips } = useApp();
 
   const activeVehicles = vehicles.filter(v => v.maintenanceStatus === 'In Service').length;
   const maintenanceVehicles = vehicles.filter(v => v.maintenanceStatus !== 'In Service').length;
@@ -210,18 +211,51 @@ export function DashboardFeature() {
           </div>
 
           <Card glow="blue" className="space-y-3">
-            <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Quick Operations</h3>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center justify-between">
+              <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Active Dispatches Summary</h3>
+              <Link href="/trips" className="text-xs text-blue-400 hover:underline flex items-center gap-1">
+                View All Trips <ArrowUpRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-center text-xs">
+              <div className="p-2 rounded-lg bg-[#1c2333]/60 border border-[#202736]">
+                <div className="font-mono font-bold text-blue-400 text-sm">
+                  {trips.filter(t => t.status === 'In Transit').length}
+                </div>
+                <div className="text-[10px] text-slate-400">In Transit</div>
+              </div>
+              <div className="p-2 rounded-lg bg-[#1c2333]/60 border border-[#202736]">
+                <div className="font-mono font-bold text-amber-400 text-sm">
+                  {trips.filter(t => t.status === 'Delayed').length}
+                </div>
+                <div className="text-[10px] text-slate-400">Delayed</div>
+              </div>
+              <div className="p-2 rounded-lg bg-[#1c2333]/60 border border-[#202736]">
+                <div className="font-mono font-bold text-emerald-400 text-sm">
+                  {trips.filter(t => t.status === 'Delivered').length}
+                </div>
+                <div className="text-[10px] text-slate-400">Delivered</div>
+              </div>
+            </div>
+
+            <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 pt-2 border-t border-[#202736]">Quick Operations</h3>
+            <div className="grid grid-cols-3 gap-2">
+              <Link href="/trips">
+                <Button variant="secondary" className="w-full justify-start text-left flex-col items-start p-2.5 gap-1">
+                  <Route className="w-4 h-4 text-emerald-400" />
+                  <span className="text-[11px] text-slate-200">Dispatch Trip</span>
+                </Button>
+              </Link>
               <Link href="/vehicles">
-                <Button variant="secondary" className="w-full justify-start text-left flex-col items-start p-3 gap-1">
+                <Button variant="secondary" className="w-full justify-start text-left flex-col items-start p-2.5 gap-1">
                   <Truck className="w-4 h-4 text-blue-400" />
-                  <span className="text-xs text-slate-200">Register Truck</span>
+                  <span className="text-[11px] text-slate-200">Add Truck</span>
                 </Button>
               </Link>
               <Link href="/drivers">
-                <Button variant="secondary" className="w-full justify-start text-left flex-col items-start p-3 gap-1">
+                <Button variant="secondary" className="w-full justify-start text-left flex-col items-start p-2.5 gap-1">
                   <Users className="w-4 h-4 text-indigo-400" />
-                  <span className="text-xs text-slate-200">Onboard Driver</span>
+                  <span className="text-[11px] text-slate-200">Add Driver</span>
                 </Button>
               </Link>
             </div>

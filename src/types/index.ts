@@ -65,9 +65,32 @@ export interface Branch {
 
 export interface ActivityLog {
   id: string;
+  timestamp: string;
   user: string;
   role: string;
   action: string;
   module: string;
-  timestamp: string;
+}
+
+export interface Trip {
+  id: string;
+  tripCode: string;
+  vehicleId: string;
+  vehicleReg: string;
+  driverId: string;
+  driverName: string;
+  origin: { city: string; address: string; lat: number; lng: number };
+  destination: { city: string; address: string; lat: number; lng: number };
+  cargoDescription: string;
+  cargoWeightTons: number;
+  status: 'Scheduled' | 'In Transit' | 'Delayed' | 'Delivered' | 'Cancelled';
+  scheduledDeparture: string;
+  scheduledArrival: string;
+  actualDeparture?: string;
+  actualArrival?: string;
+  distanceKm: number;
+  ewayBillNumber?: string;
+  ewayBillExpiry?: string;
+  podReceived: boolean;
+  podNotes?: string;
 }
