@@ -13,11 +13,12 @@ export function LoginContent() {
     <div className="min-h-screen bg-[#090d16] flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
         {/* Brand Header */}
-        <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-400 mx-auto shadow-xl shadow-blue-600/10">
-            <Truck className="w-6 h-6" />
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-50">TruckSaathi</h1>
+        <div className="text-center space-y-2 flex flex-col items-center">
+          <img
+            src="/logo-dark.png"
+            alt="TruckSaathi Logo"
+            className="h-12 w-auto object-contain mx-auto"
+          />
           <p className="text-xs text-slate-400">Fleet Operating System for India's Logistics Industry</p>
         </div>
 

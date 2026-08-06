@@ -45,21 +45,12 @@ export const Sidebar: React.FC<{
     >
       {/* Brand Header */}
       <div className="h-16 flex items-center px-4 border-b border-[#202736] justify-between">
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="w-10 h-10 rounded-xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0 shadow-lg shadow-blue-500/10">
-            <Truck className="w-5 h-5" />
-          </div>
-          {!collapsed && (
-            <div className="flex flex-col">
-              <span className="font-semibold text-base text-slate-100 tracking-tight flex items-center gap-1.5">
-                TruckSaathi
-                <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                  v1.0
-                </span>
-              </span>
-              <span className="text-[11px] text-slate-500 truncate">Fleet OS India</span>
-            </div>
-          )}
+        <div className="flex items-center gap-2 overflow-hidden">
+          <img
+            src="/logo-dark.png"
+            alt="TruckSaathi Logo"
+            className={`${collapsed ? 'h-8 w-8 object-contain object-left' : 'h-8 w-auto object-contain'}`}
+          />
         </div>
         <button
           onClick={() => setCollapsed(!collapsed)}
