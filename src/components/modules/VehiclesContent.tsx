@@ -9,15 +9,13 @@ import {
   CheckCircle2,
   AlertTriangle,
   XCircle,
-  MoreHorizontal,
   X,
   FileText,
-  ShieldCheck,
-  Wrench,
-  ChevronRight
+  ShieldCheck
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { Vehicle } from '@/types';
+import { PageHeader, Card, Button, Badge, AnimatedPage } from '@/components/ui';
 
 export function VehiclesContent() {
   const { vehicles, addVehicle, deleteVehicle } = useApp();
@@ -74,26 +72,25 @@ export function VehiclesContent() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Title & Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-50">Vehicle Asset Registry</h1>
-          <p className="text-sm text-slate-400">
-            Commercial vehicle database, payload specs, and document compliance vault.
-          </p>
-        </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-1.5 shadow-md shadow-blue-600/20 self-start sm:self-auto"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Register Vehicle</span>
-        </button>
-      </div>
+    <AnimatedPage>
+      {/* Title & Action Header */}
+      <PageHeader
+        title="Vehicle Asset Registry"
+        description="Commercial vehicle database, payload specs, and document compliance vault."
+        actions={
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setIsModalOpen(true)}
+            icon={<Plus className="w-4 h-4" />}
+          >
+            Register Vehicle
+          </Button>
+        }
+      />
 
       {/* Filter & Search Bar */}
-      <div className="bg-[#121824] border border-[#202736] rounded-xl p-4 flex flex-col md:flex-row gap-3 items-center justify-between">
+      <Card glow="blue" className="p-4 flex flex-col md:flex-row gap-3 items-center justify-between">
         <div className="w-full md:w-96 relative">
           <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -101,7 +98,7 @@ export function VehiclesContent() {
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             placeholder="Search plate number, make, model..."
-            className="w-full bg-[#1c2333] border border-[#2e374a] focus:border-blue-500 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 transition-all"
+            className="w-full bg-[#1c2333]/80 border border-[#2e374a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 transition-all backdrop-blur-md"
           />
         </div>
 
@@ -113,7 +110,7 @@ export function VehiclesContent() {
           <select
             value={categoryFilter}
             onChange={e => setCategoryFilter(e.target.value)}
-            className="bg-[#1c2333] border border-[#2e374a] rounded-lg text-xs text-slate-200 px-3 py-2 focus:outline-none"
+            className="bg-[#1c2333]/80 border border-[#2e374a] rounded-lg text-xs text-slate-200 px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/80"
           >
             <option value="All">All Categories</option>
             <option value="Container">Container</option>
@@ -126,7 +123,7 @@ export function VehiclesContent() {
           <select
             value={docFilter}
             onChange={e => setDocFilter(e.target.value)}
-            className="bg-[#1c2333] border border-[#2e374a] rounded-lg text-xs text-slate-200 px-3 py-2 focus:outline-none"
+            className="bg-[#1c2333]/80 border border-[#2e374a] rounded-lg text-xs text-slate-200 px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/80"
           >
             <option value="All">All Document Statuses</option>
             <option value="Compliant">Compliant</option>
@@ -134,14 +131,14 @@ export function VehiclesContent() {
             <option value="Expired">Expired</option>
           </select>
         </div>
-      </div>
+      </Card>
 
-      {/* TanStack-styled Data Table */}
-      <div className="bg-[#121824] border border-[#202736] rounded-xl overflow-hidden shadow-xl">
+      {/* Styled Data Table */}
+      <div className="glass-panel rounded-xl overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-[#1c2333]/60 text-slate-400 border-b border-[#202736] font-semibold uppercase tracking-wider">
+              <tr className="bg-[#1c2333]/80 backdrop-blur-md text-slate-400 border-b border-[#202736] font-semibold uppercase tracking-wider sticky top-0 z-10">
                 <th className="py-3.5 px-4">Registration Plate</th>
                 <th className="py-3.5 px-4">Category & Type</th>
                 <th className="py-3.5 px-4">Make / Model</th>
@@ -152,7 +149,7 @@ export function VehiclesContent() {
                 <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#202736] text-slate-200">
+            <tbody className="divide-y divide-[#202736]/60 text-slate-200">
               {filteredVehicles.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-8 text-center text-slate-500">
@@ -164,10 +161,10 @@ export function VehiclesContent() {
                   <tr
                     key={vehicle.id}
                     onClick={() => setSelectedVehicle(vehicle)}
-                    className="hover:bg-[#1c2333]/50 transition-colors cursor-pointer"
+                    className="hover:bg-[#1c2333]/50 transition-colors cursor-pointer group relative border-l-2 border-transparent hover:border-blue-500"
                   >
                     <td className="py-3.5 px-4 font-mono font-bold text-slate-100 flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                      <div className="w-2 h-2 rounded-full bg-blue-500" />
                       <span className="bg-[#1c2333] border border-[#2e374a] px-2 py-1 rounded text-xs">
                         {vehicle.regNumber}
                       </span>
@@ -179,43 +176,42 @@ export function VehiclesContent() {
                     <td className="py-3.5 px-4 font-mono text-slate-300">{vehicle.capacityTons} Tons</td>
                     <td className="py-3.5 px-4">
                       {vehicle.assignedDriver === 'Unassigned' ? (
-                        <span className="text-[11px] text-slate-500 bg-[#1c2333] px-2 py-0.5 rounded border border-[#2e374a]">
-                          Unassigned
-                        </span>
+                        <Badge variant="neutral">Unassigned</Badge>
                       ) : (
                         <span className="text-slate-200 font-medium">{vehicle.assignedDriver}</span>
                       )}
                     </td>
                     <td className="py-3.5 px-4">
                       {vehicle.docStatus === 'Compliant' && (
-                        <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-medium inline-flex items-center gap-1">
+                        <Badge variant="success">
                           <CheckCircle2 className="w-3 h-3" /> Compliant
-                        </span>
+                        </Badge>
                       )}
                       {vehicle.docStatus === 'Expiring Soon' && (
-                        <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded-full font-medium inline-flex items-center gap-1">
+                        <Badge variant="warning" pulse>
                           <AlertTriangle className="w-3 h-3" /> Expiring Soon
-                        </span>
+                        </Badge>
                       )}
                       {vehicle.docStatus === 'Expired' && (
-                        <span className="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2.5 py-0.5 rounded-full font-medium inline-flex items-center gap-1">
+                        <Badge variant="danger" pulse>
                           <XCircle className="w-3 h-3" /> Expired
-                        </span>
+                        </Badge>
                       )}
                     </td>
                     <td className="py-3.5 px-4">
                       <span className="text-slate-400">{vehicle.maintenanceStatus}</span>
                     </td>
                     <td className="py-3.5 px-4 text-right">
-                      <button
+                      <Button
+                        variant="danger"
+                        size="sm"
                         onClick={e => {
                           e.stopPropagation();
                           deleteVehicle(vehicle.id);
                         }}
-                        className="p-1 text-slate-500 hover:text-rose-400 transition-colors"
                       >
                         Delete
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))
@@ -227,10 +223,10 @@ export function VehiclesContent() {
 
       {/* Register Vehicle Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#121824] border border-[#202736] rounded-2xl w-full max-w-xl p-6 space-y-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-panel border border-[#202736] rounded-2xl w-full max-w-xl p-6 space-y-6 shadow-2xl relative">
             <div className="flex items-center justify-between border-b border-[#202736] pb-4">
-              <div className="flex items-center gap-2 text-slate-100 font-semibold text-lg">
+              <div className="flex items-center gap-2 text-slate-100 font-bold text-lg">
                 <Truck className="w-5 h-5 text-blue-400" />
                 <span>Register Commercial Asset</span>
               </div>
@@ -319,16 +315,12 @@ export function VehiclesContent() {
               </div>
 
               <div className="pt-4 border-t border-[#202736] flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-lg bg-[#1c2333] text-slate-300 hover:text-white"
-                >
+                <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                   Cancel
-                </button>
-                <button type="submit" className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium">
+                </Button>
+                <Button type="submit" variant="primary">
                   Save Vehicle Record
-                </button>
+                </Button>
               </div>
             </form>
           </div>
@@ -337,11 +329,11 @@ export function VehiclesContent() {
 
       {/* Detail Drawer */}
       {selectedVehicle && (
-        <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-[#121824] border-l border-[#202736] shadow-2xl p-6 overflow-y-auto space-y-6">
+        <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md glass-panel border-l border-[#202736] shadow-2xl p-6 overflow-y-auto space-y-6">
           <div className="flex items-center justify-between border-b border-[#202736] pb-4">
             <div>
-              <span className="text-xs text-blue-400 font-mono">ASSET PROFILE</span>
-              <h2 className="text-xl font-bold font-mono text-slate-50">{selectedVehicle.regNumber}</h2>
+              <span className="text-xs text-blue-400 font-mono font-bold">ASSET PROFILE</span>
+              <h2 className="text-xl font-extrabold font-mono text-slate-50">{selectedVehicle.regNumber}</h2>
             </div>
             <button onClick={() => setSelectedVehicle(null)} className="text-slate-400 hover:text-white">
               <X className="w-5 h-5" />
@@ -349,7 +341,7 @@ export function VehiclesContent() {
           </div>
 
           <div className="space-y-4 text-xs">
-            <div className="p-4 rounded-xl bg-[#1c2333] border border-[#2e374a] space-y-2">
+            <Card glow="blue" className="space-y-2">
               <div className="text-slate-400 font-medium">Specs Summary</div>
               <div className="grid grid-cols-2 gap-2 text-slate-200">
                 <div>
@@ -365,7 +357,7 @@ export function VehiclesContent() {
                   Type: <span className="font-semibold">{selectedVehicle.category}</span>
                 </div>
               </div>
-            </div>
+            </Card>
 
             <div className="space-y-2">
               <div className="text-slate-400 font-medium uppercase text-[10px] tracking-wider">Document Vault</div>
@@ -387,6 +379,6 @@ export function VehiclesContent() {
           </div>
         </div>
       )}
-    </div>
+    </AnimatedPage>
   );
 }

@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Users, UserPlus, Search, Mail, Shield, CheckCircle2, Clock, X } from 'lucide-react';
+import { UserPlus, Search, Mail, CheckCircle2, Clock, X } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
-import { User } from '@/types';
+import { PageHeader, Card, Button, Badge, AnimatedPage } from '@/components/ui';
 
 export function UsersContent() {
   const { users, addUser } = useApp();
@@ -14,7 +14,7 @@ export function UsersContent() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [role, setRole] = useState<User['role']>('Fleet Manager');
+  const [role, setRole] = useState<'Super Admin' | 'Company Admin' | 'Fleet Manager' | 'Dispatcher'>('Fleet Manager');
   const [department, setDepartment] = useState('Operations');
 
   const filteredUsers = users.filter(
@@ -43,26 +43,25 @@ export function UsersContent() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Title & Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-50">Team & User Directory</h1>
-          <p className="text-sm text-slate-400">
-            System account provisioning, administrative credentials, and departmental roles.
-          </p>
-        </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-1.5 shadow-md shadow-blue-600/20 self-start sm:self-auto"
-        >
-          <UserPlus className="w-4 h-4" />
-          <span>Invite User</span>
-        </button>
-      </div>
+    <AnimatedPage>
+      {/* Page Header */}
+      <PageHeader
+        title="Team & User Directory"
+        description="System account provisioning, administrative credentials, and departmental roles."
+        actions={
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setIsModalOpen(true)}
+            icon={<UserPlus className="w-4 h-4" />}
+          >
+            Invite User
+          </Button>
+        }
+      />
 
       {/* Search Bar */}
-      <div className="bg-[#121824] border border-[#202736] rounded-xl p-4 flex items-center justify-between">
+      <Card glow="blue" className="p-4 flex items-center justify-between">
         <div className="w-full md:w-96 relative">
           <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -70,17 +69,17 @@ export function UsersContent() {
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             placeholder="Search full name, work email..."
-            className="w-full bg-[#1c2333] border border-[#2e374a] focus:border-blue-500 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 transition-all"
+            className="w-full bg-[#1c2333]/80 border border-[#2e374a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 transition-all backdrop-blur-md"
           />
         </div>
-      </div>
+      </Card>
 
       {/* User Data Table */}
-      <div className="bg-[#121824] border border-[#202736] rounded-xl overflow-hidden shadow-xl">
+      <div className="glass-panel rounded-xl overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-[#1c2333]/60 text-slate-400 border-b border-[#202736] font-semibold uppercase tracking-wider">
+              <tr className="bg-[#1c2333]/80 backdrop-blur-md text-slate-400 border-b border-[#202736] font-semibold uppercase tracking-wider sticky top-0 z-10">
                 <th className="py-3.5 px-4">User Name</th>
                 <th className="py-3.5 px-4">Work Email</th>
                 <th className="py-3.5 px-4">Assigned Role</th>
@@ -89,11 +88,11 @@ export function UsersContent() {
                 <th className="py-3.5 px-4">Last Activity</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#202736] text-slate-200">
+            <tbody className="divide-y divide-[#202736]/60 text-slate-200">
               {filteredUsers.map(user => (
-                <tr key={user.id} className="hover:bg-[#1c2333]/50 transition-colors">
+                <tr key={user.id} className="hover:bg-[#1c2333]/50 transition-colors cursor-pointer border-l-2 border-transparent hover:border-blue-500">
                   <td className="py-3.5 px-4 font-semibold text-slate-100 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center font-bold text-xs">
+                    <div className="w-8 h-8 rounded-full bg-blue-600/20 border border-blue-500/30 text-blue-400 flex items-center justify-center font-bold text-xs shadow-md">
                       {user.fullName.charAt(0)}
                     </div>
                     <span>{user.fullName}</span>
@@ -105,28 +104,28 @@ export function UsersContent() {
                     </span>
                   </td>
                   <td className="py-3.5 px-4 font-medium">
-                    <span
-                      className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${
+                    <Badge
+                      variant={
                         user.role === 'Company Admin'
-                          ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+                          ? 'info'
                           : user.role === 'Fleet Manager'
-                          ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-                          : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                      }`}
+                          ? 'info'
+                          : 'success'
+                      }
                     >
                       {user.role}
-                    </span>
+                    </Badge>
                   </td>
                   <td className="py-3.5 px-4 text-slate-300">{user.department}</td>
                   <td className="py-3.5 px-4">
                     {user.status === 'Active' ? (
-                      <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full text-[11px] font-medium inline-flex items-center gap-1">
+                      <Badge variant="success">
                         <CheckCircle2 className="w-3 h-3" /> Active
-                      </span>
+                      </Badge>
                     ) : (
-                      <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full text-[11px] font-medium inline-flex items-center gap-1">
+                      <Badge variant="warning" pulse>
                         <Clock className="w-3 h-3" /> Invited
-                      </span>
+                      </Badge>
                     )}
                   </td>
                   <td className="py-3.5 px-4 text-slate-400 font-mono">{user.lastActive}</td>
@@ -139,10 +138,10 @@ export function UsersContent() {
 
       {/* Invite User Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#121824] border border-[#202736] rounded-2xl w-full max-w-md p-6 space-y-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-panel border border-[#202736] rounded-2xl w-full max-w-md p-6 space-y-6 shadow-2xl relative">
             <div className="flex items-center justify-between border-b border-[#202736] pb-4">
-              <div className="flex items-center gap-2 text-slate-100 font-semibold text-base">
+              <div className="flex items-center gap-2 text-slate-100 font-bold text-base">
                 <UserPlus className="w-4 h-4 text-blue-400" />
                 <span>Invite Team Member</span>
               </div>
@@ -201,21 +200,17 @@ export function UsersContent() {
               </div>
 
               <div className="pt-4 border-t border-[#202736] flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-lg bg-[#1c2333] text-slate-300 hover:text-white"
-                >
+                <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                   Cancel
-                </button>
-                <button type="submit" className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium">
+                </Button>
+                <Button type="submit" variant="primary">
                   Send Invitation
-                </button>
+                </Button>
               </div>
             </form>
           </div>
         </div>
       )}
-    </div>
+    </AnimatedPage>
   );
 }

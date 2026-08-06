@@ -1,22 +1,21 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Settings, Bell, Shield, FileText, Moon, Lock } from 'lucide-react';
+import { Bell, Shield, Clock } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
+import { PageHeader, Card, Button, AnimatedPage } from '@/components/ui';
 
 export function SettingsContent() {
   const { activityLogs } = useApp();
   const [activeTab, setActiveTab] = useState<'general' | 'audit'>('general');
 
   return (
-    <div className="space-y-6">
-      {/* Title */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-50">System Settings & Audit Logs</h1>
-        <p className="text-sm text-slate-400">
-          Organization thresholds, compliance alerts, security preferences, and audit trails.
-        </p>
-      </div>
+    <AnimatedPage>
+      {/* Page Header */}
+      <PageHeader
+        title="System Settings & Audit Logs"
+        description="Organization thresholds, compliance alerts, security preferences, and audit trails."
+      />
 
       {/* Tabs */}
       <div className="flex border-b border-[#202736] gap-6 text-sm font-medium text-slate-400">
@@ -39,7 +38,7 @@ export function SettingsContent() {
       </div>
 
       {activeTab === 'general' ? (
-        <div className="bg-[#121824] border border-[#202736] rounded-xl p-6 space-y-6 max-w-3xl text-xs">
+        <Card glow="blue" className="p-6 space-y-6 max-w-3xl text-xs">
           <div className="space-y-4">
             <h2 className="text-sm font-bold text-slate-100 uppercase tracking-wider flex items-center gap-2">
               <Bell className="w-4 h-4 text-amber-400" />
@@ -48,20 +47,20 @@ export function SettingsContent() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-slate-400 mb-1">Warning Threshold (Days Before Expiry)</label>
+                <label className="block text-slate-400 mb-1 font-medium">Warning Threshold (Days Before Expiry)</label>
                 <input
                   type="number"
                   defaultValue={30}
-                  className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 font-mono"
+                  className="w-full bg-[#1c2333]/80 border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-400 mb-1">Critical Alert Threshold (Days)</label>
+                <label className="block text-slate-400 mb-1 font-medium">Critical Alert Threshold (Days)</label>
                 <input
                   type="number"
                   defaultValue={7}
-                  className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 font-mono"
+                  className="w-full bg-[#1c2333]/80 border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -75,44 +74,53 @@ export function SettingsContent() {
 
             <div className="space-y-3">
               <label className="flex items-center gap-3 text-slate-300 cursor-pointer">
-                <input type="checkbox" defaultChecked className="w-4 h-4 rounded accent-blue-600" />
+                <input type="checkbox" defaultChecked className="w-4 h-4 rounded accent-blue-600 focus-visible:ring-2 focus-visible:ring-blue-500/80" />
                 <span>Enforce Row Level Security (RLS) on Supabase PostgreSQL tables</span>
               </label>
 
               <label className="flex items-center gap-3 text-slate-300 cursor-pointer">
-                <input type="checkbox" defaultChecked className="w-4 h-4 rounded accent-blue-600" />
+                <input type="checkbox" defaultChecked className="w-4 h-4 rounded accent-blue-600 focus-visible:ring-2 focus-visible:ring-blue-500/80" />
                 <span>Require 2FA authentication for Company Admin users</span>
               </label>
             </div>
           </div>
 
           <div className="pt-4 border-t border-[#202736]">
-            <button className="bg-blue-600 hover:bg-blue-500 text-white font-medium px-4 py-2 rounded-lg">
-              Save Settings Configuration
-            </button>
+            <Button variant="primary">Save Settings Configuration</Button>
           </div>
-        </div>
+        </Card>
       ) : (
-        <div className="bg-[#121824] border border-[#202736] rounded-xl overflow-hidden shadow-xl">
-          <div className="p-4 border-b border-[#202736] font-semibold text-slate-200 text-xs">
-            Chronological Audit History
+        <Card glow="blue" className="p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-[#202736] pb-4">
+            <div>
+              <h2 className="text-base font-bold text-slate-100">Live System Activity Audit Stream</h2>
+              <p className="text-xs text-slate-400">Complete audit trail of fleet operations, document updates, and administrative events</p>
+            </div>
           </div>
-          <div className="divide-y divide-[#202736] text-xs">
+
+          <div className="divide-y divide-[#202736]/60">
             {activityLogs.map(log => (
-              <div key={log.id} className="p-4 flex items-center justify-between hover:bg-[#1c2333]/30">
-                <div className="space-y-1">
-                  <div className="font-semibold text-slate-200">{log.action}</div>
-                  <div className="text-slate-500">
-                    User: <span className="text-slate-300">{log.user}</span> ({log.role}) • Module:{' '}
-                    <span className="text-blue-400">{log.module}</span>
+              <div key={log.id} className="py-3 flex items-center justify-between text-xs hover:bg-[#1c2333]/40 px-2.5 rounded-lg transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-mono text-[11px] font-bold">
+                    {log.user.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-slate-200">{log.action}</div>
+                    <div className="text-[11px] text-slate-500">
+                      By {log.user} ({log.role}) • <span className="text-blue-400 font-medium">{log.module}</span>
+                    </div>
                   </div>
                 </div>
-                <div className="text-slate-500 font-mono text-right">{log.timestamp}</div>
+                <div className="text-slate-500 font-mono text-[11px] flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>{log.timestamp}</span>
+                </div>
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
-    </div>
+    </AnimatedPage>
   );
 }

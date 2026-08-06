@@ -3,18 +3,16 @@
 import React, { useState } from 'react';
 import {
   UserCheck,
-  Plus,
   Search,
   CheckCircle2,
   AlertTriangle,
   Phone,
-  Shield,
-  FileCheck,
   X,
   UserPlus
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { Driver } from '@/types';
+import { PageHeader, Card, Button, Badge, AnimatedPage } from '@/components/ui';
 
 export function DriversContent() {
   const { drivers, addDriver } = useApp();
@@ -65,26 +63,25 @@ export function DriversContent() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Title & Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-50">Human Capital & Drivers Directory</h1>
-          <p className="text-sm text-slate-400">
-            Commercial driver profiles, license verification status, and vehicle assignments.
-          </p>
-        </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-1.5 shadow-md shadow-blue-600/20 self-start sm:self-auto"
-        >
-          <UserPlus className="w-4 h-4" />
-          <span>Onboard Driver</span>
-        </button>
-      </div>
+    <AnimatedPage>
+      {/* Page Header */}
+      <PageHeader
+        title="Human Capital & Drivers Directory"
+        description="Commercial driver profiles, license verification status, and vehicle assignments."
+        actions={
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setIsModalOpen(true)}
+            icon={<UserPlus className="w-4 h-4" />}
+          >
+            Onboard Driver
+          </Button>
+        }
+      />
 
       {/* Search Bar */}
-      <div className="bg-[#121824] border border-[#202736] rounded-xl p-4 flex items-center justify-between">
+      <Card glow="blue" className="p-4 flex items-center justify-between">
         <div className="w-full md:w-96 relative">
           <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -92,17 +89,17 @@ export function DriversContent() {
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             placeholder="Search driver name, phone, license..."
-            className="w-full bg-[#1c2333] border border-[#2e374a] focus:border-blue-500 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 transition-all"
+            className="w-full bg-[#1c2333]/80 border border-[#2e374a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 transition-all backdrop-blur-md"
           />
         </div>
-      </div>
+      </Card>
 
       {/* Driver Data Table */}
-      <div className="bg-[#121824] border border-[#202736] rounded-xl overflow-hidden shadow-xl">
+      <div className="glass-panel rounded-xl overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-[#1c2333]/60 text-slate-400 border-b border-[#202736] font-semibold uppercase tracking-wider">
+              <tr className="bg-[#1c2333]/80 backdrop-blur-md text-slate-400 border-b border-[#202736] font-semibold uppercase tracking-wider sticky top-0 z-10">
                 <th className="py-3.5 px-4">Driver Name</th>
                 <th className="py-3.5 px-4">Contact Phone</th>
                 <th className="py-3.5 px-4">License Number</th>
@@ -113,11 +110,11 @@ export function DriversContent() {
                 <th className="py-3.5 px-4">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#202736] text-slate-200">
+            <tbody className="divide-y divide-[#202736]/60 text-slate-200">
               {filteredDrivers.map(driver => (
-                <tr key={driver.id} className="hover:bg-[#1c2333]/50 transition-colors">
+                <tr key={driver.id} className="hover:bg-[#1c2333]/50 transition-colors cursor-pointer border-l-2 border-transparent hover:border-blue-500">
                   <td className="py-3.5 px-4 font-semibold text-slate-100 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center font-bold text-xs text-slate-200">
+                    <div className="w-8 h-8 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center font-bold text-xs text-blue-400 shadow-md">
                       {driver.fullName.charAt(0)}
                     </div>
                     <span>{driver.fullName}</span>
@@ -140,13 +137,13 @@ export function DriversContent() {
                   </td>
                   <td className="py-3.5 px-4">
                     {driver.verificationStatus === 'Fully Verified' ? (
-                      <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full text-[11px] font-medium flex items-center gap-1 w-fit">
+                      <Badge variant="success">
                         <CheckCircle2 className="w-3 h-3" /> Verified
-                      </span>
+                      </Badge>
                     ) : (
-                      <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full text-[11px] font-medium flex items-center gap-1 w-fit">
+                      <Badge variant="warning" pulse>
                         <AlertTriangle className="w-3 h-3" /> Pending
-                      </span>
+                      </Badge>
                     )}
                   </td>
                   <td className="py-3.5 px-4">
@@ -161,10 +158,10 @@ export function DriversContent() {
 
       {/* Onboard Driver Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#121824] border border-[#202736] rounded-2xl w-full max-w-xl p-6 space-y-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-panel border border-[#202736] rounded-2xl w-full max-w-xl p-6 space-y-6 shadow-2xl relative">
             <div className="flex items-center justify-between border-b border-[#202736] pb-4">
-              <div className="flex items-center gap-2 text-slate-100 font-semibold text-lg">
+              <div className="flex items-center gap-2 text-slate-100 font-bold text-lg">
                 <UserCheck className="w-5 h-5 text-indigo-400" />
                 <span>Onboard Commercial Driver</span>
               </div>
@@ -248,21 +245,17 @@ export function DriversContent() {
               </div>
 
               <div className="pt-4 border-t border-[#202736] flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-lg bg-[#1c2333] text-slate-300 hover:text-white"
-                >
+                <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                   Cancel
-                </button>
-                <button type="submit" className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium">
+                </Button>
+                <Button type="submit" variant="primary">
                   Complete Driver Onboarding
-                </button>
+                </Button>
               </div>
             </form>
           </div>
         </div>
       )}
-    </div>
+    </AnimatedPage>
   );
 }

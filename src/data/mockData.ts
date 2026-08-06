@@ -16,7 +16,8 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     engineNumber: 'ENG89021349',
     rcExpiry: '2027-08-15',
     insuranceExpiry: '2026-11-20',
-    fitnessExpiry: '2026-12-10'
+    fitnessExpiry: '2026-12-10',
+    lastKnownLocation: { lat: 19.0760, lng: 72.8777, city: 'Mumbai (Bhiwandi Hub)' }
   },
   {
     id: 'v-2',
@@ -33,7 +34,8 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     engineNumber: 'ENG44120931',
     rcExpiry: '2026-08-10',
     insuranceExpiry: '2026-08-05',
-    fitnessExpiry: '2027-01-14'
+    fitnessExpiry: '2027-01-14',
+    lastKnownLocation: { lat: 12.9716, lng: 77.5946, city: 'Bengaluru (Nelamangala Yard)' }
   },
   {
     id: 'v-3',
@@ -50,7 +52,8 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     engineNumber: 'ENG10239412',
     rcExpiry: '2028-03-30',
     insuranceExpiry: '2027-02-18',
-    fitnessExpiry: '2026-10-05'
+    fitnessExpiry: '2026-10-05',
+    lastKnownLocation: { lat: 23.0225, lng: 72.5714, city: 'Ahmedabad (Sanand Hub)' }
   },
   {
     id: 'v-4',
@@ -66,7 +69,8 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     engineNumber: 'ENG90123845',
     rcExpiry: '2026-06-01',
     insuranceExpiry: '2026-05-15',
-    fitnessExpiry: '2026-07-10'
+    fitnessExpiry: '2026-07-10',
+    lastKnownLocation: { lat: 28.4595, lng: 77.0266, city: 'Gurugram (NCR Hub)' }
   },
   {
     id: 'v-5',
@@ -83,7 +87,8 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     engineNumber: 'ENG09123841',
     rcExpiry: '2027-10-12',
     insuranceExpiry: '2026-12-01',
-    fitnessExpiry: '2027-04-18'
+    fitnessExpiry: '2027-04-18',
+    lastKnownLocation: { lat: 13.0827, lng: 80.2707, city: 'Chennai Port Yard' }
   }
 ];
 

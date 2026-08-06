@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -21,6 +21,8 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
+import { CommandPalette } from './CommandPalette';
+import { NotificationsPanel } from './NotificationsPanel';
 
 export const Sidebar: React.FC<{
   collapsed: boolean;
@@ -56,7 +58,7 @@ export const Sidebar: React.FC<{
         </div>
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-[#1c2333] transition-colors"
+          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-[#1c2333] transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/80"
         >
           {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>
@@ -76,7 +78,7 @@ export const Sidebar: React.FC<{
             <Link
               key={item.href}
               href={item.href}
-              className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-all duration-200 group ${
+              className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-all duration-200 group focus-visible:ring-2 focus-visible:ring-blue-500/80 ${
                 isActive
                   ? 'text-white font-semibold'
                   : 'text-slate-400 hover:text-slate-100 hover:bg-[#1c2333]/50'
@@ -98,7 +100,7 @@ export const Sidebar: React.FC<{
 
       {/* AI Assistance Badge */}
       {!collapsed && (
-        <div className="px-3 py-2 mx-3 mb-2 rounded-xl bg-gradient-to-r from-blue-900/30 via-indigo-900/20 to-slate-900/40 border border-blue-500/20 flex items-center gap-2 text.xs text-blue-300 shadow-lg">
+        <div className="px-3 py-2 mx-3 mb-2 rounded-xl bg-gradient-to-r from-blue-900/30 via-indigo-900/20 to-slate-900/40 border border-blue-500/20 flex items-center gap-2 text-xs text-blue-300 shadow-lg">
           <Sparkles className="w-4 h-4 text-blue-400 animate-pulse shrink-0" />
           <div className="text-[11px] leading-tight">
             <div className="font-bold text-white">Fleet AI Copilot</div>
@@ -120,7 +122,7 @@ export const Sidebar: React.FC<{
             </div>
           )}
           {!collapsed && (
-            <Link href="/login" className="p-1.5 text-slate-500 hover:text-rose-400 transition-colors">
+            <Link href="/login" className="p-1.5 text-slate-500 hover:text-rose-400 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/80">
               <LogOut className="w-4 h-4" />
             </Link>
           )}
@@ -133,6 +135,8 @@ export const Sidebar: React.FC<{
 export const Header: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
   const { currentUser } = useApp();
   const pathname = usePathname();
+  const [isCmdOpen, setIsCmdOpen] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
 
   const getBreadcrumb = () => {
     if (pathname === '/dashboard') return 'Dashboard / Telemetry Control';
@@ -146,57 +150,70 @@ export const Header: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
   };
 
   return (
-    <header
-      className={`sticky top-0 z-40 h-16 bg-[#060911]/80 backdrop-blur-xl border-b border-[#202736]/80 transition-all duration-300 flex items-center justify-between px-6 ${
-        collapsed ? 'ml-[72px]' : 'ml-[260px]'
-      }`}
-    >
-      {/* Left Breadcrumb */}
-      <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
-        <span className="text-slate-500 font-mono text-[10px] bg-[#1c2333] px-1.5 py-0.5 rounded border border-[#2e374a]">
-          FLEET-OS
-        </span>
-        <span className="text-slate-600">/</span>
-        <span className="font-semibold text-slate-200">{getBreadcrumb()}</span>
-      </div>
+    <>
+      <header
+        className={`sticky top-0 z-40 h-16 bg-[#060911]/80 backdrop-blur-xl border-b border-[#202736]/80 transition-all duration-300 flex items-center justify-between px-6 ${
+          collapsed ? 'ml-[72px]' : 'ml-[260px]'
+        }`}
+      >
+        {/* Left Breadcrumb */}
+        <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
+          <span className="text-slate-500 font-mono text-[10px] bg-[#1c2333] px-1.5 py-0.5 rounded border border-[#2e374a]">
+            FLEET-OS
+          </span>
+          <span className="text-slate-600">/</span>
+          <span className="font-semibold text-slate-200">{getBreadcrumb()}</span>
+        </div>
 
-      {/* Center Search Palette Trigger */}
-      <div className="hidden md:flex items-center w-80 relative">
-        <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-        <input
-          type="text"
-          placeholder="Search vehicles, drivers, plates (Ctrl+K)..."
-          className="w-full bg-[#121824]/80 border border-[#2e374a] focus:border-blue-500 focus:outline-none rounded-xl text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-8 py-2 transition-all shadow-inner"
-        />
-        <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-400 bg-[#1c2333] px-1.5 py-0.5 rounded border border-[#2e374a]">
-          ⌘K
-        </kbd>
-      </div>
-
-      {/* Right Controls */}
-      <div className="flex items-center gap-3">
-        <Link
-          href="/vehicles"
-          className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 px-3.5 py-2 rounded-xl transition-all shadow-lg shadow-blue-600/25 hover:scale-[1.02]"
+        {/* Center Search Palette Trigger */}
+        <div
+          onClick={() => setIsCmdOpen(true)}
+          className="hidden md:flex items-center w-80 relative cursor-pointer group"
         >
-          <Plus className="w-3.5 h-3.5" />
-          <span>Add Asset</span>
-        </Link>
+          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 group-hover:text-blue-400 transition-colors" />
+          <input
+            type="text"
+            readOnly
+            placeholder="Search vehicles, drivers, pages (Ctrl+K)..."
+            className="w-full bg-[#121824]/80 border border-[#2e374a] group-hover:border-blue-500/50 rounded-xl text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-8 py-2 transition-all shadow-inner cursor-pointer"
+          />
+          <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-400 bg-[#1c2333] px-1.5 py-0.5 rounded border border-[#2e374a]">
+            ⌘K
+          </kbd>
+        </div>
 
-        <button className="relative p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-[#1c2333] transition-all border border-[#202736]">
-          <Bell className="w-4 h-4" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-        </button>
+        {/* Right Controls */}
+        <div className="flex items-center gap-3">
+          <Link
+            href="/vehicles"
+            className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 px-3.5 py-2 rounded-xl transition-all shadow-lg shadow-blue-600/25 hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-blue-500/80"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add Asset</span>
+          </Link>
 
-        <div className="h-6 w-px bg-[#202736]"></div>
+          <button
+            onClick={() => setIsNotifOpen(true)}
+            className="relative p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-[#1c2333] transition-all border border-[#202736] focus-visible:ring-2 focus-visible:ring-blue-500/80"
+          >
+            <Bell className="w-4 h-4" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+          </button>
 
-        <div className="flex items-center gap-2">
-          <div className="text-right hidden sm:block">
-            <div className="text-xs font-bold text-slate-200">{currentUser.companyName}</div>
-            <div className="text-[10px] text-slate-500 font-mono">GSTIN: 27AAAAA0000A1Z5</div>
+          <div className="h-6 w-px bg-[#202736]"></div>
+
+          <div className="flex items-center gap-2">
+            <div className="text-right hidden sm:block">
+              <div className="text-xs font-bold text-slate-200">{currentUser.companyName}</div>
+              <div className="text-[10px] text-slate-500 font-mono">GSTIN: 27AAAAA0000A1Z5</div>
+            </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Global Command Palette & Notifications Drawer */}
+      <CommandPalette isOpen={isCmdOpen} onClose={() => setIsCmdOpen(false)} />
+      <NotificationsPanel isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
+    </>
   );
 };

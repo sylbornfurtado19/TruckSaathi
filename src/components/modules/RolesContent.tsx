@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ShieldCheck, Check, Lock, Save } from 'lucide-react';
+import { ShieldCheck, Save } from 'lucide-react';
+import { PageHeader, Card, Button, AnimatedPage } from '@/components/ui';
 
 export function RolesContent() {
   const [selectedRole, setSelectedRole] = useState<'Company Admin' | 'Fleet Manager' | 'Dispatcher'>('Fleet Manager');
@@ -26,14 +27,17 @@ export function RolesContent() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Title */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-50">Roles & Granular Permissions Matrix (RBAC)</h1>
-        <p className="text-sm text-slate-400">
-          Configure security authorization bounds and CRUD capabilities per enterprise role.
-        </p>
-      </div>
+    <AnimatedPage>
+      {/* Page Header */}
+      <PageHeader
+        title="Roles & Granular Permissions Matrix (RBAC)"
+        description="Configure security authorization bounds and CRUD capabilities per enterprise role."
+        actions={
+          <Button variant="primary" size="sm" icon={<Save className="w-3.5 h-3.5" />}>
+            Save Matrix
+          </Button>
+        }
+      />
 
       {/* Role Selector Tabs */}
       <div className="flex border-b border-[#202736] gap-4">
@@ -54,22 +58,21 @@ export function RolesContent() {
       </div>
 
       {/* Permission Table */}
-      <div className="bg-[#121824] border border-[#202736] rounded-xl overflow-hidden shadow-xl p-6 space-y-6">
+      <Card glow="blue" className="p-6 space-y-6">
         <div className="flex items-center justify-between border-b border-[#202736] pb-4">
           <div>
-            <h2 className="text-base font-semibold text-slate-100">Capability Matrix for {selectedRole}</h2>
+            <h2 className="text-base font-bold text-slate-100">Capability Matrix for {selectedRole}</h2>
             <p className="text-xs text-slate-400">Check or uncheck CRUD actions permitted for this role</p>
           </div>
-          <button className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-1.5 shadow-md">
-            <Save className="w-3.5 h-3.5" />
-            <span>Save Permission Matrix</span>
-          </button>
+          <Button variant="primary" size="sm" icon={<Save className="w-3.5 h-3.5" />}>
+            Save Permission Matrix
+          </Button>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-[#1c2333]/60 text-slate-400 border-b border-[#202736] font-semibold uppercase tracking-wider">
+              <tr className="bg-[#1c2333]/80 backdrop-blur-md text-slate-400 border-b border-[#202736] font-semibold uppercase tracking-wider">
                 <th className="py-3.5 px-4">Platform Module</th>
                 <th className="py-3.5 px-4 text-center">Read / View</th>
                 <th className="py-3.5 px-4 text-center">Create / Onboard</th>
@@ -77,7 +80,7 @@ export function RolesContent() {
                 <th className="py-3.5 px-4 text-center">Delete / Purge</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#202736] text-slate-200">
+            <tbody className="divide-y divide-[#202736]/60 text-slate-200">
               {[
                 { key: 'vehicles', name: 'Vehicle Asset Registry' },
                 { key: 'drivers', name: 'Driver Human Capital' },
@@ -95,7 +98,7 @@ export function RolesContent() {
                           type="checkbox"
                           checked={isChecked}
                           onChange={() => togglePermission(item.key, action)}
-                          className="w-4 h-4 rounded bg-[#1c2333] border-[#2e374a] text-blue-600 focus:ring-0 cursor-pointer accent-blue-600"
+                          className="w-4 h-4 rounded bg-[#1c2333] border-[#2e374a] text-blue-600 focus:ring-0 focus-visible:ring-2 focus-visible:ring-blue-500/80 cursor-pointer accent-blue-600"
                         />
                       </td>
                     );
@@ -105,7 +108,7 @@ export function RolesContent() {
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
+      </Card>
+    </AnimatedPage>
   );
 }

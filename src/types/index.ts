@@ -14,6 +14,11 @@ export interface Vehicle {
   rcExpiry: string;
   insuranceExpiry: string;
   fitnessExpiry: string;
+  lastKnownLocation?: {
+    lat: number;
+    lng: number;
+    city: string;
+  };
 }
 
 export interface Driver {
