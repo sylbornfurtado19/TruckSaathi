@@ -1,10 +1,10 @@
 import ClientLayout from '@/components/layout/ClientLayout';
-import { DashboardContent } from '@/components/modules/DashboardContent';
+import { DashboardFeature } from '@/features/dashboard/components/DashboardFeature';
 
 export default function HomePage() {
   return (
     <ClientLayout>
-      <DashboardContent />
+      <DashboardFeature />
     </ClientLayout>
   );
 }
