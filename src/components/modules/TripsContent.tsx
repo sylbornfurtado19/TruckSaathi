@@ -496,123 +496,126 @@ export function TripsContent() {
         </div>
       )}
 
-      {/* 6. Trip Detail Drawer */}
+      {/* 6. Trip Detail Pop-Up Modal */}
       {selectedTrip && (
-        <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md glass-panel border-l border-[#202736] shadow-2xl p-6 overflow-y-auto space-y-6">
-          <div className="flex items-center justify-between border-b border-[#202736] pb-4">
-            <div>
-              <span className="text-xs text-blue-400 font-mono font-bold">TRIP MANIFEST</span>
-              <h2 className="text-xl font-extrabold font-mono text-slate-50">{selectedTrip.tripCode}</h2>
-            </div>
-            <button onClick={() => setSelectedTrip(null)} className="text-slate-400 hover:text-white">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="space-y-4 text-xs">
-            {/* Route Card */}
-            <Card glow="blue" className="space-y-3">
-              <div className="text-slate-400 font-medium flex items-center justify-between">
-                <span>Route & Distance</span>
-                <span className="font-mono text-slate-200">{selectedTrip.distanceKm} km</span>
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="absolute inset-0" onClick={() => setSelectedTrip(null)} />
+          <div className="glass-panel border border-[#202736] rounded-2xl w-full max-w-xl p-6 space-y-6 shadow-2xl relative z-10 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-[#202736] pb-4">
+              <div>
+                <span className="text-xs text-blue-400 font-mono font-bold">TRIP MANIFEST</span>
+                <h2 className="text-xl font-extrabold font-mono text-slate-50">{selectedTrip.tripCode}</h2>
               </div>
-              <div className="space-y-2">
-                <div className="flex items-start gap-2">
-                  <MapPin className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-                  <div>
-                    <div className="font-bold text-slate-100">{selectedTrip.origin.city}</div>
-                    <div className="text-[11px] text-slate-400">{selectedTrip.origin.address}</div>
-                  </div>
-                </div>
-                <div className="ml-2 pl-3 border-l-2 border-dashed border-[#2e374a] py-1 text-[11px] text-slate-500 font-mono">
-                  Route Leg
-                </div>
-                <div className="flex items-start gap-2">
-                  <MapPin className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <div>
-                    <div className="font-bold text-slate-100">{selectedTrip.destination.city}</div>
-                    <div className="text-[11px] text-slate-400">{selectedTrip.destination.address}</div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            {/* Assets & Personnel */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736] space-y-1">
-                <div className="text-slate-400 flex items-center gap-1.5 font-medium">
-                  <Truck className="w-3.5 h-3.5 text-blue-400" /> Vehicle
-                </div>
-                <div className="font-mono font-bold text-slate-200">{selectedTrip.vehicleReg}</div>
-              </div>
-              <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736] space-y-1">
-                <div className="text-slate-400 flex items-center gap-1.5 font-medium">
-                  <User className="w-3.5 h-3.5 text-indigo-400" /> Driver
-                </div>
-                <div className="font-semibold text-slate-200">{selectedTrip.driverName}</div>
-              </div>
+              <button onClick={() => setSelectedTrip(null)} className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-[#1c2333]">
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            {/* Cargo & E-Way Bill */}
-            <div className="space-y-2">
-              <div className="text-slate-400 font-medium uppercase text-[10px] tracking-wider">Cargo & E-Way Compliance</div>
-              <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736] space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-300 font-semibold">{selectedTrip.cargoDescription}</span>
-                  <span className="font-mono text-slate-400">{selectedTrip.cargoWeightTons} Tons</span>
+            <div className="space-y-4 text-xs">
+              {/* Route Card */}
+              <Card glow="blue" className="space-y-3">
+                <div className="text-slate-400 font-medium flex items-center justify-between">
+                  <span>Route & Distance</span>
+                  <span className="font-mono text-slate-200">{selectedTrip.distanceKm} km</span>
                 </div>
-                {selectedTrip.ewayBillNumber && (
-                  <div className="flex items-center justify-between pt-2 border-t border-[#202736]">
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-blue-400" />
-                      <span className="font-mono">{selectedTrip.ewayBillNumber}</span>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                    <div>
+                      <div className="font-bold text-slate-100">{selectedTrip.origin.city}</div>
+                      <div className="text-[11px] text-slate-400">{selectedTrip.origin.address}</div>
                     </div>
-                    {(() => {
-                      const st = getEwayBillStatus(selectedTrip.ewayBillExpiry);
-                      return <Badge variant={st.variant}>{st.label}</Badge>;
-                    })()}
                   </div>
-                )}
-                {selectedTrip.tollSpendINR && (
-                  <div className="flex items-center justify-between pt-2 border-t border-[#202736] text-[11px]">
-                    <span className="text-slate-400 flex items-center gap-1.5">
-                      <CreditCard className="w-3.5 h-3.5 text-indigo-400" /> FASTag Toll Spend:
-                    </span>
-                    <span className="font-mono font-bold text-slate-200">₹{selectedTrip.tollSpendINR}</span>
+                  <div className="ml-2 pl-3 border-l-2 border-dashed border-[#2e374a] py-1 text-[11px] text-slate-500 font-mono">
+                    Route Leg
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <div>
+                      <div className="font-bold text-slate-100">{selectedTrip.destination.city}</div>
+                      <div className="text-[11px] text-slate-400">{selectedTrip.destination.address}</div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Assets & Personnel */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736] space-y-1">
+                  <div className="text-slate-400 flex items-center gap-1.5 font-medium">
+                    <Truck className="w-3.5 h-3.5 text-blue-400" /> Vehicle
+                  </div>
+                  <div className="font-mono font-bold text-slate-200">{selectedTrip.vehicleReg}</div>
+                </div>
+                <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736] space-y-1">
+                  <div className="text-slate-400 flex items-center gap-1.5 font-medium">
+                    <User className="w-3.5 h-3.5 text-indigo-400" /> Driver
+                  </div>
+                  <div className="font-semibold text-slate-200">{selectedTrip.driverName}</div>
+                </div>
+              </div>
+
+              {/* Cargo & E-Way Bill */}
+              <div className="space-y-2">
+                <div className="text-slate-400 font-medium uppercase text-[10px] tracking-wider">Cargo & E-Way Compliance</div>
+                <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-300 font-semibold">{selectedTrip.cargoDescription}</span>
+                    <span className="font-mono text-slate-400">{selectedTrip.cargoWeightTons} Tons</span>
+                  </div>
+                  {selectedTrip.ewayBillNumber && (
+                    <div className="flex items-center justify-between pt-2 border-t border-[#202736]">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-blue-400" />
+                        <span className="font-mono">{selectedTrip.ewayBillNumber}</span>
+                      </div>
+                      {(() => {
+                        const st = getEwayBillStatus(selectedTrip.ewayBillExpiry);
+                        return <Badge variant={st.variant}>{st.label}</Badge>;
+                      })()}
+                    </div>
+                  )}
+                  {selectedTrip.tollSpendINR && (
+                    <div className="flex items-center justify-between pt-2 border-t border-[#202736] text-[11px]">
+                      <span className="text-slate-400 flex items-center gap-1.5">
+                        <CreditCard className="w-3.5 h-3.5 text-indigo-400" /> FASTag Toll Spend:
+                      </span>
+                      <span className="font-mono font-bold text-slate-200">₹{selectedTrip.tollSpendINR}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* POD & Mark Delivered Action */}
+              <div className="space-y-3 pt-2">
+                <div className="text-slate-400 font-medium uppercase text-[10px] tracking-wider">Proof of Delivery (POD)</div>
+                {selectedTrip.podReceived ? (
+                  <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 space-y-1">
+                    <div className="flex items-center gap-2 font-bold text-xs">
+                      <CheckSquare className="w-4 h-4" /> POD Verified & Received
+                    </div>
+                    {selectedTrip.podNotes && <div className="text-[11px] text-slate-300">{selectedTrip.podNotes}</div>}
+                  </div>
+                ) : (
+                  <div className="space-y-3 p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736]">
+                    <textarea
+                      rows={2}
+                      value={podNotes}
+                      onChange={e => setPodNotes(e.target.value)}
+                      placeholder="Enter POD verification notes upon arrival..."
+                      className="w-full bg-[#121824] border border-[#2e374a] rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
+                    />
+                    <Button
+                      variant="primary"
+                      className="w-full"
+                      onClick={() => handleMarkDelivered(selectedTrip.id)}
+                      icon={<CheckCircle2 className="w-4 h-4" />}
+                    >
+                      Mark Trip Delivered
+                    </Button>
                   </div>
                 )}
               </div>
-            </div>
-
-            {/* POD & Mark Delivered Action */}
-            <div className="space-y-3 pt-2">
-              <div className="text-slate-400 font-medium uppercase text-[10px] tracking-wider">Proof of Delivery (POD)</div>
-              {selectedTrip.podReceived ? (
-                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 space-y-1">
-                  <div className="flex items-center gap-2 font-bold text-xs">
-                    <CheckSquare className="w-4 h-4" /> POD Verified & Received
-                  </div>
-                  {selectedTrip.podNotes && <div className="text-[11px] text-slate-300">{selectedTrip.podNotes}</div>}
-                </div>
-              ) : (
-                <div className="space-y-3 p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736]">
-                  <textarea
-                    rows={2}
-                    value={podNotes}
-                    onChange={e => setPodNotes(e.target.value)}
-                    placeholder="Enter POD verification notes upon arrival..."
-                    className="w-full bg-[#121824] border border-[#2e374a] rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
-                  />
-                  <Button
-                    variant="primary"
-                    className="w-full"
-                    onClick={() => handleMarkDelivered(selectedTrip.id)}
-                    icon={<CheckCircle2 className="w-4 h-4" />}
-                  >
-                    Mark Trip Delivered
-                  </Button>
-                </div>
-              )}
             </div>
           </div>
         </div>

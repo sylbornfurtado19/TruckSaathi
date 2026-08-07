@@ -361,53 +361,58 @@ export function VehiclesContent() {
         </div>
       )}
 
-      {/* Detail Drawer */}
+      {/* Vehicle Detail Pop-Up Modal */}
       {selectedVehicle && (
-        <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md glass-panel border-l border-[#202736] shadow-2xl p-6 overflow-y-auto space-y-6">
-          <div className="flex items-center justify-between border-b border-[#202736] pb-4">
-            <div>
-              <span className="text-xs text-blue-400 font-mono font-bold">ASSET PROFILE</span>
-              <h2 className="text-xl font-extrabold font-mono text-slate-50">{selectedVehicle.regNumber}</h2>
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="absolute inset-0" onClick={() => setSelectedVehicle(null)} />
+          <div className="glass-panel border border-[#202736] rounded-2xl w-full max-w-xl p-6 space-y-6 shadow-2xl relative z-10 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-[#202736] pb-4">
+              <div>
+                <span className="text-xs text-blue-400 font-mono font-bold">ASSET PROFILE</span>
+                <h2 className="text-xl font-extrabold font-mono text-slate-50">{selectedVehicle.regNumber}</h2>
+              </div>
+              <button onClick={() => setSelectedVehicle(null)} className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-[#1c2333]">
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <button onClick={() => setSelectedVehicle(null)} className="text-slate-400 hover:text-white">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
 
-          <div className="space-y-4 text-xs">
-            <Card glow="blue" className="space-y-2">
-              <div className="text-slate-400 font-medium">Specs Summary</div>
-              <div className="grid grid-cols-2 gap-2 text-slate-200">
-                <div>
-                  Make: <span className="font-semibold">{selectedVehicle.make}</span>
+            <div className="space-y-4 text-xs">
+              <Card glow="blue" className="space-y-2">
+                <div className="text-slate-400 font-medium flex items-center justify-between">
+                  <span>Category & Model</span>
+                  <Badge variant="info">{selectedVehicle.category}</Badge>
                 </div>
-                <div>
-                  Model: <span className="font-semibold">{selectedVehicle.model}</span>
+                <div className="text-lg font-bold text-slate-100">{selectedVehicle.make} {selectedVehicle.model}</div>
+                <div className="text-xs text-slate-400 font-mono">Payload Capacity: {selectedVehicle.capacityTons} Tons</div>
+              </Card>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736] space-y-1">
+                  <div className="text-slate-400 font-medium text-[11px]">Chassis Number</div>
+                  <div className="font-mono text-slate-200 font-bold">{selectedVehicle.chassisNumber}</div>
                 </div>
-                <div>
-                  Capacity: <span className="font-semibold font-mono">{selectedVehicle.capacityTons} Tons</span>
-                </div>
-                <div>
-                  Type: <span className="font-semibold">{selectedVehicle.category}</span>
+                <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736] space-y-1">
+                  <div className="text-slate-400 font-medium text-[11px]">Engine Serial</div>
+                  <div className="font-mono text-slate-200 font-bold">{selectedVehicle.engineNumber}</div>
                 </div>
               </div>
-            </Card>
 
-            <div className="space-y-2">
-              <div className="text-slate-400 font-medium uppercase text-[10px] tracking-wider">Document Vault</div>
-              <div className="p-3 rounded-lg bg-[#1c2333]/50 border border-[#202736] flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-blue-400" />
-                  <span>Registration Certificate (RC)</span>
+              <div className="space-y-2">
+                <div className="text-slate-400 font-medium uppercase text-[10px] tracking-wider">Document Compliance Vault</div>
+                <div className="p-3 rounded-lg bg-[#1c2333]/50 border border-[#202736] flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-blue-400" />
+                    <span>Registration Certificate (RC)</span>
+                  </div>
+                  <span className="text-slate-400 font-mono">{selectedVehicle.rcExpiry}</span>
                 </div>
-                <span className="text-slate-400 font-mono">{selectedVehicle.rcExpiry}</span>
-              </div>
-              <div className="p-3 rounded-lg bg-[#1c2333]/50 border border-[#202736] flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                  <span>Insurance Policy</span>
+                <div className="p-3 rounded-lg bg-[#1c2333]/50 border border-[#202736] flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                    <span>Insurance Policy</span>
+                  </div>
+                  <span className="text-slate-400 font-mono">{selectedVehicle.insuranceExpiry}</span>
                 </div>
-                <span className="text-slate-400 font-mono">{selectedVehicle.insuranceExpiry}</span>
               </div>
             </div>
           </div>

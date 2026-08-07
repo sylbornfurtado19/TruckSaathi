@@ -298,90 +298,93 @@ export function MaintenanceContent() {
         </div>
       </motion.div>
 
-      {/* 5. Detail Drawer */}
+      {/* 5. Telemetry Detail Pop-Up Modal */}
       {selectedVehicle && selectedVehicle.componentHealth && (
-        <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md glass-panel border-l border-[#202736] shadow-2xl p-6 overflow-y-auto space-y-6">
-          <div className="flex items-center justify-between border-b border-[#202736] pb-4">
-            <div>
-              <span className="text-xs text-blue-400 font-mono font-bold">TELEMETRY DIAGNOSTICS</span>
-              <h2 className="text-xl font-extrabold font-mono text-slate-50">{selectedVehicle.regNumber}</h2>
-            </div>
-            <button onClick={() => setSelectedVehicle(null)} className="text-slate-400 hover:text-white">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="space-y-4 text-xs">
-            {/* AI Prediction Insight Box */}
-            <div className="bg-gradient-to-br from-blue-950/40 via-slate-900/60 to-indigo-950/40 border border-blue-500/30 rounded-xl p-4 space-y-3 shadow-xl">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-blue-400 font-bold text-xs">
-                  <Cpu className="w-4 h-4 text-blue-400" />
-                  <span>AI Telemetry Prognosis</span>
-                </div>
-                <Badge variant="info">
-                  {selectedVehicle.componentHealth.predictionConfidence}% Confidence
-                </Badge>
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="absolute inset-0" onClick={() => setSelectedVehicle(null)} />
+          <div className="glass-panel border border-[#202736] rounded-2xl w-full max-w-xl p-6 space-y-6 shadow-2xl relative z-10 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-[#202736] pb-4">
+              <div>
+                <span className="text-xs text-blue-400 font-mono font-bold">TELEMETRY DIAGNOSTICS</span>
+                <h2 className="text-xl font-extrabold font-mono text-slate-50">{selectedVehicle.regNumber}</h2>
               </div>
-              <p className="text-slate-200 leading-relaxed text-xs">
-                {selectedVehicle.componentHealth.predictedIssue}
-              </p>
-              <div className="pt-2 border-t border-blue-500/20 text-[11px] text-slate-400 flex items-center justify-between">
-                <span>Predicted Next Service:</span>
-                <span className="font-mono text-slate-200 font-bold">{selectedVehicle.componentHealth.predictedNextServiceDate}</span>
-              </div>
+              <button onClick={() => setSelectedVehicle(null)} className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-[#1c2333]">
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            {/* Recommended Action */}
-            <Card glow="blue" className="space-y-2">
-              <div className="text-slate-400 font-medium flex items-center gap-1.5 text-xs">
-                <Sparkles className="w-4 h-4 text-amber-400" /> Recommended Action Plan
-              </div>
-              <p className="text-slate-300 leading-relaxed text-xs">
-                Schedule a workshop bay inspection before departure. Replace worn components to prevent road breakdown delays.
-              </p>
-            </Card>
-
-            {/* Component Breakdowns */}
-            <div className="space-y-2">
-              <div className="text-slate-400 font-medium uppercase text-[10px] tracking-wider">Subsystem Health Telemetry</div>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736]">
-                  <div className="text-slate-400 mb-1">Brake System</div>
-                  <div className="font-mono text-base font-bold text-slate-100">{selectedVehicle.componentHealth.brakes}%</div>
+            <div className="space-y-4 text-xs">
+              {/* AI Prediction Insight Box */}
+              <div className="bg-gradient-to-br from-blue-950/40 via-slate-900/60 to-indigo-950/40 border border-blue-500/30 rounded-xl p-4 space-y-3 shadow-xl">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-blue-400 font-bold text-xs">
+                    <Cpu className="w-4 h-4 text-blue-400" />
+                    <span>AI Telemetry Prognosis</span>
+                  </div>
+                  <Badge variant="info">
+                    {selectedVehicle.componentHealth.predictionConfidence}% Confidence
+                  </Badge>
                 </div>
-                <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736]">
-                  <div className="text-slate-400 mb-1">Battery & Electrical</div>
-                  <div className="font-mono text-base font-bold text-slate-100">{selectedVehicle.componentHealth.battery}%</div>
-                </div>
-                <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736]">
-                  <div className="text-slate-400 mb-1">Engine Powertrain</div>
-                  <div className="font-mono text-base font-bold text-slate-100">{selectedVehicle.componentHealth.engine}%</div>
-                </div>
-                <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736]">
-                  <div className="text-slate-400 mb-1">Tyre Tread Wear</div>
-                  <div className="font-mono text-base font-bold text-slate-100">{selectedVehicle.componentHealth.tyres}%</div>
+                <p className="text-slate-200 leading-relaxed text-xs">
+                  {selectedVehicle.componentHealth.predictedIssue}
+                </p>
+                <div className="pt-2 border-t border-blue-500/20 text-[11px] text-slate-400 flex items-center justify-between">
+                  <span>Predicted Next Service:</span>
+                  <span className="font-mono text-slate-200 font-bold">{selectedVehicle.componentHealth.predictedNextServiceDate}</span>
                 </div>
               </div>
-            </div>
 
-            {/* Service History Log */}
-            <div className="space-y-2">
-              <div className="text-slate-400 font-medium uppercase text-[10px] tracking-wider">Historical Workshop Service Log</div>
+              {/* Recommended Action */}
+              <Card glow="blue" className="space-y-2">
+                <div className="text-slate-400 font-medium flex items-center gap-1.5 text-xs">
+                  <Sparkles className="w-4 h-4 text-amber-400" /> Recommended Action Plan
+                </div>
+                <p className="text-slate-300 leading-relaxed text-xs">
+                  Schedule a workshop bay inspection before departure. Replace worn components to prevent road breakdown delays.
+                </p>
+              </Card>
+
+              {/* Component Breakdowns */}
               <div className="space-y-2">
-                <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736] flex items-center justify-between">
-                  <div>
-                    <div className="font-semibold text-slate-200">Routine 50,000 km Service</div>
-                    <div className="text-[11px] text-slate-500">Engine oil change & filter replacement</div>
+                <div className="text-slate-400 font-medium uppercase text-[10px] tracking-wider">Subsystem Health Telemetry</div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736]">
+                    <div className="text-slate-400 mb-1">Brake System</div>
+                    <div className="font-mono text-base font-bold text-slate-100">{selectedVehicle.componentHealth.brakes}%</div>
                   </div>
-                  <div className="font-mono text-slate-400 text-[11px]">{selectedVehicle.componentHealth.lastServiceDate}</div>
+                  <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736]">
+                    <div className="text-slate-400 mb-1">Battery & Electrical</div>
+                    <div className="font-mono text-base font-bold text-slate-100">{selectedVehicle.componentHealth.battery}%</div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736]">
+                    <div className="text-slate-400 mb-1">Engine Powertrain</div>
+                    <div className="font-mono text-base font-bold text-slate-100">{selectedVehicle.componentHealth.engine}%</div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736]">
+                    <div className="text-slate-400 mb-1">Tyre Tread Wear</div>
+                    <div className="font-mono text-base font-bold text-slate-100">{selectedVehicle.componentHealth.tyres}%</div>
+                  </div>
                 </div>
-                <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736] flex items-center justify-between">
-                  <div>
-                    <div className="font-semibold text-slate-200">Brake Fluid & Disc Inspection</div>
-                    <div className="text-[11px] text-slate-500">Bhiwandi Workshop Bay 2</div>
+              </div>
+
+              {/* Service History Log */}
+              <div className="space-y-2">
+                <div className="text-slate-400 font-medium uppercase text-[10px] tracking-wider">Historical Workshop Service Log</div>
+                <div className="space-y-2">
+                  <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736] flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold text-slate-200">Routine 50,000 km Service</div>
+                      <div className="text-[11px] text-slate-500">Engine oil change & filter replacement</div>
+                    </div>
+                    <div className="font-mono text-slate-400 text-[11px]">{selectedVehicle.componentHealth.lastServiceDate}</div>
                   </div>
-                  <div className="font-mono text-slate-400 text-[11px]">2026-01-15</div>
+                  <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736] flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold text-slate-200">Brake Fluid & Disc Inspection</div>
+                      <div className="text-[11px] text-slate-500">Bhiwandi Workshop Bay 2</div>
+                    </div>
+                    <div className="font-mono text-slate-400 text-[11px]">2026-01-15</div>
+                  </div>
                 </div>
               </div>
             </div>
