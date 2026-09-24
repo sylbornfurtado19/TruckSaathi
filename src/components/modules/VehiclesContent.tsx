@@ -14,7 +14,6 @@ import {
   Download,
   Trash2,
   Eye,
-  SlidersHorizontal,
   Scale
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -27,6 +26,7 @@ import {
   Badge,
   AnimatedPage,
   Modal,
+  Drawer,
   EmptyState,
   KPICard,
   itemVariants
@@ -193,7 +193,7 @@ export function VehiclesContent() {
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               placeholder="Search registration, make, model, driver..."
-              className="w-full bg-[#0a0f1d] border border-[#1e2e4a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 transition-all font-sans"
+              className="w-full rounded-control border border-border bg-surface px-3 py-2 pl-9 text-sm text-text-primary placeholder:text-text-muted"
             />
           </div>
 
@@ -206,7 +206,7 @@ export function VehiclesContent() {
             <select
               value={categoryFilter}
               onChange={e => setCategoryFilter(e.target.value)}
-              className="bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg text-xs text-slate-200 px-3 py-2 focus:outline-none focus:border-blue-500 transition-colors"
+              className="rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
             >
               <option value="All">All Categories</option>
               <option value="Container">Container</option>
@@ -220,7 +220,7 @@ export function VehiclesContent() {
             <select
               value={docFilter}
               onChange={e => setDocFilter(e.target.value)}
-              className="bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg text-xs text-slate-200 px-3 py-2 focus:outline-none focus:border-blue-500 transition-colors"
+              className="rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
             >
               <option value="All">All Compliance States</option>
               <option value="Compliant">Compliant</option>
@@ -232,11 +232,11 @@ export function VehiclesContent() {
       </motion.div>
 
       {/* 4. Enterprise Data Table */}
-      <motion.div variants={itemVariants} className="border border-[#1e2e4a] rounded-xl overflow-hidden bg-[#0b1120]/80 backdrop-blur-md shadow-xl">
+      <motion.div variants={itemVariants} className="overflow-hidden rounded-card border border-border bg-surface">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-[#0d1527] text-slate-400 border-b border-[#1e2e4a] font-semibold uppercase tracking-wider text-[11px]">
+              <tr className="sticky top-0 border-b border-border bg-surface-muted text-xs font-semibold text-text-secondary">
                 <th className="py-3.5 px-4 font-mono">Registration Plate</th>
                 <th className="py-3.5 px-4">Category</th>
                 <th className="py-3.5 px-4">Make & Model</th>
@@ -276,12 +276,12 @@ export function VehiclesContent() {
                   <tr
                     key={vehicle.id}
                     onClick={() => setSelectedVehicle(vehicle)}
-                    className="hover:bg-[#131f38] transition-colors cursor-pointer group"
+                    className="cursor-pointer transition-colors hover:bg-surface-muted group"
                   >
                     <td className="py-3.5 px-4 font-mono font-bold text-slate-100">
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
-                        <span className="bg-[#0a0f1d] border border-[#1e2e4a] px-2.5 py-1 rounded-md text-xs font-mono tracking-wide text-blue-300 group-hover:border-blue-500/50 transition-colors">
+                        <span className="rounded-control border border-border bg-surface-muted px-2.5 py-1 font-mono text-xs text-focus transition-colors">
                           {vehicle.regNumber}
                         </span>
                       </div>
@@ -301,7 +301,7 @@ export function VehiclesContent() {
                         <Badge variant="neutral">Unassigned</Badge>
                       ) : (
                         <span className="text-slate-200 font-medium flex items-center gap-1.5">
-                          <span className="w-5 h-5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-[10px] flex items-center justify-center font-bold">
+                          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-surface-muted text-xs font-bold text-brand-navy">
                             {vehicle.assignedDriver.charAt(0)}
                           </span>
                           {vehicle.assignedDriver}
@@ -382,7 +382,7 @@ export function VehiclesContent() {
                 placeholder="e.g. MH-12-RN-8812"
                 value={regNumber}
                 onChange={e => setRegNumber(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 uppercase focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 focus:outline-none font-mono"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-text-primary"
               />
             </div>
             <div>
@@ -390,7 +390,7 @@ export function VehiclesContent() {
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value as Vehicle['category'])}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
               >
                 <option value="Container">Container</option>
                 <option value="Trailer">Trailer</option>
@@ -408,7 +408,7 @@ export function VehiclesContent() {
               <select
                 value={make}
                 onChange={e => setMake(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
               >
                 <option value="Tata Motors">Tata Motors</option>
                 <option value="Ashok Leyland">Ashok Leyland</option>
@@ -425,7 +425,7 @@ export function VehiclesContent() {
                 placeholder="e.g. Signa 4825.T Heavy Axle"
                 value={model}
                 onChange={e => setModel(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
               />
             </div>
           </div>
@@ -439,7 +439,7 @@ export function VehiclesContent() {
                 max={60}
                 value={capacityTons}
                 onChange={e => setCapacityTons(Number(e.target.value))}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none font-mono"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-text-primary"
               />
             </div>
             <div>
@@ -449,7 +449,7 @@ export function VehiclesContent() {
                 value={assignedDriver}
                 onChange={e => setAssignedDriver(e.target.value)}
                 placeholder="Unassigned or Driver Name"
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
               />
             </div>
           </div>
@@ -462,7 +462,7 @@ export function VehiclesContent() {
                 value={chassisNumber}
                 onChange={e => setChassisNumber(e.target.value)}
                 placeholder="Auto-generated if empty"
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 uppercase focus:border-blue-500 focus:outline-none font-mono"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-text-primary"
               />
             </div>
             <div>
@@ -472,12 +472,12 @@ export function VehiclesContent() {
                 value={engineNumber}
                 onChange={e => setEngineNumber(e.target.value)}
                 placeholder="Auto-generated if empty"
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 uppercase focus:border-blue-500 focus:outline-none font-mono"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-text-primary"
               />
             </div>
           </div>
 
-          <div className="pt-4 border-t border-[#1e2e4a] flex justify-end gap-3">
+          <div className="flex justify-end gap-3 border-t border-border pt-4">
             <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>
@@ -490,15 +490,13 @@ export function VehiclesContent() {
 
       {/* 6. Vehicle Detail Modal */}
       {selectedVehicle && (
-        <Modal
+        <Drawer
           isOpen={!!selectedVehicle}
           onClose={() => setSelectedVehicle(null)}
           title={`Asset Dossier: ${selectedVehicle.regNumber}`}
-          description={`${selectedVehicle.make} ${selectedVehicle.model} • ${selectedVehicle.category}`}
-          size="lg"
         >
           <div className="space-y-4 text-xs">
-            <div className="p-4 rounded-xl bg-[#0e172a] border border-[#1e2e4a] flex items-center justify-between">
+            <div className="flex items-center justify-between rounded-control border border-border bg-surface-muted p-4">
               <div>
                 <span className="text-[11px] text-slate-400 font-mono">Payload Capacity</span>
                 <div className="text-xl font-bold font-mono text-slate-100">{selectedVehicle.capacityTons} Metric Tons</div>
@@ -518,66 +516,66 @@ export function VehiclesContent() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-lg bg-[#0e172a] border border-[#1e2e4a]">
+              <div className="rounded-control border border-border bg-surface-muted p-3">
                 <div className="text-slate-400 text-[11px] font-medium">Chassis VIN Number</div>
                 <div className="font-mono text-slate-100 font-bold mt-0.5">{selectedVehicle.chassisNumber || 'MAT78291032'}</div>
               </div>
-              <div className="p-3 rounded-lg bg-[#0e172a] border border-[#1e2e4a]">
+              <div className="rounded-control border border-border bg-surface-muted p-3">
                 <div className="text-slate-400 text-[11px] font-medium">Engine Serial Number</div>
                 <div className="font-mono text-slate-100 font-bold mt-0.5">{selectedVehicle.engineNumber || 'ENG99420188'}</div>
               </div>
             </div>
 
-            <div className="space-y-2 pt-2 border-t border-[#1e2e4a]">
-              <div className="text-slate-400 font-bold uppercase text-[10px] tracking-wider font-mono">Government Compliance Vault</div>
+            <div className="space-y-2 border-t border-border pt-2">
+              <div className="font-semibold text-text-secondary">Government compliance</div>
               
-              <div className="p-3 rounded-lg bg-[#0a0f1d] border border-[#1e2e4a] flex items-center justify-between">
+              <div className="flex items-center justify-between rounded-control border border-border bg-surface-muted p-3">
                 <div className="flex items-center gap-2.5">
                   <FileText className="w-4 h-4 text-blue-400" />
                   <div>
                     <div className="text-slate-200 font-medium">Registration Certificate (RC)</div>
-                    <div className="text-[10px] text-slate-500 font-mono">Vahan National Portal ID</div>
+                    <div className="text-xs text-text-muted font-mono">Vahan National Portal ID</div>
                   </div>
                 </div>
-                <span className="text-slate-300 font-mono text-[11px] bg-[#0e172a] px-2 py-1 rounded border border-[#1e2e4a]">
+                <span className="rounded-control border border-border bg-surface px-2 py-1 font-mono text-xs text-text-secondary">
                   Valid to {selectedVehicle.rcExpiry}
                 </span>
               </div>
 
-              <div className="p-3 rounded-lg bg-[#0a0f1d] border border-[#1e2e4a] flex items-center justify-between">
+              <div className="flex items-center justify-between rounded-control border border-border bg-surface-muted p-3">
                 <div className="flex items-center gap-2.5">
                   <ShieldCheck className="w-4 h-4 text-emerald-400" />
                   <div>
                     <div className="text-slate-200 font-medium">Comprehensive Commercial Insurance</div>
-                    <div className="text-[10px] text-slate-500 font-mono">Third-Party & Cargo Coverage</div>
+                    <div className="text-xs text-text-muted font-mono">Third-Party and cargo coverage</div>
                   </div>
                 </div>
-                <span className="text-slate-300 font-mono text-[11px] bg-[#0e172a] px-2 py-1 rounded border border-[#1e2e4a]">
+                <span className="rounded-control border border-border bg-surface px-2 py-1 font-mono text-xs text-text-secondary">
                   Valid to {selectedVehicle.insuranceExpiry}
                 </span>
               </div>
 
-              <div className="p-3 rounded-lg bg-[#0a0f1d] border border-[#1e2e4a] flex items-center justify-between">
+              <div className="flex items-center justify-between rounded-control border border-border bg-surface-muted p-3">
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-cyan-400" />
                   <div>
                     <div className="text-slate-200 font-medium">RTO Fitness Certificate (FC)</div>
-                    <div className="text-[10px] text-slate-500 font-mono">Mandatory Annual Inspection</div>
+                    <div className="text-xs text-text-muted font-mono">Mandatory annual inspection</div>
                   </div>
                 </div>
-                <span className="text-slate-300 font-mono text-[11px] bg-[#0e172a] px-2 py-1 rounded border border-[#1e2e4a]">
+                <span className="rounded-control border border-border bg-surface px-2 py-1 font-mono text-xs text-text-secondary">
                   Valid to {selectedVehicle.fitnessExpiry}
                 </span>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-[#1e2e4a] flex justify-end">
+            <div className="flex justify-end border-t border-border pt-3">
               <Button variant="outline" size="sm" onClick={() => setSelectedVehicle(null)}>
                 Close Dossier
               </Button>
             </div>
           </div>
-        </Modal>
+        </Drawer>
       )}
     </AnimatedPage>
   );

@@ -7,15 +7,15 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-canvas text-text-primary flex flex-col">
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <Header collapsed={collapsed} />
       <main
         className={`flex-1 p-6 transition-all duration-300 ${
-          collapsed ? 'ml-[72px]' : 'ml-[260px]'
+          collapsed ? 'ml-16' : 'ml-60'
         }`}
       >
-        <div className="max-w-7xl mx-auto space-y-6">{children}</div>
+        <div className="mx-auto w-full max-w-[1440px] space-y-6">{children}</div>
       </main>
     </div>
   );

@@ -155,11 +155,11 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-start justify-center pt-20 p-4">
-      <div className="glass-panel border border-[#202736] rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden relative">
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-4 pt-20">
+      <div className="relative w-full max-w-xl overflow-hidden rounded-card border border-border bg-surface shadow-popover">
         {/* Search Header */}
-        <div className="p-4 border-b border-[#202736] flex items-center gap-3">
-          <Search className="w-5 h-5 text-blue-400" />
+        <div className="flex items-center gap-3 border-b border-border p-4">
+          <Search className="h-5 w-5 text-focus" />
           <input
             type="text"
             autoFocus
@@ -169,17 +169,17 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
               setSelectedIndex(0);
             }}
             placeholder={isDriver ? "Search driver portal or assigned trips..." : "Fuzzy search vehicles, drivers, pages..."}
-            className="w-full bg-transparent text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none"
+            className="w-full bg-transparent text-sm text-text-primary placeholder:text-text-muted focus:outline-none"
           />
-          <kbd className="text-[10px] font-mono text-slate-400 bg-[#1c2333] px-2 py-0.5 rounded border border-[#2e374a]">
+          <kbd className="rounded border border-border bg-surface-muted px-2 py-0.5 text-xs text-text-secondary">
             ESC
           </kbd>
         </div>
 
         {/* Results List */}
-        <div className="max-h-80 overflow-y-auto p-2 space-y-1 text-xs">
+        <div className="max-h-80 space-y-1 overflow-y-auto p-2 text-sm">
           {results.length === 0 ? (
-            <div className="p-6 text-center text-slate-500">No matching telemetry or pages found.</div>
+            <div className="p-6 text-center text-text-muted">No matching pages or records found.</div>
           ) : (
             results.map((item, index) => {
               const Icon = item.icon;
@@ -191,16 +191,16 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                   onClick={() => handleSelect(item.href)}
                   onMouseEnter={() => setSelectedIndex(index)}
                   className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-colors ${
-                    isSelected ? 'bg-blue-600/20 text-white border border-blue-500/30' : 'text-slate-300 hover:bg-[#1c2333]/50'
+                    isSelected ? 'border border-blue-200 bg-blue-50 text-text-primary' : 'text-text-secondary hover:bg-surface-muted'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Icon className="w-4 h-4 text-blue-400" />
+                    <Icon className="h-4 w-4 text-focus" />
                     <span className="font-medium">{item.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant="neutral">{item.type}</Badge>
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
+                    <ArrowRight className="h-3.5 w-3.5 text-text-muted" />
                   </div>
                 </div>
               );

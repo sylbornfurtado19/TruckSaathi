@@ -174,11 +174,8 @@ export function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#060911] text-slate-100 flex flex-col justify-between relative overflow-hidden selection:bg-blue-600/30">
+    <div className="min-h-screen bg-canvas text-text-primary flex flex-col justify-between overflow-hidden">
       {/* Ambient background glows matching TruckSaathi brand palette */}
-      <div className="absolute top-0 left-0 w-[550px] h-[550px] bg-blue-600/10 rounded-full blur-[130px] pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute top-1/2 left-1/3 w-[350px] h-[350px] bg-sky-500/5 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Main Container */}
       <div className="flex-1 max-w-7xl mx-auto w-full px-6 lg:px-12 py-10 lg:py-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center relative z-10">
@@ -255,9 +252,8 @@ export function LoginContent() {
           transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
           className="lg:col-span-5"
         >
-          <div className="bg-[#0c111d]/90 backdrop-blur-2xl border border-[#1f2838] rounded-3xl p-8 sm:p-10 shadow-2xl shadow-black/80 space-y-6 relative overflow-hidden">
+          <div className="space-y-6 rounded-card border border-border bg-surface p-6 shadow-popover sm:p-8">
             {/* Subtle top card glow highlight */}
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent pointer-events-none" />
 
             {/* Card Header */}
             <div className="text-center space-y-1.5">
@@ -294,7 +290,7 @@ export function LoginContent() {
                     loginAsDemoRole('Driver', 'd-1');
                     router.push('/driver-portal');
                   }}
-                  className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-cyan-600/30 transition-all cursor-pointer active:scale-[0.98]"
+                  className="py-2.5 px-3 rounded-control bg-brand-navy hover:bg-slate-800 text-white font-semibold text-sm flex items-center justify-center gap-1.5 transition-colors duration-150 cursor-pointer"
                 >
                   <Truck className="w-3.5 h-3.5" />
                   <span>Driver (Ramesh)</span>
@@ -312,8 +308,8 @@ export function LoginContent() {
                 onClick={() => handleRoleChange('driver')}
                 className={`py-2.5 px-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                   portalRole === 'driver'
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/30'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-[#1a2338]/40'
+                    ? 'bg-brand-orange text-white'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-muted'
                 }`}
               >
                 <User className="w-3.5 h-3.5" />
@@ -324,8 +320,8 @@ export function LoginContent() {
                 onClick={() => handleRoleChange('management')}
                 className={`py-2.5 px-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                   portalRole === 'management'
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/30'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-[#1a2338]/40'
+                    ? 'bg-brand-orange text-white'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-muted'
                 }`}
               >
                 <Shield className="w-3.5 h-3.5" />
@@ -447,11 +443,11 @@ export function LoginContent() {
                 </div>
 
                 {/* Submit Action Button */}
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-3.5 px-4 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] disabled:opacity-60"
-                >
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full py-3.5 px-4 rounded-xl font-bold text-sm text-white bg-brand-orange hover:bg-orange-700 transition-colors duration-150 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] disabled:opacity-60"
+                  >
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />

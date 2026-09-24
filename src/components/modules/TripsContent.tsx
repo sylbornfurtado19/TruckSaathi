@@ -29,7 +29,7 @@ import {
   Badge,
   AnimatedPage,
   KPICard,
-  Modal,
+  Drawer,
   EmptyState,
   itemVariants
 } from '@/components/ui';
@@ -262,7 +262,7 @@ export function TripsContent() {
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               placeholder="Search trip code, registration, driver, city..."
-              className="w-full bg-[#0a0f1d] border border-[#1e2e4a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 transition-all font-sans"
+              className="w-full rounded-control border border-border bg-surface px-3 py-2 pl-9 text-sm text-text-primary placeholder:text-text-muted"
             />
           </div>
 
@@ -275,7 +275,7 @@ export function TripsContent() {
             <select
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value)}
-              className="bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg text-xs text-slate-200 px-3 py-2 focus:outline-none focus:border-blue-500 transition-colors"
+              className="rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
             >
               <option value="All">All Trip Statuses</option>
               <option value="Scheduled">Scheduled</option>
@@ -289,11 +289,11 @@ export function TripsContent() {
       </motion.div>
 
       {/* 4. Trips Data Table */}
-      <motion.div variants={itemVariants} className="border border-[#1e2e4a] rounded-xl overflow-hidden bg-[#0b1120]/80 backdrop-blur-md shadow-xl">
+      <motion.div variants={itemVariants} className="overflow-hidden rounded-card border border-border bg-surface">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-[#0d1527] text-slate-400 border-b border-[#1e2e4a] font-semibold uppercase tracking-wider text-[11px]">
+              <tr className="sticky top-0 border-b border-border bg-surface-muted text-xs font-semibold text-text-secondary">
                 <th className="py-3.5 px-4 font-mono">Trip Code</th>
                 <th className="py-3.5 px-4 font-mono">Vehicle</th>
                 <th className="py-3.5 px-4">Driver</th>
@@ -337,17 +337,17 @@ export function TripsContent() {
                         setSelectedTrip(trip);
                         setPodNotes(trip.podNotes || '');
                       }}
-                      className="hover:bg-[#131f38] transition-colors cursor-pointer group"
+                      className="cursor-pointer transition-colors hover:bg-surface-muted group"
                     >
                       <td className="py-3.5 px-4 font-mono font-bold text-slate-100">
-                        <span className="bg-[#0a0f1d] border border-[#1e2e4a] px-2.5 py-1 rounded-md text-xs font-mono text-blue-400 group-hover:border-blue-500/50 transition-colors">
+                        <span className="rounded-control border border-border bg-surface-muted px-2.5 py-1 font-mono text-xs text-focus transition-colors">
                           {trip.tripCode}
                         </span>
                       </td>
                       <td className="py-3.5 px-4 font-mono text-slate-200 font-semibold">{trip.vehicleReg}</td>
                       <td className="py-3.5 px-4 text-slate-300 font-medium">
                         <div className="flex items-center gap-1.5">
-                          <span className="w-5 h-5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-[10px] flex items-center justify-center font-bold">
+                          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-surface-muted text-xs font-bold text-brand-navy">
                             {trip.driverName.charAt(0)}
                           </span>
                           <span>{trip.driverName}</span>
@@ -414,12 +414,10 @@ export function TripsContent() {
       </motion.div>
 
       {/* 5. Dispatch New Trip Modal */}
-      <Modal
+      <Drawer
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title="Dispatch New Commercial Trip"
-        description="Allocate an active commercial vehicle, verified driver, cargo specs, and destination hub."
-        size="lg"
       >
         <form onSubmit={handleCreateTrip} className="space-y-4 text-xs">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -429,7 +427,7 @@ export function TripsContent() {
                 required
                 value={vehicleId}
                 onChange={e => setVehicleId(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
               >
                 <option value="">-- Choose Commercial Asset --</option>
                 {availableVehicles.map(v => (
@@ -445,7 +443,7 @@ export function TripsContent() {
                 required
                 value={driverId}
                 onChange={e => setDriverId(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
               >
                 <option value="">-- Choose Verified Driver --</option>
                 {availableDrivers.map(d => (
@@ -466,7 +464,7 @@ export function TripsContent() {
                 placeholder="e.g. Mumbai Hub"
                 value={originCity}
                 onChange={e => setOriginCity(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
               />
             </div>
             <div>
@@ -477,7 +475,7 @@ export function TripsContent() {
                 placeholder="e.g. Bengaluru Depot"
                 value={destCity}
                 onChange={e => setDestCity(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
               />
             </div>
           </div>
@@ -490,7 +488,7 @@ export function TripsContent() {
                 placeholder="e.g. Gate 4, Bhiwandi Logistics Park"
                 value={originAddress}
                 onChange={e => setOriginAddress(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
               />
             </div>
             <div>
@@ -500,7 +498,7 @@ export function TripsContent() {
                 placeholder="e.g. Nelamangala Cargo Terminal"
                 value={destAddress}
                 onChange={e => setDestAddress(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
               />
             </div>
           </div>
@@ -513,7 +511,7 @@ export function TripsContent() {
                 placeholder="e.g. Precision Engineering Parts & Modules"
                 value={cargoDesc}
                 onChange={e => setCargoDesc(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
               />
             </div>
             <div>
@@ -524,7 +522,7 @@ export function TripsContent() {
                 max={50}
                 value={cargoWeight}
                 onChange={e => setCargoWeight(Number(e.target.value))}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-text-primary"
               />
               {isOverloaded && (
                 <div className="mt-1.5">
@@ -543,7 +541,7 @@ export function TripsContent() {
                 type="number"
                 value={distanceKm}
                 onChange={e => setDistanceKm(Number(e.target.value))}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-text-primary"
               />
             </div>
             <div>
@@ -553,12 +551,12 @@ export function TripsContent() {
                 placeholder="12-digit GST E-Way Bill"
                 value={ewayBill}
                 onChange={e => setEwayBill(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-text-primary"
               />
             </div>
           </div>
 
-          <div className="pt-4 border-t border-[#1e2e4a] flex justify-end gap-3">
+          <div className="flex justify-end gap-3 border-t border-border pt-4">
             <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>
@@ -567,20 +565,18 @@ export function TripsContent() {
             </Button>
           </div>
         </form>
-      </Modal>
+      </Drawer>
 
       {/* 6. Trip Detail Pop-Up Modal */}
       {selectedTrip && (
-        <Modal
+        <Drawer
           isOpen={!!selectedTrip}
           onClose={() => setSelectedTrip(null)}
           title={`Trip Manifest: ${selectedTrip.tripCode}`}
-          description={`${selectedTrip.origin.city} → ${selectedTrip.destination.city} • ${selectedTrip.vehicleReg}`}
-          size="lg"
         >
           <div className="space-y-4 text-xs">
             {/* Route Timeline Card */}
-            <div className="p-4 rounded-xl bg-[#0e172a] border border-[#1e2e4a] space-y-3">
+            <div className="space-y-3 rounded-control border border-border bg-surface-muted p-4">
               <div className="text-slate-400 font-medium flex items-center justify-between font-mono text-[11px]">
                 <span>Highway Route Corridor</span>
                 <span className="text-slate-200 font-bold">{selectedTrip.distanceKm} km</span>
@@ -593,7 +589,7 @@ export function TripsContent() {
                     <div className="text-[11px] text-slate-400">{selectedTrip.origin.address}</div>
                   </div>
                 </div>
-                <div className="ml-2 pl-4 border-l-2 border-dashed border-[#1e2e4a] py-1 text-[11px] text-slate-500 font-mono">
+                <div className="ml-2 border-l-2 border-dashed border-border py-1 pl-4 font-mono text-xs text-text-muted">
                   Transit Corridor Leg
                 </div>
                 <div className="flex items-start gap-2.5">
@@ -608,13 +604,13 @@ export function TripsContent() {
 
             {/* Assets & Personnel */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-lg bg-[#0e172a] border border-[#1e2e4a] space-y-1">
+              <div className="space-y-1 rounded-control border border-border bg-surface-muted p-3">
                 <div className="text-slate-400 flex items-center gap-1.5 font-medium text-[11px]">
                   <Truck className="w-3.5 h-3.5 text-blue-400" /> Commercial Asset
                 </div>
                 <div className="font-mono font-bold text-slate-100">{selectedTrip.vehicleReg}</div>
               </div>
-              <div className="p-3 rounded-lg bg-[#0e172a] border border-[#1e2e4a] space-y-1">
+              <div className="space-y-1 rounded-control border border-border bg-surface-muted p-3">
                 <div className="text-slate-400 flex items-center gap-1.5 font-medium text-[11px]">
                   <User className="w-3.5 h-3.5 text-indigo-400" /> Assigned Driver
                 </div>
@@ -624,14 +620,14 @@ export function TripsContent() {
 
             {/* Cargo & E-Way Bill Compliance */}
             <div className="space-y-2">
-              <div className="text-slate-400 font-bold uppercase text-[10px] tracking-wider font-mono">Cargo & E-Way Compliance</div>
-              <div className="p-3 rounded-lg bg-[#0a0f1d] border border-[#1e2e4a] space-y-2">
+              <div className="font-semibold text-text-secondary">Cargo and E-Way compliance</div>
+              <div className="space-y-2 rounded-control border border-border bg-surface-muted p-3">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-200 font-semibold">{selectedTrip.cargoDescription}</span>
                   <span className="font-mono text-slate-300 font-bold">{selectedTrip.cargoWeightTons} Tons</span>
                 </div>
                 {selectedTrip.ewayBillNumber && (
-                  <div className="flex items-center justify-between pt-2 border-t border-[#1e2e4a]">
+                  <div className="flex items-center justify-between border-t border-border pt-2">
                     <div className="flex items-center gap-2">
                       <FileText className="w-4 h-4 text-blue-400" />
                       <span className="font-mono text-slate-300">{selectedTrip.ewayBillNumber}</span>
@@ -643,7 +639,7 @@ export function TripsContent() {
                   </div>
                 )}
                 {selectedTrip.tollSpendINR && (
-                  <div className="flex items-center justify-between pt-2 border-t border-[#1e2e4a] text-[11px]">
+                  <div className="flex items-center justify-between border-t border-border pt-2 text-xs">
                     <span className="text-slate-400 flex items-center gap-1.5">
                       <CreditCard className="w-3.5 h-3.5 text-indigo-400" /> FASTag Highway Toll:
                     </span>
@@ -655,7 +651,7 @@ export function TripsContent() {
 
             {/* Proof of Delivery (POD) Section */}
             <div className="space-y-3 pt-2">
-              <div className="text-slate-400 font-bold uppercase text-[10px] tracking-wider font-mono">Proof of Delivery (POD) Verification</div>
+              <div className="font-semibold text-text-secondary">Proof of delivery verification</div>
               {selectedTrip.podReceived ? (
                 <div className="p-3.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 space-y-1">
                   <div className="flex items-center gap-2 font-bold text-xs">
@@ -664,13 +660,13 @@ export function TripsContent() {
                   {selectedTrip.podNotes && <div className="text-[11px] text-slate-300">{selectedTrip.podNotes}</div>}
                 </div>
               ) : (
-                <div className="space-y-3 p-3.5 rounded-lg bg-[#0e172a] border border-[#1e2e4a]">
+                <div className="space-y-3 rounded-control border border-border bg-surface-muted p-3.5">
                   <textarea
                     rows={2}
                     value={podNotes}
                     onChange={e => setPodNotes(e.target.value)}
                     placeholder="Enter consignee signature notes, seal number, or gate receipt details..."
-                    className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
+                    className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
                   />
                   <Button
                     variant="primary"
@@ -684,13 +680,13 @@ export function TripsContent() {
               )}
             </div>
 
-            <div className="pt-3 border-t border-[#1e2e4a] flex justify-end">
+            <div className="flex justify-end border-t border-border pt-3">
               <Button variant="outline" size="sm" onClick={() => setSelectedTrip(null)}>
                 Close Manifest
               </Button>
             </div>
           </div>
-        </Modal>
+        </Drawer>
       )}
     </AnimatedPage>
   );

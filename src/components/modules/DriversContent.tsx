@@ -12,8 +12,6 @@ import {
   ShieldCheck,
   Award,
   Eye,
-  CreditCard,
-  UserCheck
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
@@ -187,18 +185,18 @@ export function DriversContent() {
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               placeholder="Search driver name, phone, commercial license..."
-              className="w-full bg-[#0a0f1d] border border-[#1e2e4a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 transition-all font-sans"
+              className="w-full rounded-control border border-border bg-surface px-3 py-2 pl-9 text-sm text-text-primary placeholder:text-text-muted"
             />
           </div>
         </Card>
       </motion.div>
 
       {/* 4. Enterprise Driver Data Table */}
-      <motion.div variants={itemVariants} className="border border-[#1e2e4a] rounded-xl overflow-hidden bg-[#0b1120]/80 backdrop-blur-md shadow-xl">
+      <motion.div variants={itemVariants} className="overflow-hidden rounded-card border border-border bg-surface">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-[#0d1527] text-slate-400 border-b border-[#1e2e4a] font-semibold uppercase tracking-wider text-[11px]">
+              <tr className="sticky top-0 border-b border-border bg-surface-muted text-xs font-semibold text-text-secondary">
                 <th className="py-3.5 px-4">Driver Profile</th>
                 <th className="py-3.5 px-4 font-mono">Contact Phone</th>
                 <th className="py-3.5 px-4 font-mono">License Number</th>
@@ -231,7 +229,7 @@ export function DriversContent() {
                   <tr
                     key={driver.id}
                     onClick={() => setSelectedDriver(driver)}
-                    className="hover:bg-[#131f38] transition-colors cursor-pointer group"
+                    className="cursor-pointer transition-colors hover:bg-surface-muted group"
                   >
                     <td className="py-3.5 px-4 font-semibold text-slate-100 flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-blue-600/15 border border-blue-500/30 flex items-center justify-center font-bold text-xs text-blue-400 shrink-0">
@@ -239,7 +237,7 @@ export function DriversContent() {
                       </div>
                       <div>
                         <div className="font-semibold text-slate-100">{driver.fullName}</div>
-                        <div className="text-[10px] text-slate-400 font-mono">ID: {driver.id.slice(0, 8)}</div>
+                        <div className="text-xs text-text-muted font-mono">ID: {driver.id.slice(0, 8)}</div>
                       </div>
                     </td>
                     <td className="py-3.5 px-4 font-mono text-slate-300">
@@ -264,7 +262,7 @@ export function DriversContent() {
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2">
-                        <div className="w-12 h-1.5 bg-[#0a0f1d] rounded-full overflow-hidden border border-[#1e2e4a]">
+                        <div className="h-2 w-12 overflow-hidden rounded-full border border-border bg-surface-muted">
                           <div
                             className="h-full bg-emerald-500 rounded-full"
                             style={{ width: `${driver.safetyScore || 92}%` }}
@@ -324,7 +322,7 @@ export function DriversContent() {
                 placeholder="e.g. Ramesh Kumar Verma"
                 value={fullName}
                 onChange={e => setFullName(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
               />
             </div>
             <div>
@@ -335,7 +333,7 @@ export function DriversContent() {
                 placeholder="+91 98765 43210"
                 value={phone}
                 onChange={e => setPhone(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-text-primary"
               />
             </div>
           </div>
@@ -349,7 +347,7 @@ export function DriversContent() {
                 placeholder="e.g. MH12 20180091234"
                 value={licenseNumber}
                 onChange={e => setLicenseNumber(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono uppercase focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-text-primary"
               />
             </div>
             <div>
@@ -357,7 +355,7 @@ export function DriversContent() {
               <select
                 value={licenseCategory}
                 onChange={e => setLicenseCategory(e.target.value as Driver['licenseCategory'])}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
               >
                 <option value="HMV">HMV (Heavy Motor Vehicle)</option>
                 <option value="Trailer">Multi-Axle Trailer Commercial</option>
@@ -375,7 +373,7 @@ export function DriversContent() {
                 max={40}
                 value={experienceYears}
                 onChange={e => setExperienceYears(Number(e.target.value))}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-text-primary"
               />
             </div>
             <div>
@@ -385,12 +383,12 @@ export function DriversContent() {
                 placeholder="12-digit UIDAI Number"
                 value={aadhaarNumber}
                 onChange={e => setAadhaarNumber(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-text-primary"
               />
             </div>
           </div>
 
-          <div className="pt-4 border-t border-[#1e2e4a] flex justify-end gap-3">
+          <div className="flex justify-end gap-3 border-t border-border pt-4">
             <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>
@@ -411,7 +409,7 @@ export function DriversContent() {
           size="lg"
         >
           <div className="space-y-4 text-xs">
-            <div className="p-4 rounded-xl bg-[#0e172a] border border-[#1e2e4a] flex items-center justify-between">
+            <div className="flex items-center justify-between rounded-control border border-border bg-surface-muted p-4">
               <div>
                 <span className="text-[11px] text-slate-400 font-mono">Assigned Asset</span>
                 <div className="text-base font-bold font-mono text-blue-400">{selectedDriver.assignedVehicle || 'Standby Pool'}</div>
@@ -427,19 +425,19 @@ export function DriversContent() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-lg bg-[#0e172a] border border-[#1e2e4a]">
+              <div className="rounded-control border border-border bg-surface-muted p-3">
                 <div className="text-slate-400 text-[11px] font-medium">Contact Phone</div>
                 <div className="font-mono text-slate-100 font-bold mt-0.5">{selectedDriver.phone}</div>
               </div>
-              <div className="p-3 rounded-lg bg-[#0e172a] border border-[#1e2e4a]">
+              <div className="rounded-control border border-border bg-surface-muted p-3">
                 <div className="text-slate-400 text-[11px] font-medium">Sarathi DL Expiry</div>
                 <div className="font-mono text-slate-100 font-bold mt-0.5">{selectedDriver.licenseExpiry || '2029-10-30'}</div>
               </div>
             </div>
 
             {selectedDriver.emergencyContact && (
-              <div className="p-3.5 rounded-lg bg-[#0a0f1d] border border-[#1e2e4a] space-y-1.5">
-                <div className="text-slate-400 font-bold uppercase text-[10px] tracking-wider font-mono">Family Emergency Contact</div>
+              <div className="space-y-1.5 rounded-control border border-border bg-surface-muted p-3.5">
+                <div className="font-semibold text-text-secondary">Family emergency contact</div>
                 <div className="flex items-center justify-between text-slate-200">
                   <span className="font-medium">{selectedDriver.emergencyContact.name} ({selectedDriver.emergencyContact.relation})</span>
                   <span className="font-mono text-blue-400">{selectedDriver.emergencyContact.phone}</span>
@@ -447,7 +445,7 @@ export function DriversContent() {
               </div>
             )}
 
-            <div className="pt-3 border-t border-[#1e2e4a] flex justify-end">
+            <div className="flex justify-end border-t border-border pt-3">
               <Button variant="outline" size="sm" onClick={() => setSelectedDriver(null)}>
                 Close Profile
               </Button>

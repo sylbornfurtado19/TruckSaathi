@@ -1,12 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { ArrowDown, ArrowUp, Loader2, X } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowUp, ArrowDown, Loader2, X } from 'lucide-react';
 
-/* -------------------------------------------------------------------------- */
-/*                                   BUTTON                                   */
-/* -------------------------------------------------------------------------- */
+const focusRing = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'amber';
@@ -15,397 +13,42 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
 }
 
-export const Button: React.FC<ButtonProps> = ({
-  children,
-  variant = 'primary',
-  size = 'md',
-  icon,
-  loading = false,
-  disabled,
-  className = '',
-  ...props
-}) => {
-  const baseStyle =
-    'inline-flex items-center justify-center font-bold rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 relative select-none active:scale-[0.98]';
-
-  const variants = {
-    primary:
-      'bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-600/25 border border-blue-400/25 hover:shadow-blue-500/40',
-    secondary:
-      'bg-white/[0.05] hover:bg-white/[0.1] active:bg-white/[0.03] text-slate-200 border border-white/[0.1] hover:border-white/[0.2]',
-    outline:
-      'bg-transparent border border-white/[0.12] text-slate-300 hover:bg-white/[0.06] hover:text-white hover:border-white/[0.25]',
-    ghost:
-      'bg-transparent text-slate-400 hover:text-white hover:bg-white/[0.06]',
-    danger:
-      'bg-rose-500/15 hover:bg-rose-500/25 active:bg-rose-500/30 text-rose-300 border border-rose-500/30 shadow-sm shadow-rose-500/10',
-    amber:
-      'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-extrabold shadow-lg shadow-amber-500/25 border border-amber-300/30'
-  };
-
-  const sizes = {
-    sm: 'text-xs px-3 py-1.5 gap-1.5 min-h-[32px]',
-    md: 'text-xs px-4 py-2 gap-2 min-h-[38px]',
-    lg: 'text-sm px-5 py-2.5 gap-2.5 min-h-[44px]'
-  };
-
-  return (
-    <button
-      disabled={disabled || loading}
-      className={`${baseStyle} ${variants[variant]} ${sizes[size]} ${className}`}
-      {...props}
-    >
-      {loading ? (
-        <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
-      ) : icon ? (
-        <span className="shrink-0">{icon}</span>
-      ) : null}
-      <span>{children}</span>
-    </button>
-  );
+export const Button: React.FC<ButtonProps> = ({ children, variant = 'primary', size = 'md', icon, loading = false, disabled, className = '', ...props }) => {
+  const variants = { primary: 'bg-brand-orange text-white hover:bg-orange-700 border-brand-orange', secondary: 'bg-surface-muted text-text-primary hover:bg-slate-200 border-border', outline: 'bg-transparent text-text-primary hover:bg-surface-muted border-border', ghost: 'bg-transparent text-text-secondary hover:bg-surface-muted border-transparent', danger: 'bg-red-600 text-white hover:bg-red-700 border-red-600', amber: 'bg-brand-orange text-white hover:bg-orange-700 border-brand-orange' };
+  const sizes = { sm: 'min-h-8 px-3 text-xs gap-1.5', md: 'min-h-9 px-4 text-sm gap-2', lg: 'min-h-11 px-5 text-sm gap-2.5' };
+  return <button disabled={disabled || loading} className={`inline-flex items-center justify-center rounded-control border font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50 ${focusRing} ${variants[variant]} ${sizes[size]} ${className}`} {...props}>{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : icon ? <span className="shrink-0">{icon}</span> : null}<span>{children}</span></button>;
 };
 
-/* -------------------------------------------------------------------------- */
-/*                                    CARD                                    */
-/* -------------------------------------------------------------------------- */
+export const Card: React.FC<{ children: React.ReactNode; className?: string; onClick?: () => void; glow?: string; tilt?: boolean }> = ({ children, className = '', onClick }) => <div onClick={onClick} className={`rounded-card border border-border bg-surface p-5 ${onClick ? 'cursor-pointer hover:border-slate-300' : ''} ${className}`}>{children}</div>;
 
-export const Card: React.FC<{
-  children: React.ReactNode;
-  className?: string;
-  onClick?: () => void;
-  glow?: 'blue' | 'emerald' | 'amber' | 'rose' | 'cyan' | 'none';
-  tilt?: boolean;
-}> = ({ children, className = '', onClick, glow = 'none' }) => {
-  const shouldReduceMotion = useReducedMotion();
+type StatusVariant = 'success' | 'warning' | 'danger' | 'info' | 'cyan' | 'neutral' | 'maintenance' | 'vibe';
+const statusStyles: Record<StatusVariant, string> = { success: 'bg-green-50 text-green-800 border-green-200', warning: 'bg-amber-50 text-amber-800 border-amber-200', danger: 'bg-red-50 text-red-800 border-red-200', info: 'bg-blue-50 text-blue-800 border-blue-200', cyan: 'bg-blue-50 text-blue-800 border-blue-200', neutral: 'bg-slate-100 text-slate-700 border-slate-200', maintenance: 'bg-violet-50 text-violet-800 border-violet-200', vibe: 'bg-orange-50 text-orange-800 border-orange-200' };
+const statusDots: Record<StatusVariant, string> = { success: 'bg-green-600', warning: 'bg-amber-600', danger: 'bg-red-600', info: 'bg-blue-600', cyan: 'bg-blue-600', neutral: 'bg-slate-500', maintenance: 'bg-violet-600', vibe: 'bg-orange-600' };
+export const StatusPill: React.FC<{ children: React.ReactNode; status?: StatusVariant; variant?: StatusVariant; className?: string }> = ({ children, status = 'neutral', variant, className = '' }) => { const resolved = variant || status; return <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${statusStyles[resolved]} ${className}`}><span className={`h-1.5 w-1.5 rounded-full ${statusDots[resolved]}`} />{children}</span>; };
+export const Badge: React.FC<{ children: React.ReactNode; variant?: StatusVariant; pulse?: boolean; className?: string }> = ({ children, variant = 'neutral', className = '' }) => <StatusPill status={variant} className={className}>{children}</StatusPill>;
 
-  const glowStyles = {
-    none: 'border-white/[0.08] hover:border-white/[0.16]',
-    blue: 'border-white/[0.08] hover:border-blue-500/40 hover:shadow-[0_12px_40px_rgba(59,130,246,0.15)]',
-    emerald: 'border-white/[0.08] hover:border-emerald-500/40 hover:shadow-[0_12px_40px_rgba(16,185,129,0.15)]',
-    amber: 'border-white/[0.08] hover:border-amber-500/40 hover:shadow-[0_12px_40px_rgba(245,158,11,0.15)]',
-    rose: 'border-white/[0.08] hover:border-rose-500/40 hover:shadow-[0_12px_40px_rgba(244,63,94,0.15)]',
-    cyan: 'border-white/[0.08] hover:border-cyan-500/40 hover:shadow-[0_12px_40px_rgba(6,182,212,0.15)]'
-  };
+export const Input: React.FC<React.InputHTMLAttributes<HTMLInputElement> & { icon?: React.ReactNode }> = ({ icon, className = '', ...props }) => <div className="relative w-full">{icon && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">{icon}</span>}<input className={`w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted ${icon ? 'pl-9' : ''} ${focusRing} ${className}`} {...props} /></div>;
+export const Select: React.FC<React.SelectHTMLAttributes<HTMLSelectElement>> = ({ className = '', ...props }) => <select className={`w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary ${focusRing} ${className}`} {...props} />;
+export const Textarea: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement>> = ({ className = '', ...props }) => <textarea className={`w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted ${focusRing} ${className}`} {...props} />;
 
-  return (
-    <motion.div
-      whileHover={shouldReduceMotion || !onClick ? {} : { y: -2 }}
-      transition={{ duration: 0.18, ease: 'easeOut' }}
-      onClick={onClick}
-      className={`bg-[#12151e]/90 backdrop-blur-xl rounded-2xl p-5 border transition-all duration-200 relative shadow-[0_8px_32px_rgba(0,0,0,0.36)] ${glowStyles[glow]} ${
-        onClick ? 'cursor-pointer' : ''
-      } ${className}`}
-    >
-      {/* Precision top edge highlight */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent pointer-events-none" />
-      {children}
-    </motion.div>
-  );
-};
+export const Table: React.FC<React.TableHTMLAttributes<HTMLTableElement>> = ({ className = '', ...props }) => <div className="overflow-x-auto rounded-card border border-border"><table className={`w-full border-collapse text-left text-[13px] ${className}`} {...props} /></div>;
+export const TableHeader: React.FC<React.HTMLAttributes<HTMLTableSectionElement>> = ({ className = '', ...props }) => <thead className={`sticky top-0 bg-surface-muted text-xs font-semibold text-text-secondary ${className}`} {...props} />;
+export const TableBody: React.FC<React.HTMLAttributes<HTMLTableSectionElement>> = ({ className = '', ...props }) => <tbody className={`divide-y divide-border ${className}`} {...props} />;
+export const TableRow: React.FC<React.HTMLAttributes<HTMLTableRowElement>> = ({ className = '', ...props }) => <tr className={`h-11 transition-colors duration-150 hover:bg-surface-muted ${className}`} {...props} />;
+export const TableHead: React.FC<React.ThHTMLAttributes<HTMLTableCellElement>> = ({ className = '', ...props }) => <th className={`px-4 py-3 text-left ${className}`} {...props} />;
+export const TableCell: React.FC<React.TdHTMLAttributes<HTMLTableCellElement>> = ({ className = '', ...props }) => <td className={`px-4 py-3 text-text-primary ${className}`} {...props} />;
 
-/* -------------------------------------------------------------------------- */
-/*                                    BADGE                                   */
-/* -------------------------------------------------------------------------- */
+export const PageHeader: React.FC<{ title: string; description?: string; subtitle?: string; badge?: React.ReactNode; actions?: React.ReactNode }> = ({ title, description, subtitle, badge, actions }) => <div className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between"><div><div className="flex flex-wrap items-center gap-2"><h1 className="text-2xl font-bold text-brand-navy dark:text-text-primary">{title}</h1>{badge}</div>{(description || subtitle) && <p className="mt-1 max-w-2xl text-sm text-text-secondary">{description || subtitle}</p>}</div>{actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}</div>;
+export const AnimatedNumber: React.FC<{ value: number }> = ({ value }) => <span className="tabular-nums font-semibold">{value}</span>;
 
-export const Badge: React.FC<{
-  children: React.ReactNode;
-  variant?: 'success' | 'warning' | 'danger' | 'info' | 'cyan' | 'neutral' | 'vibe';
-  pulse?: boolean;
-  className?: string;
-}> = ({ children, variant = 'neutral', pulse = false, className = '' }) => {
-  const styles = {
-    success: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25 shadow-[0_0_12px_rgba(16,185,129,0.12)]',
-    warning: 'bg-amber-500/10 text-amber-400 border-amber-500/25 shadow-[0_0_12px_rgba(245,158,11,0.12)]',
-    danger: 'bg-rose-500/10 text-rose-400 border-rose-500/25 shadow-[0_0_12px_rgba(244,63,94,0.12)]',
-    info: 'bg-blue-500/10 text-blue-400 border-blue-500/25 shadow-[0_0_12px_rgba(59,130,246,0.12)]',
-    cyan: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/25 shadow-[0_0_12px_rgba(6,182,212,0.12)]',
-    neutral: 'bg-white/[0.05] text-slate-300 border-white/[0.1]',
-    vibe: 'bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 text-amber-300 border-amber-400/30 shadow-[0_0_16px_rgba(245,158,11,0.15)]'
-  };
+interface KpiProps { title?: string; label?: string; value?: string | number; number?: string | number; subtext?: string; delta?: string; trend?: { direction?: 'up' | 'down'; isPositive?: boolean; value: string }; icon?: React.ReactNode; iconBg?: string; glow?: string; sparkline?: React.ReactNode; }
+export const KpiCard: React.FC<KpiProps> = ({ title, label, value, number, subtext, delta, trend, icon, sparkline }) => { const change = delta || trend?.value; const positive = trend?.isPositive ?? (trend?.direction ? trend.direction === 'up' : true); return <Card className="flex min-h-32 flex-col justify-between"><div className="flex items-start justify-between gap-3"><span className="text-xs font-semibold text-text-secondary">{label || title}</span>{icon && <span className="text-brand-orange">{icon}</span>}</div><div className="mt-3 flex items-end justify-between gap-3"><span className="text-2xl font-bold tabular-nums text-text-primary">{number ?? value}</span>{change && <span className={`inline-flex items-center gap-1 text-xs font-semibold ${positive ? 'text-green-700' : 'text-red-700'}`}>{positive ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />}{change}</span>}{sparkline}</div>{subtext && <span className="mt-2 text-xs text-text-muted">{subtext}</span>}</Card>; };
+export const KPICard: React.FC<KpiProps> = props => <KpiCard {...props} />;
 
-  const dotStyles = {
-    success: 'bg-emerald-400',
-    warning: 'bg-amber-400',
-    danger: 'bg-rose-400',
-    info: 'bg-blue-400',
-    cyan: 'bg-cyan-400',
-    neutral: 'bg-slate-400',
-    vibe: 'bg-amber-400'
-  };
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border backdrop-blur-md ${styles[variant]} ${className}`}
-    >
-      {pulse && (
-        <span className="relative flex h-1.5 w-1.5">
-          <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${dotStyles[variant]}`} />
-          <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${dotStyles[variant]}`} />
-        </span>
-      )}
-      {children}
-    </span>
-  );
-};
-
-/* -------------------------------------------------------------------------- */
-/*                                    INPUT                                   */
-/* -------------------------------------------------------------------------- */
-
-export const Input: React.FC<React.InputHTMLAttributes<HTMLInputElement> & { icon?: React.ReactNode }> = ({
-  icon,
-  className = '',
-  ...props
-}) => (
-  <div className="relative w-full">
-    {icon && <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">{icon}</span>}
-    <input
-      className={`w-full bg-white/[0.03] border border-white/[0.1] focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none rounded-xl text-xs text-white placeholder:text-slate-500 py-2.5 transition-all shadow-inner ${
-        icon ? 'pl-9 pr-3' : 'px-3.5'
-      } ${className}`}
-      {...props}
-    />
-  </div>
-);
-
-/* -------------------------------------------------------------------------- */
-/*                                 PAGE HEADER                                */
-/* -------------------------------------------------------------------------- */
-
-export const PageHeader: React.FC<{
-  title: string;
-  description: string;
-  badge?: React.ReactNode;
-  actions?: React.ReactNode;
-}> = ({ title, description, badge, actions }) => (
-  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
-    <div className="space-y-1">
-      <div className="flex flex-wrap items-center gap-2.5">
-        <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
-          {title}
-        </h1>
-        {badge && (
-          typeof badge === 'string' ? (
-            <span className="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/30">
-              {badge}
-            </span>
-          ) : badge
-        )}
-      </div>
-      <p className="text-xs sm:text-sm text-slate-400 max-w-2xl leading-relaxed">{description}</p>
-    </div>
-    {actions && <div className="flex items-center gap-2.5 self-start sm:self-auto shrink-0">{actions}</div>}
-  </div>
-);
-
-/* -------------------------------------------------------------------------- */
-/*                              ANIMATED NUMBER                               */
-/* -------------------------------------------------------------------------- */
-
-export const AnimatedNumber: React.FC<{ value: number }> = ({ value }) => {
-  const [displayValue, setDisplayValue] = useState(0);
-
-  useEffect(() => {
-    let start = 0;
-    const end = value;
-    if (start === end) return;
-
-    const duration = 600; // ms
-    const increment = end / (duration / 16);
-
-    const timer = setInterval(() => {
-      start += increment;
-      if (start >= end) {
-        setDisplayValue(end);
-        clearInterval(timer);
-      } else {
-        setDisplayValue(Math.floor(start));
-      }
-    }, 16);
-
-    return () => clearInterval(timer);
-  }, [value]);
-
-  return <span className="tabular-nums font-bold">{displayValue}</span>;
-};
-
-/* -------------------------------------------------------------------------- */
-/*                                  KPI CARD                                  */
-/* -------------------------------------------------------------------------- */
-
-export const KPICard: React.FC<{
-  title: string;
-  value: string | number;
-  subtext?: string;
-  trend?: { direction?: 'up' | 'down'; isPositive?: boolean; value: string };
-  icon: React.ReactNode;
-  iconBg?: string;
-  glow?: 'blue' | 'emerald' | 'amber' | 'rose' | 'cyan';
-}> = ({
-  title,
-  value,
-  subtext,
-  trend,
-  icon,
-  iconBg = 'bg-blue-600/10 text-blue-400 border-blue-500/20',
-  glow = 'blue'
-}) => {
-  const isUp = trend?.direction === 'up' || trend?.isPositive === true;
-
-  return (
-    <Card glow={glow} className="relative overflow-hidden p-5 flex flex-col justify-between group">
-      <div>
-        <div className="flex items-center justify-between">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">{title}</span>
-          <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 shadow-md ${iconBg}`}>{icon}</div>
-        </div>
-        <div className="mt-3 text-3xl sm:text-4xl font-black text-white tracking-tight flex items-baseline justify-between">
-          {typeof value === 'number' ? <AnimatedNumber value={value} /> : <span className="tabular-nums font-mono">{value}</span>}
-          {trend && (
-            <span
-              className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border flex items-center gap-1 font-mono ${
-                isUp
-                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                  : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-              }`}
-            >
-              {isUp ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
-              {trend.value}
-            </span>
-          )}
-        </div>
-      </div>
-      {subtext && <div className="mt-2 text-xs text-slate-400 flex items-center gap-1 font-medium">{subtext}</div>}
-
-      {/* Bottom glowing accent line */}
-      <div className="mt-3 pt-2 border-t border-white/[0.04] flex items-center justify-between text-[10px] text-slate-500 font-mono">
-        <span className="flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" /> Live Telemetry
-        </span>
-        <span className="group-hover:text-blue-400 transition-colors">Nominal</span>
-      </div>
-    </Card>
-  );
-};
-
-/* -------------------------------------------------------------------------- */
-/*                               MODAL / DIALOG                               */
-/* -------------------------------------------------------------------------- */
-
-export const Modal: React.FC<{
-  isOpen: boolean;
-  onClose: () => void;
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | string;
-  maxWidth?: string;
-}> = ({ isOpen, onClose, title, description, children, size = 'lg', maxWidth }) => {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
-  const sizeClasses: Record<string, string> = {
-    sm: 'max-w-md',
-    md: 'max-w-lg',
-    lg: 'max-w-2xl',
-    xl: 'max-w-4xl'
-  };
-
-  const resolvedWidth = maxWidth || sizeClasses[size] || 'max-w-2xl';
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150">
-      <div className="absolute inset-0" onClick={onClose} />
-      <div
-        className={`relative z-10 w-full ${resolvedWidth} bg-[#12151e]/95 backdrop-blur-2xl border border-white/[0.1] rounded-2xl p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-150`}
-      >
-        <div className="flex items-start justify-between border-b border-white/[0.08] pb-3.5">
-          <div className="space-y-0.5">
-            <h2 className="text-lg font-black text-white tracking-tight">{title}</h2>
-            {description && <p className="text-xs text-slate-400">{description}</p>}
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-        <div className="max-h-[75vh] overflow-y-auto pr-1">{children}</div>
-      </div>
-    </div>
-  );
-};
-
-/* -------------------------------------------------------------------------- */
-/*                                 EMPTY STATE                                */
-/* -------------------------------------------------------------------------- */
-
-export const EmptyState: React.FC<{
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  action?: React.ReactNode;
-}> = ({ icon, title, description, action }) => (
-  <div className="p-10 rounded-2xl bg-white/[0.02] border border-white/[0.08] text-center space-y-3 flex flex-col items-center justify-center">
-    <div className="w-12 h-12 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shadow-lg shadow-blue-500/10">
-      {icon}
-    </div>
-    <div className="space-y-1 max-w-sm">
-      <h3 className="text-sm font-bold text-white">{title}</h3>
-      <p className="text-xs text-slate-400 leading-relaxed">{description}</p>
-    </div>
-    {action && <div className="pt-2">{action}</div>}
-  </div>
-);
-
-/* -------------------------------------------------------------------------- */
-/*                            ANIMATION VARIANTS                              */
-/* -------------------------------------------------------------------------- */
-
-export const itemVariants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.25 } }
-};
-
-export const RouteDivider: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <div className={`route-line-divider my-4 ${className}`} />
-);
-
-export const AnimatedPage: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const shouldReduceMotion = useReducedMotion();
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: shouldReduceMotion ? 0 : 0.05
-      }
-    }
-  };
-
-  return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="space-y-6 relative"
-    >
-      {children}
-    </motion.div>
-  );
-};
+export const Modal: React.FC<{ isOpen: boolean; onClose: () => void; title: string; description?: string; children: React.ReactNode; size?: 'sm' | 'md' | 'lg' | 'xl' | string; maxWidth?: string }> = ({ isOpen, onClose, title, description, children, size = 'lg', maxWidth }) => { useEffect(() => { const key = (event: KeyboardEvent) => event.key === 'Escape' && onClose(); if (isOpen) { document.body.style.overflow = 'hidden'; window.addEventListener('keydown', key); } return () => { document.body.style.overflow = ''; window.removeEventListener('keydown', key); }; }, [isOpen, onClose]); if (!isOpen) return null; const sizes: Record<string, string> = { sm: 'max-w-md', md: 'max-w-lg', lg: 'max-w-2xl', xl: 'max-w-4xl' }; return <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"><button className="absolute inset-0 cursor-default" aria-label="Close modal" onClick={onClose} /><div className={`relative z-10 w-full rounded-card border border-border bg-surface p-6 shadow-popover ${maxWidth || sizes[size] || sizes.lg}`}><div className="mb-5 flex items-start justify-between border-b border-border pb-4"><div><h2 className="text-lg font-bold text-text-primary">{title}</h2>{description && <p className="mt-1 text-sm text-text-secondary">{description}</p>}</div><button onClick={onClose} className={`rounded-control p-1 text-text-secondary hover:bg-surface-muted ${focusRing}`} aria-label="Close"><X className="h-4 w-4" /></button></div><div className="max-h-[75vh] overflow-y-auto">{children}</div></div></div>; };
+export const Drawer: React.FC<{ isOpen: boolean; onClose: () => void; title: string; children: React.ReactNode }> = ({ isOpen, onClose, title, children }) => !isOpen ? null : <div className="fixed inset-0 z-50 bg-black/40"><button className="absolute inset-0" aria-label="Close drawer" onClick={onClose} /><aside className="absolute right-0 top-0 h-full w-full max-w-lg overflow-y-auto border-l border-border bg-surface p-6 shadow-popover"><div className="mb-6 flex items-center justify-between border-b border-border pb-4"><h2 className="text-lg font-bold text-text-primary">{title}</h2><button onClick={onClose} className={`rounded-control p-1 text-text-secondary hover:bg-surface-muted ${focusRing}`} aria-label="Close"><X className="h-4 w-4" /></button></div>{children}</aside></div>;
+export const EmptyState: React.FC<{ icon: React.ReactNode; title: string; description: string; action?: React.ReactNode }> = ({ icon, title, description, action }) => <div className="flex flex-col items-center justify-center gap-3 rounded-card border border-dashed border-border p-10 text-center"><div className="text-brand-orange">{icon}</div><h3 className="text-sm font-semibold text-text-primary">{title}</h3><p className="max-w-sm text-sm text-text-secondary">{description}</p>{action}</div>;
+export const Skeleton: React.FC<{ className?: string }> = ({ className = '' }) => <div className={`animate-pulse rounded-control bg-surface-muted ${className}`} aria-hidden="true" />;
+export const itemVariants = { hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.15 } } };
+export const RouteDivider: React.FC<{ className?: string }> = ({ className = '' }) => <div className={`route-line-divider my-4 ${className}`} />;
+export const AnimatedPage: React.FC<{ children: React.ReactNode }> = ({ children }) => { const reduce = useReducedMotion(); return <motion.div initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="space-y-6">{children}</motion.div>; };

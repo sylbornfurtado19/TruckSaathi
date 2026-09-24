@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Bell, Shield, Clock, FileCheck, CheckCircle2, ShieldCheck } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Bell, Shield, Clock, FileCheck, CheckCircle2, ShieldCheck, Sun, Moon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
 import { PageHeader, Card, Button, Badge, AnimatedPage, itemVariants } from '@/components/ui';
@@ -10,10 +10,25 @@ export function SettingsContent() {
   const { activityLogs, vehicles, drivers, trips } = useApp();
   const [activeTab, setActiveTab] = useState<'general' | 'audit'>('general');
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window === 'undefined') return 'light';
+    return window.localStorage.getItem('trucksaathi-theme') === 'dark' ? 'dark' : 'light';
+  });
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   const handleSave = () => {
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 3000);
+  };
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme);
+    document.documentElement.dataset.theme = nextTheme;
+    window.localStorage.setItem('trucksaathi-theme', nextTheme);
   };
 
   return (
@@ -57,6 +72,15 @@ export function SettingsContent() {
 
         {activeTab === 'general' ? (
           <Card className="p-6 space-y-6 max-w-3xl text-xs border-[#1e2e4a]">
+            <div className="flex items-center justify-between border-b border-border pb-4">
+              <div>
+                <h2 className="text-sm font-bold text-text-primary">Appearance</h2>
+                <p className="mt-1 text-sm text-text-secondary">Choose the display theme for this device.</p>
+              </div>
+              <Button variant="outline" size="sm" onClick={toggleTheme} icon={theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}>
+                {theme === 'light' ? 'Dark theme' : 'Light theme'}
+              </Button>
+            </div>
             <div className="space-y-4">
               <h2 className="text-sm font-bold text-slate-100 flex items-center gap-2">
                 <Bell className="w-4 h-4 text-amber-400" />

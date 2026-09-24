@@ -72,43 +72,43 @@ export function NotificationsPanel({ isOpen, onClose }: NotificationsPanelProps)
       ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       {/* Click outside to close backdrop */}
       <div className="absolute inset-0" onClick={onClose} />
 
-      <div className="glass-panel border border-[#202736] rounded-2xl w-full max-w-md p-6 space-y-6 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between border-b border-[#202736] pb-4">
+      <div className="relative z-10 w-full max-w-md space-y-6 rounded-card border border-border bg-surface p-6 shadow-popover">
+        <div className="flex items-center justify-between border-b border-border pb-4">
           <div className="flex items-center gap-2">
-            <Bell className="w-5 h-5 text-blue-400" />
-            <h2 className="text-base font-bold text-slate-50">Notifications & Alerts</h2>
+            <Bell className="h-5 w-5 text-focus" />
+            <h2 className="text-base font-bold text-text-primary">Notifications and alerts</h2>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-[#1c2333]">
+          <button onClick={onClose} className="rounded-control p-1 text-text-secondary hover:bg-surface-muted" aria-label="Close notifications">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="space-y-4 text-xs max-h-[60vh] overflow-y-auto pr-1">
+        <div className="max-h-[60vh] space-y-4 overflow-y-auto pr-1 text-sm">
           {['Today', 'Earlier'].map(group => (
             <div key={group} className="space-y-2">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{group}</div>
+              <div className="text-xs font-semibold text-text-muted">{group}</div>
               {notifications
                 .filter(n => n.group === group)
                 .map(n => (
-                  <div key={n.id} className="p-3.5 rounded-xl bg-[#1c2333]/80 border border-[#2e374a] space-y-2">
+                  <div key={n.id} className="space-y-2 rounded-control border border-border bg-surface-muted p-3.5">
                     <div className="flex items-center justify-between">
                       <Badge variant={n.severity}>{n.title}</Badge>
-                      <span className="text-[10px] text-slate-500 flex items-center gap-1 font-mono">
+                      <span className="flex items-center gap-1 text-xs text-text-muted">
                         <Clock className="w-3 h-3" /> {n.time}
                       </span>
                     </div>
-                    <p className="text-slate-300 leading-relaxed">{n.desc}</p>
+                    <p className="leading-relaxed text-text-secondary">{n.desc}</p>
                   </div>
                 ))}
             </div>
           ))}
         </div>
 
-        <div className="pt-2 border-t border-[#202736]">
+        <div className="border-t border-border pt-2">
           <Button variant="secondary" className="w-full" onClick={onClose}>
             Mark All as Read
           </Button>
