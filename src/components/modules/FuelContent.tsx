@@ -95,7 +95,7 @@ export function FuelContent() {
       <motion.div variants={itemVariants}>
         <PageHeader
           badge={
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/30">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-muted px-2.5 py-1 text-xs font-semibold text-text-secondary">
               <Fuel className="w-3.5 h-3.5" />
               Fuel Telemetry
             </span>
@@ -152,18 +152,18 @@ export function FuelContent() {
       {/* 3. Fuel Theft Alert Hero Notice */}
       {theftAlertsCount > 0 && (
         <motion.div variants={itemVariants}>
-          <div className="p-4 rounded-xl bg-[#120c14] border border-rose-500/40 shadow-lg">
+          <div className="rounded-card border border-red-200 bg-red-50 p-4 dark:border-red-900/60 dark:bg-red-950/20">
             <div className="flex items-start gap-3.5">
               <div className="w-10 h-10 rounded-lg bg-rose-600/15 border border-rose-500/30 flex items-center justify-center text-rose-400 shrink-0">
-                <AlertTriangle className="w-5 h-5 animate-pulse" />
+                <AlertTriangle className="h-5 w-5" />
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-mono font-bold text-rose-400 uppercase tracking-wider">CRITICAL FUEL DRAIN TELEMETRY</span>
+                  <span className="font-mono text-xs font-bold uppercase tracking-wider text-status-red">CRITICAL FUEL DRAIN TELEMETRY</span>
                   <Badge variant="danger">Action Required</Badge>
                 </div>
-                <h3 className="text-sm font-bold text-slate-100">Abnormal Tank Level Drop Detected on KA-01-EA-9011</h3>
-                <p className="text-xs text-slate-300">
+                <h3 className="text-sm font-bold text-text-primary">Abnormal Tank Level Drop Detected on KA-01-EA-9011</h3>
+                <p className="text-sm text-text-secondary">
                   Sensor recorded a sudden 28-Liter fuel drop at 02:45 AM while vehicle ignition was OFF near Hosur RTO Checkpost.
                 </p>
               </div>
@@ -173,8 +173,8 @@ export function FuelContent() {
       )}
 
       {/* 4. Fuel Data Table */}
-      <motion.div variants={itemVariants} className="border border-[#1e2e4a] rounded-xl overflow-hidden bg-[#0b1120]/80 backdrop-blur-md shadow-xl">
-        <div className="p-4 border-b border-[#1e2e4a] flex flex-col sm:flex-row gap-3 items-center justify-between">
+      <motion.div variants={itemVariants} className="overflow-hidden rounded-card border border-border bg-surface">
+        <div className="flex flex-col items-center justify-between gap-3 border-b border-border p-4 sm:flex-row">
           <div className="w-full sm:w-80 relative">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
@@ -182,7 +182,7 @@ export function FuelContent() {
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               placeholder="Search registration, station..."
-              className="w-full bg-[#0a0f1d] border border-[#1e2e4a] focus:border-blue-500 focus:outline-none rounded-lg text-xs text-slate-200 pl-9 pr-3 py-2 font-sans"
+              className="w-full rounded-control border border-border bg-surface px-3 py-2 pl-9 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-focus"
             />
           </div>
           <span className="text-xs font-mono text-slate-400">{filteredLogs.length} Vehicles Tracked</span>
@@ -191,7 +191,7 @@ export function FuelContent() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-[#0d1527] text-slate-400 border-b border-[#1e2e4a] font-semibold uppercase tracking-wider text-[11px]">
+              <tr className="border-b border-border bg-surface-muted text-xs font-semibold uppercase tracking-wider text-text-secondary">
                 <th className="py-3.5 px-4 font-mono">Vehicle Reg</th>
                 <th className="py-3.5 px-4">Tank Level (%)</th>
                 <th className="py-3.5 px-4 font-mono">Current Volume</th>
@@ -201,7 +201,7 @@ export function FuelContent() {
                 <th className="py-3.5 px-4">Telemetry Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#16233b] text-slate-200">
+            <tbody className="divide-y divide-border text-text-primary">
               {filteredLogs.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-12">
@@ -219,11 +219,11 @@ export function FuelContent() {
                 </tr>
               ) : (
                 filteredLogs.map(log => (
-                  <tr key={log.id} className="hover:bg-[#131f38] transition-colors">
+                  <tr key={log.id} className="transition-colors hover:bg-surface-muted">
                     <td className="py-3.5 px-4 font-mono font-bold text-slate-100">{log.vehicleReg}</td>
                     <td className="py-3.5 px-4 font-mono">
                       <div className="flex items-center gap-2">
-                        <div className="w-24 bg-[#0a0f1d] rounded-full h-2 overflow-hidden border border-[#1e2e4a]">
+                        <div className="h-2 w-24 overflow-hidden rounded-full border border-border bg-surface-muted">
                           <div
                             className={`h-full rounded-full ${
                               log.fuelLevelPercent < 25
@@ -238,13 +238,13 @@ export function FuelContent() {
                         <span className="font-bold text-slate-200">{log.fuelLevelPercent}%</span>
                       </div>
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-slate-300">{log.fuelLiters} Liters</td>
-                    <td className="py-3.5 px-4 font-mono font-bold text-emerald-400">{log.avgKmpl} KMPL</td>
-                    <td className="py-3.5 px-4 text-slate-300 flex items-center gap-1.5">
+                    <td className="px-4 py-3.5 font-mono text-text-secondary">{log.fuelLiters} Liters</td>
+                    <td className="px-4 py-3.5 font-mono font-bold text-status-green">{log.avgKmpl} KMPL</td>
+                    <td className="flex items-center gap-1.5 px-4 py-3.5 text-text-secondary">
                       <Building className="w-3.5 h-3.5 text-blue-400" />
                       <span>{log.lastRefuelStation}</span>
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-slate-200 font-semibold">
+                    <td className="px-4 py-3.5 font-mono font-semibold text-text-primary">
                       ₹{log.lastRefuelCostINR.toLocaleString('en-IN')}
                     </td>
                     <td className="py-3.5 px-4">
@@ -279,7 +279,7 @@ export function FuelContent() {
               required
               value={vehicleId}
               onChange={e => setVehicleId(e.target.value)}
-              className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-control border border-border bg-surface px-3 py-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-focus"
             >
               <option value="">-- Choose Asset --</option>
               {vehicles.map(v => (
@@ -298,7 +298,7 @@ export function FuelContent() {
               placeholder="e.g. HPCL Highway Plaza - Khalapur"
               value={refuelStation}
               onChange={e => setRefuelStation(e.target.value)}
-              className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-control border border-border bg-surface px-3 py-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-focus"
             />
           </div>
 
@@ -312,7 +312,7 @@ export function FuelContent() {
                 max={500}
                 value={refuelLiters}
                 onChange={e => setRefuelLiters(Number(e.target.value))}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-text-primary focus:outline-none focus:ring-2 focus:ring-focus"
               />
             </div>
             <div>
@@ -323,12 +323,12 @@ export function FuelContent() {
                 min={500}
                 value={refuelCost}
                 onChange={e => setRefuelCost(Number(e.target.value))}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-text-primary focus:outline-none focus:ring-2 focus:ring-focus"
               />
             </div>
           </div>
 
-          <div className="pt-4 border-t border-[#1e2e4a] flex justify-end gap-3">
+          <div className="flex justify-end gap-3 border-t border-border pt-4">
             <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>

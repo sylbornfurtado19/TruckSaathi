@@ -3,7 +3,7 @@ import { LoginContent } from '@/components/modules/LoginContent';
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#060911]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-canvas" />}>
       <LoginContent />
     </Suspense>
   );

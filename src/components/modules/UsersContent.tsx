@@ -65,7 +65,7 @@ export function UsersContent() {
       <motion.div variants={itemVariants}>
         <PageHeader
           badge={
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/30">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-muted px-2.5 py-1 text-xs font-semibold text-text-secondary">
               <Users className="w-3.5 h-3.5" />
               Access Control
             </span>
@@ -105,7 +105,7 @@ export function UsersContent() {
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               placeholder="Search user name, email, department..."
-              className="w-full bg-[#0a0f1d] border border-[#1e2e4a] focus:border-blue-500 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 font-sans"
+              className="w-full rounded-control border border-border bg-surface px-3 py-2 pl-9 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-focus"
             />
           </div>
           <span className="text-xs font-mono text-slate-400">{filteredUsers.length} Users Provisioned</span>
@@ -113,11 +113,11 @@ export function UsersContent() {
       </motion.div>
 
       {/* 3. User Data Table */}
-      <motion.div variants={itemVariants} className="border border-[#1e2e4a] rounded-xl overflow-hidden bg-[#0b1120]/80 backdrop-blur-md shadow-xl">
+      <motion.div variants={itemVariants} className="overflow-hidden rounded-card border border-border bg-surface">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-[#0d1527] text-slate-400 border-b border-[#1e2e4a] font-semibold uppercase tracking-wider text-[11px]">
+              <tr className="border-b border-border bg-surface-muted text-xs font-semibold uppercase tracking-wider text-text-secondary">
                 <th className="py-3.5 px-4">User Name</th>
                 <th className="py-3.5 px-4 font-mono">Work Email</th>
                 <th className="py-3.5 px-4">Assigned Role</th>
@@ -126,7 +126,7 @@ export function UsersContent() {
                 <th className="py-3.5 px-4 font-mono">Last Activity</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#16233b] text-slate-200">
+            <tbody className="divide-y divide-border text-text-primary">
               {filteredUsers.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-12">
@@ -144,7 +144,7 @@ export function UsersContent() {
                 </tr>
               ) : (
                 filteredUsers.map(user => (
-                  <tr key={user.id} className="hover:bg-[#131f38] transition-colors">
+                  <tr key={user.id} className="transition-colors hover:bg-surface-muted">
                     <td className="py-3.5 px-4 font-semibold text-slate-100 flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-blue-600/15 border border-blue-500/30 text-blue-400 flex items-center justify-center font-bold text-xs shrink-0">
                         {user.fullName.charAt(0)}
@@ -184,7 +184,7 @@ export function UsersContent() {
                         </Badge>
                       )}
                     </td>
-                    <td className="py-3.5 px-4 text-slate-400 font-mono text-[11px]">{user.lastActive}</td>
+                    <td className="px-4 py-3.5 font-mono text-xs text-text-secondary">{user.lastActive}</td>
                   </tr>
                 ))
               )}
@@ -210,7 +210,7 @@ export function UsersContent() {
               placeholder="e.g. Anish Shah"
               value={fullName}
               onChange={e => setFullName(e.target.value)}
-              className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-control border border-border bg-surface px-3 py-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-focus"
             />
           </div>
 
@@ -222,7 +222,7 @@ export function UsersContent() {
               placeholder="name@mahindra.com"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-text-primary focus:outline-none focus:ring-2 focus:ring-focus"
             />
           </div>
 
@@ -232,7 +232,7 @@ export function UsersContent() {
               <select
                 value={role}
                 onChange={e => setRole(e.target.value as UserRole)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-focus"
               >
                 <option value="Super Admin">Super Admin</option>
                 <option value="Company Admin">Company Admin</option>
@@ -247,12 +247,12 @@ export function UsersContent() {
                 type="text"
                 value={department}
                 onChange={e => setDepartment(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-focus"
               />
             </div>
           </div>
 
-          <div className="pt-4 border-t border-[#1e2e4a] flex justify-end gap-3">
+          <div className="flex justify-end gap-3 border-t border-border pt-4">
             <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>

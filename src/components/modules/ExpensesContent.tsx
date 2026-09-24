@@ -63,7 +63,7 @@ export function ExpensesContent() {
       <motion.div variants={itemVariants}>
         <PageHeader
           badge={
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-muted px-2.5 py-1 text-xs font-semibold text-text-secondary">
               <DollarSign className="w-3.5 h-3.5" />
               Financial Telematics
             </span>
@@ -112,8 +112,8 @@ export function ExpensesContent() {
       </motion.div>
 
       {/* 3. Expense & P&L Table */}
-      <motion.div variants={itemVariants} className="border border-[#1e2e4a] rounded-xl overflow-hidden bg-[#0b1120]/80 backdrop-blur-md shadow-xl">
-        <div className="p-4 border-b border-[#1e2e4a] flex flex-col sm:flex-row gap-3 items-center justify-between">
+      <motion.div variants={itemVariants} className="overflow-hidden rounded-card border border-border bg-surface">
+        <div className="flex flex-col items-center justify-between gap-3 border-b border-border p-4 sm:flex-row">
           <div className="w-full sm:w-80 relative">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
@@ -121,7 +121,7 @@ export function ExpensesContent() {
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               placeholder="Search trip code, vehicle, driver..."
-              className="w-full bg-[#0a0f1d] border border-[#1e2e4a] focus:border-blue-500 focus:outline-none rounded-lg text-xs text-slate-200 pl-9 pr-3 py-2 font-sans"
+              className="w-full rounded-control border border-border bg-surface px-3 py-2 pl-9 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-focus"
             />
           </div>
           <span className="text-xs font-mono text-slate-400">{filteredExpenses.length} Trip P&L Statements</span>
@@ -130,7 +130,7 @@ export function ExpensesContent() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-[#0d1527] text-slate-400 border-b border-[#1e2e4a] font-semibold uppercase tracking-wider text-[11px]">
+              <tr className="border-b border-border bg-surface-muted text-xs font-semibold uppercase tracking-wider text-text-secondary">
                 <th className="py-3.5 px-4 font-mono">Trip Code</th>
                 <th className="py-3.5 px-4">Vehicle & Driver</th>
                 <th className="py-3.5 px-4 font-mono">Gross Revenue</th>
@@ -141,7 +141,7 @@ export function ExpensesContent() {
                 <th className="py-3.5 px-4">Margin %</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#16233b] text-slate-200">
+            <tbody className="divide-y divide-border text-text-primary">
               {filteredExpenses.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-12">
@@ -159,29 +159,29 @@ export function ExpensesContent() {
                 </tr>
               ) : (
                 filteredExpenses.map(exp => (
-                  <tr key={exp.id} className="hover:bg-[#131f38] transition-colors">
-                    <td className="py-3.5 px-4 font-mono font-bold text-blue-400">
-                      <span className="bg-[#0a0f1d] border border-[#1e2e4a] px-2 py-0.5 rounded text-xs">
+                  <tr key={exp.id} className="transition-colors hover:bg-surface-muted">
+                    <td className="px-4 py-3.5 font-mono font-bold text-brand-orange">
+                      <span className="rounded-control border border-border bg-surface-muted px-2 py-1 text-xs">
                         {exp.tripCode}
                       </span>
                     </td>
                     <td className="py-3.5 px-4">
-                      <div className="font-bold text-slate-100 font-mono">{exp.vehicleReg}</div>
-                      <div className="text-[11px] text-slate-400">{exp.driverName}</div>
+                      <div className="font-mono font-bold text-text-primary">{exp.vehicleReg}</div>
+                      <div className="text-xs text-text-secondary">{exp.driverName}</div>
                     </td>
-                    <td className="py-3.5 px-4 font-mono font-bold text-slate-100">
+                    <td className="px-4 py-3.5 font-mono font-bold text-text-primary">
                       ₹{exp.freightRevenue.toLocaleString('en-IN')}
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-slate-300">
+                    <td className="px-4 py-3.5 font-mono text-text-secondary">
                       ₹{exp.fuelCost.toLocaleString('en-IN')}
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-slate-300">
+                    <td className="px-4 py-3.5 font-mono text-text-secondary">
                       ₹{exp.tollCost.toLocaleString('en-IN')}
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-slate-300">
+                    <td className="px-4 py-3.5 font-mono text-text-secondary">
                       ₹{exp.driverAllowance.toLocaleString('en-IN')}
                     </td>
-                    <td className="py-3.5 px-4 font-mono font-bold text-emerald-400">
+                    <td className="px-4 py-3.5 font-mono font-bold text-status-green">
                       ₹{exp.netProfit.toLocaleString('en-IN')}
                     </td>
                     <td className="py-3.5 px-4">

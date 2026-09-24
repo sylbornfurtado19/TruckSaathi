@@ -6,7 +6,6 @@ import { motion, useReducedMotion } from 'framer-motion';
 import {
   Mail,
   Lock,
-  ArrowRight,
   ShieldCheck,
   AlertCircle,
   CheckCircle2,
@@ -18,7 +17,6 @@ import {
   Building2,
   Truck
 } from 'lucide-react';
-import { Button } from '@/components/ui';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
 import { useApp } from '@/context/AppContext';
 import { ensureUserProfile } from '@/lib/services/profileService';
@@ -175,8 +173,6 @@ export function LoginContent() {
 
   return (
     <div className="min-h-screen bg-canvas text-text-primary flex flex-col justify-between overflow-hidden">
-      {/* Ambient background glows matching TruckSaathi brand palette */}
-
       {/* Main Container */}
       <div className="flex-1 max-w-7xl mx-auto w-full px-6 lg:px-12 py-10 lg:py-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center relative z-10">
         
@@ -189,8 +185,8 @@ export function LoginContent() {
         >
           {/* Brand Logo & Name */}
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 p-0.5 shadow-lg shadow-blue-600/25 flex items-center justify-center">
-              <div className="w-full h-full bg-[#0b0f19] rounded-[10px] flex items-center justify-center p-1.5">
+            <div className="flex h-12 w-12 items-center justify-center rounded-card bg-brand-navy p-0.5">
+              <div className="flex h-full w-full items-center justify-center rounded-control bg-brand-navy p-1.5">
                 <img
                   src="/logo-dark.png"
                   alt="TruckSaathi Logo"
@@ -198,24 +194,22 @@ export function LoginContent() {
                 />
               </div>
             </div>
-            <span className="text-2xl font-black tracking-tight text-white font-mono">
-              TRUCK<span className="text-blue-500">SAATHI</span>
+            <span className="font-mono text-2xl font-black tracking-tight text-brand-navy">
+              TRUCK<span className="text-brand-orange">SAATHI</span>
             </span>
           </div>
 
           {/* Badge Pill */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#121824]/90 border border-[#202736] text-xs font-semibold text-slate-300 shadow-inner">
-            <Sparkles className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
-            <span className="bg-gradient-to-r from-blue-400 to-sky-300 bg-clip-text text-transparent">
-              AI-Powered Logistics OS
-            </span>
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-muted px-3.5 py-1.5 text-sm font-semibold text-text-secondary">
+            <Sparkles className="h-4 w-4 text-brand-orange" />
+            <span>AI-powered logistics OS</span>
           </div>
 
           {/* Headline inspired by PLATR design */}
           <div className="space-y-2">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
+            <h1 className="text-4xl font-extrabold leading-[1.12] tracking-tight text-brand-navy sm:text-5xl lg:text-6xl">
               Seamless logistics, <br />
-              <span className="bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent">
+              <span className="text-brand-orange">
                 effortless
               </span>{' '}
               <br />
@@ -229,18 +223,18 @@ export function LoginContent() {
           </p>
 
           {/* Value Highlights */}
-          <div className="grid grid-cols-3 gap-4 pt-4 border-t border-[#1c2333] max-w-lg">
+          <div className="grid max-w-lg grid-cols-3 gap-4 border-t border-border pt-4">
             <div>
-              <div className="text-xl sm:text-2xl font-black text-white font-mono">99.8%</div>
-              <div className="text-xs text-slate-500 font-medium">GPS Telemetry Uptime</div>
+              <div className="font-mono text-xl font-black text-text-primary sm:text-2xl">99.8%</div>
+              <div className="text-xs font-medium text-text-secondary">GPS telemetry uptime</div>
             </div>
             <div>
-              <div className="text-xl sm:text-2xl font-black text-blue-400 font-mono">14+</div>
-              <div className="text-xs text-slate-500 font-medium">Integrated Modules</div>
+              <div className="font-mono text-xl font-black text-focus sm:text-2xl">14+</div>
+              <div className="text-xs font-medium text-text-secondary">Integrated modules</div>
             </div>
             <div>
-              <div className="text-xl sm:text-2xl font-black text-emerald-400 font-mono">&lt; 3s</div>
-              <div className="text-xs text-slate-500 font-medium">Digital POD Sync</div>
+              <div className="font-mono text-xl font-black text-green-700 sm:text-2xl">&lt; 3s</div>
+              <div className="text-xs font-medium text-text-secondary">Digital POD sync</div>
             </div>
           </div>
         </motion.div>
@@ -253,22 +247,20 @@ export function LoginContent() {
           className="lg:col-span-5"
         >
           <div className="space-y-6 rounded-card border border-border bg-surface p-6 shadow-popover sm:p-8">
-            {/* Subtle top card glow highlight */}
-
             {/* Card Header */}
             <div className="text-center space-y-1.5">
-              <h2 className="text-2xl font-bold tracking-tight text-white">Welcome Back</h2>
-              <p className="text-xs text-slate-400">Select your portal role to log in</p>
+              <h2 className="text-2xl font-bold tracking-tight text-text-primary">Welcome back</h2>
+              <p className="text-sm text-text-secondary">Select your portal role to log in</p>
             </div>
 
             {/* 2-Window Live Simulation Quick Demo Launcher */}
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-950/70 via-indigo-950/50 to-[#0e1627] border border-blue-500/40 shadow-xl space-y-2.5">
+            <div className="space-y-2.5 rounded-card border border-border bg-surface-muted p-4">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-white flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                  <Sparkles className="h-4 w-4 text-brand-orange" />
                   2-Window Live Simulation
                 </span>
-                <span className="text-[10px] font-mono text-cyan-300 font-bold bg-cyan-500/15 px-2 py-0.5 rounded-full border border-cyan-500/30">
+                <span className="rounded-full border border-border bg-surface px-2 py-1 font-mono text-xs font-bold text-text-secondary">
                   Real-Time Sync
                 </span>
               </div>
@@ -279,7 +271,7 @@ export function LoginContent() {
                     loginAsDemoRole('Fleet Manager');
                     router.push('/dashboard');
                   }}
-                  className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-blue-600/30 transition-all cursor-pointer active:scale-[0.98]"
+                  className="flex cursor-pointer items-center justify-center gap-1.5 rounded-control bg-brand-orange px-3 py-2.5 text-sm font-semibold text-white transition-colors duration-150 hover:bg-orange-700"
                 >
                   <Building2 className="w-3.5 h-3.5" />
                   <span>Fleet Manager</span>
@@ -296,17 +288,17 @@ export function LoginContent() {
                   <span>Driver (Ramesh)</span>
                 </button>
               </div>
-              <p className="text-[10px] text-slate-400 leading-tight">
+              <p className="text-xs leading-tight text-text-secondary">
                 💡 <strong>Demo tip:</strong> Open one tab as <em>Fleet Manager</em> and another tab (or Incognito) as <em>Driver</em> to see the highway simulation and speed sync in real time!
               </p>
             </div>
 
             {/* Role Selector Tabs (Customer vs Staff & Manager in PLATR reference) */}
-            <div className="p-1 rounded-xl bg-[#141b2b] border border-[#202738] grid grid-cols-2 gap-1 text-xs">
+            <div className="grid grid-cols-2 gap-1 rounded-control border border-border bg-surface-muted p-1 text-sm">
               <button
                 type="button"
                 onClick={() => handleRoleChange('driver')}
-                className={`py-2.5 px-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                  className={`flex cursor-pointer items-center justify-center gap-2 rounded-control px-3 py-2.5 font-semibold transition-colors duration-150 ${
                   portalRole === 'driver'
                     ? 'bg-brand-orange text-white'
                     : 'text-text-secondary hover:text-text-primary hover:bg-surface-muted'
@@ -318,7 +310,7 @@ export function LoginContent() {
               <button
                 type="button"
                 onClick={() => handleRoleChange('management')}
-                className={`py-2.5 px-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                  className={`flex cursor-pointer items-center justify-center gap-2 rounded-control px-3 py-2.5 font-semibold transition-colors duration-150 ${
                   portalRole === 'management'
                     ? 'bg-brand-orange text-white'
                     : 'text-text-secondary hover:text-text-primary hover:bg-surface-muted'
@@ -333,34 +325,17 @@ export function LoginContent() {
             <button
               type="button"
               onClick={handleGoogleLogin}
-              className="w-full py-2.5 px-4 bg-white hover:bg-slate-100 text-slate-900 font-semibold text-xs rounded-xl flex items-center justify-center gap-2.5 transition-all shadow-md cursor-pointer hover:shadow-lg active:scale-[0.99]"
+              className="flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-control border border-border bg-surface px-4 py-2.5 text-sm font-semibold text-text-primary transition-colors duration-150 hover:bg-surface-muted"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24">
-                <path
-                  fill="#4285F4"
-                  d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.15z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.27v3.15C3.25 21.31 7.31 24 12 24z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.27C.46 8.2.01 10.05.01 12s.45 3.8 1.26 5.42l4.01-3.15z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.69 1.27 6.58l4.01 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
-                />
-              </svg>
+              <span className="flex h-5 w-5 items-center justify-center rounded-full border border-border text-xs font-bold text-focus">G</span>
               <span>Continue with Google</span>
             </button>
 
             {/* Divider */}
             <div className="relative flex items-center justify-center">
-              <div className="border-t border-[#1f2838] w-full" />
-              <span className="bg-[#0c111d] px-3 text-[10px] uppercase font-bold tracking-widest text-slate-500 absolute">
-                OR SIGN IN WITH EMAIL
+              <div className="w-full border-t border-border" />
+              <span className="absolute bg-surface px-3 text-xs font-semibold text-text-muted">
+                Or sign in with email
               </span>
             </div>
 
@@ -371,7 +346,7 @@ export function LoginContent() {
                   <Info className="w-3.5 h-3.5 shrink-0" />
                   <span>Prototype Demo Mode</span>
                 </div>
-                <p className="text-[11px] text-slate-300 leading-relaxed">
+                <p className="text-sm leading-relaxed text-text-secondary">
                   Click below to log in instantly as{' '}
                   <strong className="text-white">
                     {portalRole === 'driver' ? 'Ramesh Kumar (Driver)' : 'Sylborn Furtado (Admin)'}
@@ -409,7 +384,7 @@ export function LoginContent() {
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       placeholder="name@example.com"
-                      className="w-full bg-[#141b2b] border border-[#202738] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 focus:outline-none rounded-xl text-slate-100 pl-10 pr-3.5 py-3 font-mono transition-colors"
+                      className="w-full rounded-control border border-border bg-surface px-3.5 py-3 pl-10 font-mono text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
                     />
                   </div>
                 </div>
@@ -424,7 +399,7 @@ export function LoginContent() {
                         setError(null);
                         setMessage(null);
                       }}
-                      className="text-blue-400 hover:text-blue-300 text-[11px] cursor-pointer"
+                      className="cursor-pointer text-sm text-focus hover:text-blue-700"
                     >
                       Forgot password?
                     </button>
@@ -437,7 +412,7 @@ export function LoginContent() {
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-[#141b2b] border border-[#202738] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 focus:outline-none rounded-xl text-slate-100 pl-10 pr-3.5 py-3 transition-colors"
+                      className="w-full rounded-control border border-border bg-surface px-3.5 py-3 pl-10 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
                     />
                   </div>
                 </div>
@@ -472,7 +447,7 @@ export function LoginContent() {
                       value={resetEmail || email}
                       onChange={e => setResetEmail(e.target.value)}
                       placeholder="name@example.com"
-                      className="w-full bg-[#141b2b] border border-[#202738] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 focus:outline-none rounded-xl text-slate-100 pl-10 pr-3.5 py-3 font-mono transition-colors"
+                      className="w-full rounded-control border border-border bg-surface px-3.5 py-3 pl-10 font-mono text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
                     />
                   </div>
                 </div>
@@ -480,7 +455,7 @@ export function LoginContent() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 px-4 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                  className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-control bg-brand-orange px-4 py-3.5 text-sm font-semibold text-white transition-colors duration-150 hover:bg-orange-700 disabled:opacity-60"
                 >
                   {loading ? (
                     <>
@@ -525,7 +500,7 @@ export function LoginContent() {
       </div>
 
       {/* Page Bottom Footer */}
-      <footer className="w-full max-w-7xl mx-auto px-6 lg:px-12 py-6 border-t border-[#1c2333]/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 relative z-10">
+      <footer className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-4 border-t border-border px-6 py-6 text-sm text-text-muted sm:flex-row lg:px-12">
         <div>© 2026 TruckSaathi Inc. All rights reserved.</div>
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-4 h-4 text-blue-400" />

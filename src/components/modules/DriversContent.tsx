@@ -110,7 +110,7 @@ export function DriversContent() {
       <motion.div variants={itemVariants}>
         <PageHeader
           badge={
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/30">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-muted px-2.5 py-1 text-xs font-medium text-text-secondary">
               <Users className="w-3.5 h-3.5" />
               Human Capital
             </span>
@@ -208,7 +208,7 @@ export function DriversContent() {
                 <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#16233b] text-slate-200">
+            <tbody className="divide-y divide-border text-text-primary">
               {filteredDrivers.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="py-12">
@@ -268,7 +268,7 @@ export function DriversContent() {
                             style={{ width: `${driver.safetyScore || 92}%` }}
                           />
                         </div>
-                        <span className="font-mono text-[11px] font-bold text-emerald-400">
+                        <span className="font-mono text-xs font-bold text-green-700">
                           {driver.safetyScore || 92}%
                         </span>
                       </div>
@@ -411,26 +411,26 @@ export function DriversContent() {
           <div className="space-y-4 text-xs">
             <div className="flex items-center justify-between rounded-control border border-border bg-surface-muted p-4">
               <div>
-                <span className="text-[11px] text-slate-400 font-mono">Assigned Asset</span>
+                <span className="text-xs text-text-secondary font-mono">Assigned asset</span>
                 <div className="text-base font-bold font-mono text-blue-400">{selectedDriver.assignedVehicle || 'Standby Pool'}</div>
               </div>
               <div>
-                <span className="text-[11px] text-slate-400 font-mono">Highway Experience</span>
+                <span className="text-xs text-text-secondary font-mono">Highway experience</span>
                 <div className="text-base font-bold font-mono text-slate-100">{selectedDriver.experienceYears} Years</div>
               </div>
               <div>
-                <span className="text-[11px] text-slate-400 font-mono">Safety Telematics</span>
+                <span className="text-xs text-text-secondary font-mono">Safety telematics</span>
                 <div className="text-base font-bold font-mono text-emerald-400">{selectedDriver.safetyScore || 94}% Nominal</div>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-control border border-border bg-surface-muted p-3">
-                <div className="text-slate-400 text-[11px] font-medium">Contact Phone</div>
+                <div className="text-text-secondary text-xs font-medium">Contact phone</div>
                 <div className="font-mono text-slate-100 font-bold mt-0.5">{selectedDriver.phone}</div>
               </div>
               <div className="rounded-control border border-border bg-surface-muted p-3">
-                <div className="text-slate-400 text-[11px] font-medium">Sarathi DL Expiry</div>
+                <div className="text-text-secondary text-xs font-medium">Sarathi DL expiry</div>
                 <div className="font-mono text-slate-100 font-bold mt-0.5">{selectedDriver.licenseExpiry || '2029-10-30'}</div>
               </div>
             </div>

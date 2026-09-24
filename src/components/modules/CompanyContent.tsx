@@ -44,7 +44,7 @@ export function CompanyContent() {
       <motion.div variants={itemVariants}>
         <PageHeader
           badge={
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/30">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-muted px-2.5 py-1 text-xs font-semibold text-text-secondary">
               <Building2 className="w-3.5 h-3.5" />
               Corporate Identity
             </span>
@@ -68,7 +68,7 @@ export function CompanyContent() {
 
       {/* 2. Navigation Tabs */}
       <motion.div variants={itemVariants} className="space-y-6">
-        <div className="flex border-b border-[#1e2e4a] gap-6 text-xs font-medium text-slate-400">
+        <div className="flex gap-6 border-b border-border text-xs font-medium text-text-secondary">
           <button
             onClick={() => setActiveTab('profile')}
             className={`pb-3 border-b-2 transition-colors flex items-center gap-2 ${
@@ -90,15 +90,15 @@ export function CompanyContent() {
         </div>
 
         {activeTab === 'profile' ? (
-          <Card className="p-6 space-y-6 max-w-4xl border-[#1e2e4a]">
-            <div className="flex items-center gap-4 pb-6 border-b border-[#1e2e4a]">
+          <Card className="max-w-4xl space-y-6 p-6">
+            <div className="flex items-center gap-4 border-b border-border pb-6">
               <div className="w-14 h-14 rounded-2xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-400 font-extrabold text-xl font-mono">
                 ML
               </div>
               <div>
                 <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
                   Mahindra Logistics India Ltd.
-                  <Badge variant="success" className="text-[10px]">Verified Enterprise</Badge>
+                  <Badge variant="success">Verified Enterprise</Badge>
                 </h2>
                 <p className="text-xs text-slate-400 mt-0.5">Commercial Road Transport & Multimodal Logistics Division</p>
               </div>
@@ -112,7 +112,7 @@ export function CompanyContent() {
                     type="text"
                     readOnly
                     value="Mahindra Logistics India Ltd."
-                    className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2.5 text-slate-200 font-medium"
+                    className="w-full rounded-control border border-border bg-surface px-3 py-2.5 font-medium text-text-primary"
                   />
                 </div>
 
@@ -122,7 +122,7 @@ export function CompanyContent() {
                     type="text"
                     readOnly
                     value="27AAAAA0000A1Z5"
-                    className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2.5 text-blue-300 font-mono font-bold"
+                    className="w-full rounded-control border border-border bg-surface px-3 py-2.5 font-mono font-bold text-blue-700 dark:text-blue-300"
                   />
                 </div>
 
@@ -132,7 +132,7 @@ export function CompanyContent() {
                     type="text"
                     readOnly
                     value="AAAAA0000A"
-                    className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2.5 text-slate-200 font-mono"
+                    className="w-full rounded-control border border-border bg-surface px-3 py-2.5 font-mono text-text-primary"
                   />
                 </div>
               </div>
@@ -144,7 +144,7 @@ export function CompanyContent() {
                     type="text"
                     readOnly
                     value="MTO/MH/2024/09124"
-                    className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2.5 text-slate-200 font-mono"
+                    className="w-full rounded-control border border-border bg-surface px-3 py-2.5 font-mono text-text-primary"
                   />
                 </div>
 
@@ -154,7 +154,7 @@ export function CompanyContent() {
                     readOnly
                     rows={3}
                     value="1A & B, Techniplex-I, Off Veer Savarkar Flyover, Goregaon West, Mumbai, Maharashtra 400062"
-                    className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg p-3 text-slate-200 leading-relaxed font-sans"
+                    className="w-full rounded-control border border-border bg-surface p-3 font-sans leading-relaxed text-text-primary"
                   />
                 </div>
               </div>
@@ -163,12 +163,12 @@ export function CompanyContent() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {branches.map(branch => (
-              <Card key={branch.id} className="p-5 space-y-3 border-[#1e2e4a] hover:border-blue-500/40 transition-colors">
-                <div className="flex items-center justify-between border-b border-[#1e2e4a] pb-3">
+              <Card key={branch.id} className="space-y-3 p-5 transition-colors hover:border-focus">
+                <div className="flex items-center justify-between border-b border-border pb-3">
                   <span className="font-mono text-xs text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20 font-bold">
                     {branch.code}
                   </span>
-                  <span className="text-[11px] text-slate-400 font-mono">{branch.capacity} Vehicles Yard</span>
+                  <span className="font-mono text-xs text-text-secondary">{branch.capacity} Vehicles Yard</span>
                 </div>
                 <h3 className="font-bold text-slate-100 text-sm">{branch.name}</h3>
                 <div className="text-xs text-slate-400 space-y-1.5">
@@ -204,7 +204,7 @@ export function CompanyContent() {
               placeholder="e.g. Bhiwandi Freight Terminal"
               value={branchName}
               onChange={e => setBranchName(e.target.value)}
-              className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-control border border-border bg-surface px-3 py-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-focus"
             />
           </div>
 
@@ -217,7 +217,7 @@ export function CompanyContent() {
                 placeholder="e.g. Mumbai"
                 value={city}
                 onChange={e => setCity(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-focus"
               />
             </div>
             <div>
@@ -226,7 +226,7 @@ export function CompanyContent() {
                 type="text"
                 value={state}
                 onChange={e => setState(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-focus"
               />
             </div>
           </div>
@@ -239,7 +239,7 @@ export function CompanyContent() {
                 placeholder="e.g. Depot Operations Lead"
                 value={contactPerson}
                 onChange={e => setContactPerson(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-focus"
               />
             </div>
             <div>
@@ -250,12 +250,12 @@ export function CompanyContent() {
                 max={500}
                 value={capacity}
                 onChange={e => setCapacity(Number(e.target.value))}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-text-primary focus:outline-none focus:ring-2 focus:ring-focus"
               />
             </div>
           </div>
 
-          <div className="pt-4 border-t border-[#1e2e4a] flex justify-end gap-3">
+          <div className="flex justify-end gap-3 border-t border-border pt-4">
             <Button type="button" variant="outline" onClick={() => setIsBranchModalOpen(false)}>
               Cancel
             </Button>

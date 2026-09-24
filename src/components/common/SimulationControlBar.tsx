@@ -6,11 +6,9 @@ import {
   Play,
   Pause,
   RotateCcw,
-  Zap,
   Radio,
   AlertTriangle,
   Navigation,
-  Gauge,
   CheckCircle2
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
@@ -35,7 +33,7 @@ export function SimulationControlBar() {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            className="mb-4 p-4 rounded-2xl bg-gradient-to-r from-rose-950/80 via-red-900/60 to-rose-950/80 border-2 border-rose-500 text-white shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3 animate-pulse"
+            className="mb-4 flex flex-col items-center justify-between gap-3 rounded-card border-2 border-red-300 bg-red-50 p-4 text-text-primary dark:border-red-800 dark:bg-red-950/20 sm:flex-row"
           >
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 shrink-0">
@@ -63,25 +61,23 @@ export function SimulationControlBar() {
       </AnimatePresence>
 
       {/* 2. Interactive Simulation Controller Bar */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#121624] via-[#10141f] to-[#0d1017] border border-blue-500/30 shadow-2xl relative overflow-hidden">
-        {/* Subtle background glow */}
-        <div className="absolute top-0 right-1/4 w-64 h-32 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-card border border-border bg-surface p-4 sm:p-5">
 
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 relative z-10">
           {/* Left: Simulation Status & Telemetry Readout */}
           <div className="space-y-1.5 min-w-0">
             <div className="flex items-center gap-2.5 flex-wrap">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-blue-500/15 text-blue-300 border border-blue-500/30 shadow-[0_0_12px_rgba(59,130,246,0.2)]">
-                <Radio className={`w-3.5 h-3.5 ${simState.isRunning ? 'text-emerald-400 animate-pulse' : 'text-slate-400'}`} />
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-muted px-3 py-1 font-mono text-xs font-bold text-text-secondary">
+                <Radio className={`w-3.5 h-3.5 ${simState.isRunning ? 'text-status-green' : 'text-text-muted'}`} />
                 <span>{simState.isRunning ? 'LIVE TRANSIT SIMULATION RUNNING' : 'TRANSIT SIMULATION STANDBY'}</span>
               </span>
 
-              <span className="text-xs font-mono text-cyan-300 font-semibold bg-cyan-500/10 px-2.5 py-0.5 rounded-full border border-cyan-500/25">
+              <span className="rounded-full border border-border bg-surface-muted px-2.5 py-1 font-mono text-xs font-semibold text-text-secondary">
                 {simState.vehicleReg} ({simState.driverName})
               </span>
 
               {simState.tripStatus === 'Delivered' && (
-                <span className="text-xs font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/30 flex items-center gap-1">
+                <span className="flex items-center gap-1 rounded-full border border-green-200 bg-green-50 px-2.5 py-1 font-mono text-xs font-bold text-status-green dark:border-green-900/60 dark:bg-green-950/20">
                   <CheckCircle2 className="w-3.5 h-3.5" /> Delivered & Handed Over
                 </span>
               )}
@@ -94,15 +90,15 @@ export function SimulationControlBar() {
               </span>
               <span className="text-cyan-300 font-mono font-bold">{simState.currentCheckpoint}</span>
               <span className="text-slate-500">•</span>
-              <span className="text-slate-400 font-mono text-[11px]">
+              <span className="font-mono text-xs text-text-secondary">
                 Speed: <strong className="text-white">{simState.speedKmh} km/h</strong>
               </span>
               <span className="text-slate-500">•</span>
-              <span className="text-slate-400 font-mono text-[11px]">
+              <span className="font-mono text-xs text-text-secondary">
                 Odometer: <strong className="text-white">{simState.odometerKm} km</strong>
               </span>
               <span className="text-slate-500">•</span>
-              <span className="text-slate-400 font-mono text-[11px]">
+              <span className="font-mono text-xs text-text-secondary">
                 Fuel: <strong className="text-emerald-400">{simState.fuelPercent}%</strong>
               </span>
             </div>
@@ -111,14 +107,14 @@ export function SimulationControlBar() {
           {/* Right: Controller Buttons */}
           <div className="flex items-center gap-2.5 self-stretch sm:self-auto flex-wrap">
             {/* Speed Multiplier Pills */}
-            <div className="flex items-center bg-black/40 p-1 rounded-xl border border-white/10 text-xs">
+            <div className="flex items-center rounded-control border border-border bg-surface-muted p-1 text-xs">
               {[1, 3, 5].map((multiplier) => (
                 <button
                   key={multiplier}
                   onClick={() => setSimulationSpeed(multiplier)}
                   className={`px-2.5 py-1 rounded-lg font-mono font-bold text-xs transition-colors cursor-pointer ${
                     simState.speedMultiplier === multiplier
-                      ? 'bg-blue-600 text-white shadow-md'
+                      ? 'bg-focus text-white'
                       : 'text-slate-400 hover:text-white'
                   }`}
                   title={`${multiplier}x speed`}
@@ -145,7 +141,7 @@ export function SimulationControlBar() {
                 size="sm"
                 icon={<Play className="w-4 h-4 fill-white" />}
                 onClick={() => startSimulation(simState.speedMultiplier || 1)}
-                className="font-black text-xs shadow-lg shadow-blue-600/30"
+                className="font-semibold text-xs"
               >
                 {simState.progressPercent > 0 ? 'Resume Simulation' : 'Start Live Simulation'}
               </Button>
@@ -166,19 +162,19 @@ export function SimulationControlBar() {
         </div>
 
         {/* Live Progress Bar along the corridor */}
-        <div className="mt-3.5 pt-3 border-t border-white/[0.08] flex items-center justify-between gap-4 text-xs font-mono">
+          <div className="mt-3.5 flex items-center justify-between gap-4 border-t border-border pt-3 font-mono text-xs">
           <div className="flex items-center gap-2 text-slate-400">
-            <span className="text-[11px]">Bhiwandi Hub</span>
+            <span>Bhiwandi Hub</span>
             <div className="w-32 sm:w-60 h-2 bg-white/[0.06] rounded-full overflow-hidden flex p-0.5 border border-white/[0.1]">
               <div
-                className="bg-gradient-to-r from-blue-500 via-cyan-400 to-emerald-400 h-full rounded-full transition-all duration-300 shadow-[0_0_8px_#38bdf8]"
+                className="h-full rounded-full bg-brand-orange transition-all duration-300"
                 style={{ width: `${simState.progressPercent}%` }}
               />
             </div>
-            <span className="text-[11px]">Chakan MIDC</span>
+            <span>Chakan MIDC</span>
           </div>
 
-          <div className="text-right text-slate-400 font-mono text-[11px]">
+          <div className="text-right font-mono text-xs text-text-secondary">
             <span className="text-white font-bold">{simState.progressPercent}%</span> Completed (
             <span className="text-cyan-300">{simState.distanceRemainingKm} km</span> remaining)
           </div>

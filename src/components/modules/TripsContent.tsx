@@ -187,7 +187,7 @@ export function TripsContent() {
       <motion.div variants={itemVariants}>
         <PageHeader
           badge={
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/30">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-muted px-2.5 py-1 text-xs font-medium text-text-secondary">
               <Route className="w-3.5 h-3.5" />
               Dispatch Operations
             </span>
@@ -304,7 +304,7 @@ export function TripsContent() {
                 <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#16233b] text-slate-200">
+            <tbody className="divide-y divide-border text-text-primary">
               {filteredTrips.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-12">
@@ -577,7 +577,7 @@ export function TripsContent() {
           <div className="space-y-4 text-xs">
             {/* Route Timeline Card */}
             <div className="space-y-3 rounded-control border border-border bg-surface-muted p-4">
-              <div className="text-slate-400 font-medium flex items-center justify-between font-mono text-[11px]">
+              <div className="text-text-secondary flex items-center justify-between font-mono text-xs">
                 <span>Highway Route Corridor</span>
                 <span className="text-slate-200 font-bold">{selectedTrip.distanceKm} km</span>
               </div>
@@ -586,7 +586,7 @@ export function TripsContent() {
                   <MapPin className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
                   <div>
                     <div className="font-bold text-slate-100">{selectedTrip.origin.city}</div>
-                    <div className="text-[11px] text-slate-400">{selectedTrip.origin.address}</div>
+                    <div className="text-xs text-text-secondary">{selectedTrip.origin.address}</div>
                   </div>
                 </div>
                 <div className="ml-2 border-l-2 border-dashed border-border py-1 pl-4 font-mono text-xs text-text-muted">
@@ -596,7 +596,7 @@ export function TripsContent() {
                   <MapPin className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                   <div>
                     <div className="font-bold text-slate-100">{selectedTrip.destination.city}</div>
-                    <div className="text-[11px] text-slate-400">{selectedTrip.destination.address}</div>
+                    <div className="text-xs text-text-secondary">{selectedTrip.destination.address}</div>
                   </div>
                 </div>
               </div>
@@ -605,13 +605,13 @@ export function TripsContent() {
             {/* Assets & Personnel */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1 rounded-control border border-border bg-surface-muted p-3">
-                <div className="text-slate-400 flex items-center gap-1.5 font-medium text-[11px]">
+                <div className="text-text-secondary flex items-center gap-1.5 font-medium text-xs">
                   <Truck className="w-3.5 h-3.5 text-blue-400" /> Commercial Asset
                 </div>
                 <div className="font-mono font-bold text-slate-100">{selectedTrip.vehicleReg}</div>
               </div>
               <div className="space-y-1 rounded-control border border-border bg-surface-muted p-3">
-                <div className="text-slate-400 flex items-center gap-1.5 font-medium text-[11px]">
+                <div className="text-text-secondary flex items-center gap-1.5 font-medium text-xs">
                   <User className="w-3.5 h-3.5 text-indigo-400" /> Assigned Driver
                 </div>
                 <div className="font-semibold text-slate-100">{selectedTrip.driverName}</div>
@@ -657,7 +657,7 @@ export function TripsContent() {
                   <div className="flex items-center gap-2 font-bold text-xs">
                     <CheckSquare className="w-4 h-4" /> POD Physically Verified & Logged
                   </div>
-                  {selectedTrip.podNotes && <div className="text-[11px] text-slate-300">{selectedTrip.podNotes}</div>}
+                  {selectedTrip.podNotes && <div className="text-xs text-text-secondary">{selectedTrip.podNotes}</div>}
                 </div>
               ) : (
                 <div className="space-y-3 rounded-control border border-border bg-surface-muted p-3.5">

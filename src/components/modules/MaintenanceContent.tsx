@@ -112,7 +112,7 @@ export function MaintenanceContent() {
       <motion.div variants={itemVariants}>
         <PageHeader
           badge={
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/30">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-muted px-2.5 py-1 text-xs font-semibold text-text-secondary">
               <Wrench className="w-3.5 h-3.5" />
               Diagnostics & Telematics
             </span>
@@ -167,7 +167,7 @@ export function MaintenanceContent() {
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               placeholder="Search vehicle plate, model, predicted issue..."
-              className="w-full bg-[#0a0f1d] border border-[#1e2e4a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 transition-all font-sans"
+              className="w-full rounded-control border border-border bg-surface px-3 py-2 pl-9 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-focus"
             />
           </div>
 
@@ -179,8 +179,8 @@ export function MaintenanceContent() {
               onClick={() => toggleSort('urgency')}
               className={`px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 font-medium ${
                 sortField === 'urgency'
-                  ? 'bg-blue-600/20 border-blue-500 text-blue-300 font-bold'
-                  : 'bg-[#0a0f1d] border-[#1e2e4a] text-slate-300 hover:text-white'
+                  ? 'border-focus bg-blue-50 font-bold text-blue-700 dark:bg-blue-950/30 dark:text-blue-300'
+                  : 'border-border bg-surface text-text-secondary hover:bg-surface-muted'
               }`}
             >
               Urgency Date <ArrowUpDown className="w-3 h-3" />
@@ -189,8 +189,8 @@ export function MaintenanceContent() {
               onClick={() => toggleSort('health')}
               className={`px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 font-medium ${
                 sortField === 'health'
-                  ? 'bg-blue-600/20 border-blue-500 text-blue-300 font-bold'
-                  : 'bg-[#0a0f1d] border-[#1e2e4a] text-slate-300 hover:text-white'
+                  ? 'border-focus bg-blue-50 font-bold text-blue-700 dark:bg-blue-950/30 dark:text-blue-300'
+                  : 'border-border bg-surface text-text-secondary hover:bg-surface-muted'
               }`}
             >
               Health Score <ArrowUpDown className="w-3 h-3" />
@@ -200,11 +200,11 @@ export function MaintenanceContent() {
       </motion.div>
 
       {/* 4. Component Health Table */}
-      <motion.div variants={itemVariants} className="border border-[#1e2e4a] rounded-xl overflow-hidden bg-[#0b1120]/80 backdrop-blur-md shadow-xl">
+      <motion.div variants={itemVariants} className="overflow-hidden rounded-card border border-border bg-surface">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-[#0d1527] text-slate-400 border-b border-[#1e2e4a] font-semibold uppercase tracking-wider text-[11px]">
+              <tr className="border-b border-border bg-surface-muted text-xs font-semibold uppercase tracking-wider text-text-secondary">
                 <th className="py-3.5 px-4 font-mono">Vehicle Plate</th>
                 <th className="py-3.5 px-4">Overall Health</th>
                 <th className="py-3.5 px-4">Subsystem Wear Telemetry (BRK / BAT / ENG / TYR)</th>
@@ -213,7 +213,7 @@ export function MaintenanceContent() {
                 <th className="py-3.5 px-4 text-right">Confidence</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#16233b] text-slate-200">
+            <tbody className="divide-y divide-border text-text-primary">
               {filteredVehicles.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-12">
@@ -236,10 +236,10 @@ export function MaintenanceContent() {
                     <tr
                       key={vehicle.id}
                       onClick={() => setSelectedVehicle(vehicle)}
-                      className="hover:bg-[#131f38] transition-colors cursor-pointer group"
+                      className="group cursor-pointer transition-colors hover:bg-surface-muted"
                     >
                       <td className="py-3.5 px-4 font-mono font-bold text-slate-100">
-                        <span className="bg-[#0a0f1d] border border-[#1e2e4a] px-2.5 py-1 rounded-md text-xs text-blue-300 group-hover:border-blue-500/50 transition-colors">
+                        <span className="rounded-control border border-border bg-surface-muted px-2.5 py-1 text-xs text-blue-700 transition-colors group-hover:border-focus dark:text-blue-300">
                           {vehicle.regNumber}
                         </span>
                       </td>
@@ -262,11 +262,11 @@ export function MaintenanceContent() {
                       <td className="py-3.5 px-4 min-w-[280px]">
                         <div className="grid grid-cols-4 gap-2">
                           <div>
-                            <div className="text-[10px] text-slate-400 flex justify-between mb-1 font-mono">
+                            <div className="mb-1 flex justify-between font-mono text-xs text-text-secondary">
                               <span>BRK</span>
                               <span>{vehicle.health.brakes}%</span>
                             </div>
-                            <div className="h-1.5 w-full bg-[#0a0f1d] rounded-full overflow-hidden border border-[#1e2e4a]">
+                            <div className="h-1.5 w-full overflow-hidden rounded-full border border-border bg-surface-muted">
                               <div
                                 className={`h-full ${getHealthBarClass(vehicle.health.brakes)} rounded-full`}
                                 style={{ width: `${vehicle.health.brakes}%` }}
@@ -275,11 +275,11 @@ export function MaintenanceContent() {
                           </div>
 
                           <div>
-                            <div className="text-[10px] text-slate-400 flex justify-between mb-1 font-mono">
+                            <div className="mb-1 flex justify-between font-mono text-xs text-text-secondary">
                               <span>BAT</span>
                               <span>{vehicle.health.battery}%</span>
                             </div>
-                            <div className="h-1.5 w-full bg-[#0a0f1d] rounded-full overflow-hidden border border-[#1e2e4a]">
+                            <div className="h-1.5 w-full overflow-hidden rounded-full border border-border bg-surface-muted">
                               <div
                                 className={`h-full ${getHealthBarClass(vehicle.health.battery)} rounded-full`}
                                 style={{ width: `${vehicle.health.battery}%` }}
@@ -288,11 +288,11 @@ export function MaintenanceContent() {
                           </div>
 
                           <div>
-                            <div className="text-[10px] text-slate-400 flex justify-between mb-1 font-mono">
+                            <div className="mb-1 flex justify-between font-mono text-xs text-text-secondary">
                               <span>ENG</span>
                               <span>{vehicle.health.engine}%</span>
                             </div>
-                            <div className="h-1.5 w-full bg-[#0a0f1d] rounded-full overflow-hidden border border-[#1e2e4a]">
+                            <div className="h-1.5 w-full overflow-hidden rounded-full border border-border bg-surface-muted">
                               <div
                                 className={`h-full ${getHealthBarClass(vehicle.health.engine)} rounded-full`}
                                 style={{ width: `${vehicle.health.engine}%` }}
@@ -301,11 +301,11 @@ export function MaintenanceContent() {
                           </div>
 
                           <div>
-                            <div className="text-[10px] text-slate-400 flex justify-between mb-1 font-mono">
+                            <div className="mb-1 flex justify-between font-mono text-xs text-text-secondary">
                               <span>TYR</span>
                               <span>{vehicle.health.tyres}%</span>
                             </div>
-                            <div className="h-1.5 w-full bg-[#0a0f1d] rounded-full overflow-hidden border border-[#1e2e4a]">
+                            <div className="h-1.5 w-full overflow-hidden rounded-full border border-border bg-surface-muted">
                               <div
                                 className={`h-full ${getHealthBarClass(vehicle.health.tyres)} rounded-full`}
                                 style={{ width: `${vehicle.health.tyres}%` }}
@@ -352,7 +352,7 @@ export function MaintenanceContent() {
         >
           <div className="space-y-4 text-xs">
             {/* AI Prediction Insight Box */}
-            <div className="p-4 rounded-xl bg-[#080d1a] border border-cyan-500/30 space-y-2">
+            <div className="space-y-2 rounded-card border border-border bg-surface-muted p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-cyan-300 font-bold text-xs">
                   <Cpu className="w-4 h-4 text-cyan-400" />
@@ -365,7 +365,7 @@ export function MaintenanceContent() {
               <p className="text-slate-200 leading-relaxed text-xs">
                 {selectedVehicle.componentHealth.predictedIssue}
               </p>
-              <div className="pt-2 border-t border-[#1e2e4a] text-[11px] text-slate-400 flex items-center justify-between">
+              <div className="flex items-center justify-between border-t border-border pt-2 text-xs text-text-secondary">
                 <span>Predicted Next Service:</span>
                 <span className="font-mono text-slate-100 font-bold">{selectedVehicle.componentHealth.predictedNextServiceDate}</span>
               </div>
@@ -373,22 +373,22 @@ export function MaintenanceContent() {
 
             {/* Subsystem Health Grid */}
             <div className="space-y-2">
-              <div className="text-slate-400 font-bold uppercase text-[10px] tracking-wider font-mono">Subsystem Telemetry</div>
+              <div className="font-mono text-xs font-bold uppercase tracking-wider text-text-secondary">Subsystem Telemetry</div>
               <div className="grid grid-cols-2 gap-2.5">
-                <div className="p-3 rounded-lg bg-[#0e172a] border border-[#1e2e4a]">
-                  <div className="text-slate-400 text-[11px]">Brake Disc & Hydraulics</div>
+                <div className="rounded-control border border-border bg-surface p-3">
+                  <div className="text-xs text-text-secondary">Brake Disc & Hydraulics</div>
                   <div className="font-mono text-base font-bold text-slate-100 mt-0.5">{selectedVehicle.componentHealth.brakes}%</div>
                 </div>
-                <div className="p-3 rounded-lg bg-[#0e172a] border border-[#1e2e4a]">
-                  <div className="text-slate-400 text-[11px]">Battery & Alternator</div>
+                <div className="rounded-control border border-border bg-surface p-3">
+                  <div className="text-xs text-text-secondary">Battery & Alternator</div>
                   <div className="font-mono text-base font-bold text-slate-100 mt-0.5">{selectedVehicle.componentHealth.battery}%</div>
                 </div>
-                <div className="p-3 rounded-lg bg-[#0e172a] border border-[#1e2e4a]">
-                  <div className="text-slate-400 text-[11px]">Engine & Compression</div>
+                <div className="rounded-control border border-border bg-surface p-3">
+                  <div className="text-xs text-text-secondary">Engine & Compression</div>
                   <div className="font-mono text-base font-bold text-slate-100 mt-0.5">{selectedVehicle.componentHealth.engine}%</div>
                 </div>
-                <div className="p-3 rounded-lg bg-[#0e172a] border border-[#1e2e4a]">
-                  <div className="text-slate-400 text-[11px]">Tyre Tread Depth</div>
+                <div className="rounded-control border border-border bg-surface p-3">
+                  <div className="text-xs text-text-secondary">Tyre Tread Depth</div>
                   <div className="font-mono text-base font-bold text-slate-100 mt-0.5">{selectedVehicle.componentHealth.tyres}%</div>
                 </div>
               </div>
@@ -396,17 +396,17 @@ export function MaintenanceContent() {
 
             {/* Service History */}
             <div className="space-y-2">
-              <div className="text-slate-400 font-bold uppercase text-[10px] tracking-wider font-mono">Service Log History</div>
-              <div className="p-3 rounded-lg bg-[#0a0f1d] border border-[#1e2e4a] flex items-center justify-between">
+              <div className="font-mono text-xs font-bold uppercase tracking-wider text-text-secondary">Service Log History</div>
+              <div className="flex items-center justify-between rounded-control border border-border bg-surface-muted p-3">
                 <div>
                   <div className="font-semibold text-slate-200">Routine Workshop Interval Service</div>
-                  <div className="text-[11px] text-slate-400">Oil filter replacement & hydraulic inspection</div>
+                  <div className="text-xs text-text-secondary">Oil filter replacement & hydraulic inspection</div>
                 </div>
-                <div className="font-mono text-slate-300 text-[11px]">{selectedVehicle.componentHealth.lastServiceDate}</div>
+                <div className="font-mono text-xs text-text-secondary">{selectedVehicle.componentHealth.lastServiceDate}</div>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-[#1e2e4a] flex justify-end">
+            <div className="flex justify-end border-t border-border pt-3">
               <Button variant="outline" size="sm" onClick={() => setSelectedVehicle(null)}>
                 Close Diagnostics
               </Button>

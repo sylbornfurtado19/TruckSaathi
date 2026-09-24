@@ -155,7 +155,7 @@ export function ReportsContent() {
       <motion.div variants={itemVariants}>
         <PageHeader
           badge={
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/30">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-muted px-2.5 py-1 text-xs font-semibold text-text-secondary">
               <FileSpreadsheet className="w-3.5 h-3.5" />
               Audits & Exports
             </span>
@@ -176,9 +176,9 @@ export function ReportsContent() {
       </motion.div>
 
       {/* 2. Reports History Table */}
-      <motion.div variants={itemVariants} className="border border-[#1e2e4a] rounded-xl overflow-hidden bg-[#0b1120]/80 backdrop-blur-md shadow-xl">
-        <div className="p-4 border-b border-[#1e2e4a] flex items-center justify-between">
-          <div className="flex items-center gap-2 text-slate-100 font-bold text-sm">
+      <motion.div variants={itemVariants} className="overflow-hidden rounded-card border border-border bg-surface">
+        <div className="flex items-center justify-between border-b border-border p-4">
+          <div className="flex items-center gap-2 text-sm font-bold text-text-primary">
             <FileSpreadsheet className="w-4 h-4 text-blue-400" />
             <span>Generated Reports Archive</span>
           </div>
@@ -188,7 +188,7 @@ export function ReportsContent() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-[#0d1527] text-slate-400 border-b border-[#1e2e4a] font-semibold uppercase tracking-wider text-[11px]">
+              <tr className="border-b border-border bg-surface-muted text-xs font-semibold uppercase tracking-wider text-text-secondary">
                 <th className="py-3.5 px-4">Report Name</th>
                 <th className="py-3.5 px-4">Type</th>
                 <th className="py-3.5 px-4 font-mono">Date Range</th>
@@ -197,10 +197,10 @@ export function ReportsContent() {
                 <th className="py-3.5 px-4 text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#16233b] text-slate-200">
+            <tbody className="divide-y divide-border text-text-primary">
               {reports.map(rep => (
-                <tr key={rep.id} className="hover:bg-[#131f38] transition-colors">
-                  <td className="py-3.5 px-4 font-semibold text-slate-100 flex items-center gap-2.5">
+                <tr key={rep.id} className="transition-colors hover:bg-surface-muted">
+                  <td className="flex items-center gap-2.5 px-4 py-3.5 font-semibold text-text-primary">
                     <FileText className="w-4 h-4 text-blue-400 shrink-0" />
                     <span>{rep.name}</span>
                   </td>
@@ -209,9 +209,9 @@ export function ReportsContent() {
                     {rep.type === 'Driver Safety' && <Badge variant="success">Driver Safety</Badge>}
                     {rep.type === 'Trip Summary' && <Badge variant="warning">Trip Summary</Badge>}
                   </td>
-                  <td className="py-3.5 px-4 font-mono text-slate-300">{rep.dateRange}</td>
-                  <td className="py-3.5 px-4 font-mono text-slate-400">{rep.generatedDate}</td>
-                  <td className="py-3.5 px-4 text-slate-300">{rep.generatedBy}</td>
+                  <td className="px-4 py-3.5 font-mono text-text-secondary">{rep.dateRange}</td>
+                  <td className="px-4 py-3.5 font-mono text-text-secondary">{rep.generatedDate}</td>
+                  <td className="px-4 py-3.5 text-text-secondary">{rep.generatedBy}</td>
                   <td className="py-3.5 px-4 text-right">
                     <Button
                       variant="outline"
@@ -244,7 +244,7 @@ export function ReportsContent() {
               required
               value={reportType}
               onChange={e => setReportType(e.target.value as ReportHistoryItem['type'])}
-              className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-control border border-border bg-surface px-3 py-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-focus"
             >
               <option value="Vehicle Compliance">Vehicle Compliance & RC/Insurance Vault</option>
               <option value="Driver Safety">Driver Safety Telemetry & Risk Scorecard</option>
@@ -260,7 +260,7 @@ export function ReportsContent() {
                 required
                 value={startDate}
                 onChange={e => setStartDate(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-text-primary focus:outline-none focus:ring-2 focus:ring-focus"
               />
             </div>
             <div>
@@ -270,12 +270,12 @@ export function ReportsContent() {
                 required
                 value={endDate}
                 onChange={e => setEndDate(e.target.value)}
-                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-text-primary focus:outline-none focus:ring-2 focus:ring-focus"
               />
             </div>
           </div>
 
-          <div className="pt-4 border-t border-[#1e2e4a] flex justify-end gap-3">
+          <div className="flex justify-end gap-3 border-t border-border pt-4">
             <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>

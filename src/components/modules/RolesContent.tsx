@@ -48,7 +48,7 @@ export function RolesContent() {
       <motion.div variants={itemVariants}>
         <PageHeader
           badge={
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/30">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-muted px-2.5 py-1 text-xs font-semibold text-text-secondary">
               <ShieldCheck className="w-3.5 h-3.5" />
               RBAC Governance
             </span>
@@ -69,7 +69,7 @@ export function RolesContent() {
       </motion.div>
 
       {/* 2. Role Selector Tabs */}
-      <motion.div variants={itemVariants} className="flex border-b border-[#1e2e4a] gap-2 overflow-x-auto pb-px text-xs">
+      <motion.div variants={itemVariants} className="flex gap-2 overflow-x-auto border-b border-border pb-px text-xs">
         {ROLES_LIST.map(role => (
           <button
             key={role}
@@ -88,8 +88,8 @@ export function RolesContent() {
 
       {/* 3. Capability Matrix Table */}
       <motion.div variants={itemVariants}>
-        <Card className="p-6 space-y-6 border-[#1e2e4a]">
-          <div className="flex items-center justify-between border-b border-[#1e2e4a] pb-4">
+        <Card className="space-y-6 p-6">
+          <div className="flex items-center justify-between border-b border-border pb-4">
             <div>
               <h2 className="text-base font-bold text-slate-100">Capability Entitlement Matrix: {selectedRole}</h2>
               <p className="text-xs text-slate-400 mt-0.5">Toggle CRUD operations and module access allowed for users in this role group.</p>
@@ -104,7 +104,7 @@ export function RolesContent() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-[#0d1527] text-slate-400 border-b border-[#1e2e4a] font-semibold uppercase tracking-wider text-[11px]">
+                <tr className="border-b border-border bg-surface-muted text-xs font-semibold uppercase tracking-wider text-text-secondary">
                   <th className="py-3.5 px-4">Platform Module</th>
                   <th className="py-3.5 px-4 text-center">Read / View</th>
                   <th className="py-3.5 px-4 text-center">Create / Dispatch</th>
@@ -112,7 +112,7 @@ export function RolesContent() {
                   <th className="py-3.5 px-4 text-center">Delete / Purge</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#16233b] text-slate-200">
+              <tbody className="divide-y divide-border text-text-primary">
                 {[
                   { key: 'vehicles', name: 'Commercial Vehicle Registry' },
                   { key: 'drivers', name: 'Human Capital & Drivers Directory' },
@@ -120,7 +120,7 @@ export function RolesContent() {
                   { key: 'users', name: 'User Management & Provisioning' },
                   { key: 'roles', name: 'Security Roles & RBAC Settings' }
                 ].map(item => (
-                  <tr key={item.key} className="hover:bg-[#131f38] transition-colors">
+                  <tr key={item.key} className="transition-colors hover:bg-surface-muted">
                     <td className="py-3.5 px-4 font-semibold text-slate-100">{item.name}</td>
                     {['read', 'create', 'update', 'delete'].map(action => {
                       const isChecked = matrix[item.key]?.[action] ?? false;
@@ -130,7 +130,7 @@ export function RolesContent() {
                             type="checkbox"
                             checked={isChecked}
                             onChange={() => togglePermission(item.key, action)}
-                            className="w-4 h-4 rounded bg-[#0a0f1d] border-[#1e2e4a] text-blue-600 focus:ring-0 cursor-pointer accent-blue-600"
+                            className="h-4 w-4 cursor-pointer rounded border-border bg-surface accent-brand-orange focus:ring-0"
                           />
                         </td>
                       );

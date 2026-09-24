@@ -76,7 +76,7 @@ export function SafetyContent() {
       <motion.div variants={itemVariants}>
         <PageHeader
           badge={
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-muted px-2.5 py-1 text-xs font-semibold text-text-secondary">
               <ShieldCheck className="w-3.5 h-3.5" />
               Safety Telematics
             </span>
@@ -88,24 +88,24 @@ export function SafetyContent() {
 
       {/* 2. Hero KPI: Aggregate Fleet Safety Score */}
       <motion.div variants={itemVariants}>
-        <Card className="p-6 border-[#1e2e4a] bg-[#080d1a]">
+        <Card className="p-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
                 <ShieldCheck className="w-7 h-7" />
               </div>
               <div>
-                <span className="text-[11px] text-blue-400 font-mono font-bold uppercase tracking-wider">ENTERPRISE TELEMATICS INDEX</span>
-                <h2 className="text-xl font-bold text-slate-100">Fleet Aggregate Safety Rating</h2>
-                <p className="text-xs text-slate-400 mt-0.5">Calculated from harsh braking, highway overspeed, rapid acceleration, and DMS fatigue sensors.</p>
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-brand-orange">ENTERPRISE TELEMATICS INDEX</span>
+                <h2 className="text-xl font-bold text-text-primary">Fleet Aggregate Safety Rating</h2>
+                <p className="mt-0.5 text-sm text-text-secondary">Calculated from harsh braking, highway overspeed, rapid acceleration, and DMS fatigue sensors.</p>
               </div>
             </div>
-            <div className="text-right bg-[#0a0f1d] px-6 py-3 rounded-xl border border-[#1e2e4a] shrink-0">
+            <div className="shrink-0 rounded-card border border-border bg-surface-muted px-6 py-3 text-right">
               <div className="text-3xl font-extrabold font-mono text-emerald-400 flex items-center gap-1 justify-end">
                 <AnimatedNumber value={aggregateSafetyScore} />
                 <span className="text-lg text-slate-500">/100</span>
               </div>
-              <div className="text-[11px] text-emerald-400/90 font-medium">Top Tier Commercial Safety</div>
+              <div className="text-xs font-medium text-status-green">Top Tier Commercial Safety</div>
             </div>
           </div>
         </Card>
@@ -118,7 +118,7 @@ export function SafetyContent() {
           className={`p-3.5 rounded-xl border text-left transition-all ${
             selectedEventType === 'overspeed'
               ? 'bg-blue-600/20 border-blue-500 text-blue-300'
-              : 'bg-[#0b1120] border-[#1e2e4a] hover:border-blue-500/40 text-slate-300'
+              : 'border-border bg-surface text-text-secondary hover:bg-surface-muted'
           }`}
         >
           <div className="flex items-center justify-between text-slate-400 text-xs font-medium mb-1">
@@ -126,7 +126,7 @@ export function SafetyContent() {
             <Zap className="w-3.5 h-3.5 text-amber-400" />
           </div>
           <div className="text-xl font-bold font-mono text-slate-100">{totalOverspeed}</div>
-          <div className="text-[10px] text-slate-500 mt-1 font-mono">&gt;80 km/h limit</div>
+          <div className="mt-1 font-mono text-xs text-text-muted">&gt;80 km/h limit</div>
         </button>
 
         <button
@@ -134,7 +134,7 @@ export function SafetyContent() {
           className={`p-3.5 rounded-xl border text-left transition-all ${
             selectedEventType === 'braking'
               ? 'bg-blue-600/20 border-blue-500 text-blue-300'
-              : 'bg-[#0b1120] border-[#1e2e4a] hover:border-blue-500/40 text-slate-300'
+              : 'border-border bg-surface text-text-secondary hover:bg-surface-muted'
           }`}
         >
           <div className="flex items-center justify-between text-slate-400 text-xs font-medium mb-1">
@@ -142,7 +142,7 @@ export function SafetyContent() {
             <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
           </div>
           <div className="text-xl font-bold font-mono text-slate-100">{totalHarshBraking}</div>
-          <div className="text-[10px] text-slate-500 mt-1 font-mono">&gt;0.4g de-accel</div>
+          <div className="mt-1 font-mono text-xs text-text-muted">&gt;0.4g de-accel</div>
         </button>
 
         <button
@@ -150,7 +150,7 @@ export function SafetyContent() {
           className={`p-3.5 rounded-xl border text-left transition-all ${
             selectedEventType === 'accel'
               ? 'bg-blue-600/20 border-blue-500 text-blue-300'
-              : 'bg-[#0b1120] border-[#1e2e4a] hover:border-blue-500/40 text-slate-300'
+              : 'border-border bg-surface text-text-secondary hover:bg-surface-muted'
           }`}
         >
           <div className="flex items-center justify-between text-slate-400 text-xs font-medium mb-1">
@@ -158,7 +158,7 @@ export function SafetyContent() {
             <TrendingUp className="w-3.5 h-3.5 text-cyan-400" />
           </div>
           <div className="text-xl font-bold font-mono text-slate-100">{totalRapidAccel}</div>
-          <div className="text-[10px] text-slate-500 mt-1 font-mono">Throttle spikes</div>
+          <div className="mt-1 font-mono text-xs text-text-muted">Throttle spikes</div>
         </button>
 
         <button
@@ -166,7 +166,7 @@ export function SafetyContent() {
           className={`p-3.5 rounded-xl border text-left transition-all ${
             selectedEventType === 'fatigue'
               ? 'bg-blue-600/20 border-blue-500 text-blue-300'
-              : 'bg-[#0b1120] border-[#1e2e4a] hover:border-blue-500/40 text-slate-300'
+              : 'border-border bg-surface text-text-secondary hover:bg-surface-muted'
           }`}
         >
           <div className="flex items-center justify-between text-slate-400 text-xs font-medium mb-1">
@@ -174,7 +174,7 @@ export function SafetyContent() {
             <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
           </div>
           <div className="text-xl font-bold font-mono text-slate-100">{totalFatigue}</div>
-          <div className="text-[10px] text-slate-500 mt-1 font-mono">DMS camera</div>
+          <div className="mt-1 font-mono text-xs text-text-muted">DMS camera</div>
         </button>
 
         <button
@@ -182,7 +182,7 @@ export function SafetyContent() {
           className={`p-3.5 rounded-xl border text-left transition-all ${
             selectedEventType === 'seatbelt'
               ? 'bg-blue-600/20 border-blue-500 text-blue-300'
-              : 'bg-[#0b1120] border-[#1e2e4a] hover:border-blue-500/40 text-slate-300'
+              : 'border-border bg-surface text-text-secondary hover:bg-surface-muted'
           }`}
         >
           <div className="flex items-center justify-between text-slate-400 text-xs font-medium mb-1">
@@ -190,13 +190,13 @@ export function SafetyContent() {
             <UserCheck className="w-3.5 h-3.5 text-indigo-400" />
           </div>
           <div className="text-xl font-bold font-mono text-slate-100">{totalSeatbelt}</div>
-          <div className="text-[10px] text-slate-500 mt-1 font-mono">In-motion alert</div>
+          <div className="mt-1 font-mono text-xs text-text-muted">In-motion alert</div>
         </button>
       </motion.div>
 
       {/* 4. Driver Safety Leaderboard Table */}
-      <motion.div variants={itemVariants} className="border border-[#1e2e4a] rounded-xl overflow-hidden bg-[#0b1120]/80 backdrop-blur-md shadow-xl">
-        <div className="p-4 border-b border-[#1e2e4a] flex items-center justify-between">
+      <motion.div variants={itemVariants} className="overflow-hidden rounded-card border border-border bg-surface">
+        <div className="flex items-center justify-between border-b border-border p-4">
           <div>
             <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
               <Award className="w-4 h-4 text-amber-400" />
@@ -214,7 +214,7 @@ export function SafetyContent() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-[#0d1527] text-slate-400 border-b border-[#1e2e4a] font-semibold uppercase tracking-wider text-[11px]">
+              <tr className="border-b border-border bg-surface-muted text-xs font-semibold uppercase tracking-wider text-text-secondary">
                 <th className="py-3.5 px-4 font-mono">Rank</th>
                 <th className="py-3.5 px-4">Driver Name</th>
                 <th className="py-3.5 px-4 font-mono">Safety Score</th>
@@ -225,15 +225,15 @@ export function SafetyContent() {
                 <th className="py-3.5 px-4">Risk Profile</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#16233b] text-slate-200">
+            <tbody className="divide-y divide-border text-text-primary">
               {filteredDrivers.map((driver, idx) => {
                 const rank = idx + 1;
                 const isTop3 = rank <= 3;
                 return (
-                  <tr key={driver.id} className="hover:bg-[#131f38] transition-colors">
+                  <tr key={driver.id} className="transition-colors hover:bg-surface-muted">
                     <td className="py-3.5 px-4 font-mono font-bold">
                       {isTop3 ? (
-                        <span className="text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 text-[11px]">
+                        <span className="rounded-control border border-amber-200 bg-amber-50 px-2 py-1 text-xs text-status-amber dark:border-amber-900/60 dark:bg-amber-950/20">
                           Rank #{rank}
                         </span>
                       ) : (
@@ -241,7 +241,7 @@ export function SafetyContent() {
                       )}
                     </td>
                     <td className="py-3.5 px-4 font-semibold text-slate-100 flex items-center gap-2.5">
-                      <div className="w-6 h-6 rounded-full bg-blue-600/15 border border-blue-500/30 flex items-center justify-center font-bold text-[10px] text-blue-400">
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-surface-muted text-xs font-bold text-brand-orange">
                         {driver.fullName.charAt(0)}
                       </div>
                       <span>{driver.fullName}</span>
@@ -284,7 +284,7 @@ export function SafetyContent() {
             {atRiskDrivers.map(driver => (
               <div
                 key={driver.id}
-                className="bg-[#0b1329] border border-cyan-500/30 rounded-xl p-5 space-y-3 shadow-lg"
+                className="space-y-3 rounded-card border border-border bg-surface-muted p-5"
               >
                 <div className="flex items-center justify-between">
                   <div className="font-bold text-slate-100 flex items-center gap-2">
@@ -299,9 +299,9 @@ export function SafetyContent() {
                   <span className="font-mono text-amber-300 font-bold">{driver.events.overspeedCount} overspeed</span> events this cycle. Recommend defensive driving course for payload safety.
                 </p>
 
-                <div className="pt-2 border-t border-[#1e2e4a] flex items-center justify-between text-xs">
-                  <span className="text-slate-400 text-[11px]">Recommended: Defensive Driving Refresher</span>
-                  <Button variant="primary" size="sm" className="text-[11px] py-1 bg-gradient-to-r from-blue-600 to-cyan-600">
+                <div className="flex items-center justify-between border-t border-border pt-2 text-xs">
+                  <span className="text-xs text-text-secondary">Recommended: Defensive Driving Refresher</span>
+                  <Button variant="primary" size="sm">
                     Assign Coaching Module
                   </Button>
                 </div>

@@ -119,7 +119,7 @@ export function VehiclesContent() {
       <motion.div variants={itemVariants}>
         <PageHeader
           badge={
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/30">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-muted px-2.5 py-1 text-xs font-medium text-text-secondary">
               <Truck className="w-3.5 h-3.5" />
               Fleet Registry
             </span>
@@ -247,7 +247,7 @@ export function VehiclesContent() {
                 <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#16233b] text-slate-200">
+            <tbody className="divide-y divide-border text-text-primary">
               {filteredVehicles.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-12">
@@ -291,7 +291,7 @@ export function VehiclesContent() {
                     </td>
                     <td className="py-3.5 px-4 text-slate-300">
                       <div className="font-semibold text-slate-100">{vehicle.make}</div>
-                      <div className="text-[11px] text-slate-400">{vehicle.model}</div>
+                      <div className="text-xs text-text-secondary">{vehicle.model}</div>
                     </td>
                     <td className="py-3.5 px-4 font-mono text-slate-300">
                       <span className="font-bold text-slate-100">{vehicle.capacityTons}</span> Tons
@@ -327,12 +327,12 @@ export function VehiclesContent() {
                     </td>
                     <td className="py-3.5 px-4">
                       {vehicle.maintenanceStatus === 'In Service' ? (
-                        <span className="inline-flex items-center gap-1.5 text-emerald-400 font-medium text-[11px]">
+                        <span className="inline-flex items-center gap-1.5 text-green-700 font-medium text-xs">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                           In Service
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 text-amber-400 font-medium text-[11px]">
+                        <span className="inline-flex items-center gap-1.5 text-amber-700 font-medium text-xs">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                           {vehicle.maintenanceStatus}
                         </span>
@@ -498,15 +498,15 @@ export function VehiclesContent() {
           <div className="space-y-4 text-xs">
             <div className="flex items-center justify-between rounded-control border border-border bg-surface-muted p-4">
               <div>
-                <span className="text-[11px] text-slate-400 font-mono">Payload Capacity</span>
+                <span className="text-xs text-text-secondary font-mono">Payload capacity</span>
                 <div className="text-xl font-bold font-mono text-slate-100">{selectedVehicle.capacityTons} Metric Tons</div>
               </div>
               <div>
-                <span className="text-[11px] text-slate-400 font-mono">Assigned Driver</span>
+                <span className="text-xs text-text-secondary font-mono">Assigned driver</span>
                 <div className="text-sm font-semibold text-blue-400">{selectedVehicle.assignedDriver || 'Unassigned'}</div>
               </div>
               <div>
-                <span className="text-[11px] text-slate-400 font-mono">Operational State</span>
+                <span className="text-xs text-text-secondary font-mono">Operational state</span>
                 <div className="mt-0.5">
                   <Badge variant={selectedVehicle.maintenanceStatus === 'In Service' ? 'success' : 'warning'}>
                     {selectedVehicle.maintenanceStatus}
@@ -517,11 +517,11 @@ export function VehiclesContent() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-control border border-border bg-surface-muted p-3">
-                <div className="text-slate-400 text-[11px] font-medium">Chassis VIN Number</div>
+                <div className="text-text-secondary text-xs font-medium">Chassis VIN number</div>
                 <div className="font-mono text-slate-100 font-bold mt-0.5">{selectedVehicle.chassisNumber || 'MAT78291032'}</div>
               </div>
               <div className="rounded-control border border-border bg-surface-muted p-3">
-                <div className="text-slate-400 text-[11px] font-medium">Engine Serial Number</div>
+                <div className="text-text-secondary text-xs font-medium">Engine serial number</div>
                 <div className="font-mono text-slate-100 font-bold mt-0.5">{selectedVehicle.engineNumber || 'ENG99420188'}</div>
               </div>
             </div>

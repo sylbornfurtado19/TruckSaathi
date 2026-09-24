@@ -98,14 +98,14 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
   // Loading state while checking authorization
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen bg-[#060911] flex flex-col items-center justify-center p-4 select-none">
+      <div className="flex min-h-screen select-none flex-col items-center justify-center bg-canvas p-4">
         <div className="flex flex-col items-center gap-4 text-center">
           <img
             src="/logo-dark.png"
             alt="TruckSaathi Logo"
-            className="h-12 w-auto object-contain filter brightness-125 contrast-125 drop-shadow-[0_0_20px_rgba(59,130,246,0.5)] animate-pulse"
+            className="h-12 w-auto object-contain"
           />
-          <div className="flex items-center gap-2 text-xs text-blue-400 font-mono bg-[#1c2333]/80 border border-[#2e374a] px-3.5 py-1.5 rounded-full">
+          <div className="flex items-center gap-2 rounded-full border border-border bg-surface-muted px-3.5 py-1.5 font-mono text-xs text-text-secondary">
             <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-400" />
             <span>Verifying permissions...</span>
           </div>
