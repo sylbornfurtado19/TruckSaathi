@@ -286,7 +286,7 @@ export function VehiclesContent() {
                   <label className="block text-slate-400 mb-1 font-medium">Category</label>
                   <select
                     value={category}
-                    onChange={e => setCategory(e.target.value as any)}
+                    onChange={e => setCategory(e.target.value as Vehicle['category'])}
                     className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 focus:outline-none"
                   >
                     <option value="Container">Container</option>

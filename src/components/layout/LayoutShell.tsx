@@ -2,7 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+
+const getInitials = (name?: string) => {
+  if (!name) return 'TS';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
 import { motion } from 'framer-motion';
 import {
   Truck,
@@ -37,7 +44,13 @@ export const Sidebar: React.FC<{
   setCollapsed: (val: boolean) => void;
 }> = ({ collapsed, setCollapsed }) => {
   const pathname = usePathname();
-  const { currentUser } = useApp();
+  const router = useRouter();
+  const { currentUser, signOut } = useApp();
+
+  const handleLogout = async () => {
+    await signOut();
+    router.push('/login');
+  };
 
   const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -132,19 +145,30 @@ export const Sidebar: React.FC<{
       {/* Tenant Footer */}
       <div className="p-3 border-t border-[#202736]/80 bg-[#060911]/80">
         <div className={`flex items-center gap-3 ${collapsed ? 'justify-center' : ''}`}>
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-xs text-white shrink-0 shadow-md shadow-blue-600/20">
-            SF
+          <div
+            title={currentUser?.name ? `${currentUser.name} (${currentUser.companyName})` : 'Fleet User'}
+            className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-xs text-white shrink-0 shadow-md shadow-blue-600/20"
+          >
+            {getInitials(currentUser?.name)}
           </div>
           {!collapsed && (
             <div className="flex flex-col min-w-0 flex-1">
-              <span className="text-xs font-semibold text-slate-200 truncate">{currentUser.name}</span>
-              <span className="text-[10px] text-slate-500 truncate">{currentUser.companyName}</span>
+              <span className="text-xs font-semibold text-slate-200 truncate">{currentUser?.name || 'Fleet Admin'}</span>
+              <span className="text-[10px] text-slate-400 truncate flex items-center gap-1">
+                {currentUser?.role && <span className="text-blue-400 font-medium">{currentUser.role} •</span>}
+                <span className="truncate">{currentUser?.companyName || 'TruckSaathi Fleet'}</span>
+              </span>
             </div>
           )}
           {!collapsed && (
-            <Link href="/login" className="p-1.5 text-slate-500 hover:text-rose-400 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/80">
+            <button
+              type="button"
+              onClick={handleLogout}
+              title="Sign Out"
+              className="p-1.5 text-slate-500 hover:text-rose-400 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/80 cursor-pointer rounded-lg hover:bg-rose-500/10"
+            >
               <LogOut className="w-4 h-4" />
-            </Link>
+            </button>
           )}
         </div>
       </div>
@@ -243,7 +267,7 @@ export const Header: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
 
           <div className="flex items-center gap-2">
             <div className="text-right hidden sm:block">
-              <div className="text-xs font-bold text-slate-200">{currentUser.companyName}</div>
+              <div className="text-xs font-bold text-slate-200">{currentUser?.companyName || 'TruckSaathi Fleet'}</div>
               <div className="text-[10px] text-slate-500 font-mono">GSTIN: 27AAAAA0000A1Z5</div>
             </div>
           </div>

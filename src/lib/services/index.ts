@@ -96,3 +96,4 @@ export const vehicleService = new VehicleService();
 export const driverService = new DriverService();
 export const userService = new UserService();
 export const companyService = new CompanyService();
+export * from './profileService';

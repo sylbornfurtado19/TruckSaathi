@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, Truck, Users, LayoutDashboard, ShieldCheck, Building2, Settings, Route, Wrench, ShieldAlert, FileText, Fuel, DollarSign, Bot, Smartphone, ArrowRight } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
@@ -48,17 +48,23 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
     .filter(d => d.fullName.toLowerCase().includes(query.toLowerCase()) || d.phone.includes(query))
     .map(d => ({ name: `${d.fullName} (${d.phone})`, href: '/drivers', type: 'Driver', icon: Users }));
 
-  const results = [
-    ...pages.filter(p => p.name.toLowerCase().includes(query.toLowerCase())),
-    ...matchedTrips,
-    ...matchedVehicles,
-    ...matchedDrivers
-  ];
+  const results = useMemo(
+    () => [
+      ...pages.filter(p => p.name.toLowerCase().includes(query.toLowerCase())),
+      ...matchedTrips,
+      ...matchedVehicles,
+      ...matchedDrivers
+    ],
+    [query, pages, matchedTrips, matchedVehicles, matchedDrivers]
+  );
 
-  // Reset selectedIndex whenever query changes
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [query]);
+  const handleSelect = useCallback(
+    (href: string) => {
+      router.push(href);
+      onClose();
+    },
+    [router, onClose]
+  );
 
   // Scroll active item into view
   useEffect(() => {
@@ -91,14 +97,9 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, results, selectedIndex]);
+  }, [isOpen, results, selectedIndex, handleSelect, onClose]);
 
   if (!isOpen) return null;
-
-  const handleSelect = (href: string) => {
-    router.push(href);
-    onClose();
-  };
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-start justify-center pt-20 p-4">
@@ -110,7 +111,10 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
             type="text"
             autoFocus
             value={query}
-            onChange={e => setQuery(e.target.value)}
+            onChange={e => {
+              setQuery(e.target.value);
+              setSelectedIndex(0);
+            }}
             placeholder="Fuzzy search vehicles, drivers, pages..."
             className="w-full bg-transparent text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none"
           />

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { UserPlus, Search, Mail, CheckCircle2, Clock, X, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
+import { UserRole } from '@/types';
 import { PageHeader, Card, Button, Badge, AnimatedPage, itemVariants } from '@/components/ui';
 import { exportToCSV } from '@/lib/csvExport';
 
@@ -16,7 +17,7 @@ export function UsersContent() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [role, setRole] = useState<'Super Admin' | 'Company Admin' | 'Fleet Manager' | 'Dispatcher'>('Fleet Manager');
+  const [role, setRole] = useState<UserRole>('Fleet Manager');
   const [department, setDepartment] = useState('Operations');
 
   const filteredUsers = users.filter(
@@ -209,12 +210,14 @@ export function UsersContent() {
                   <label className="block text-slate-400 mb-1 font-medium">Platform Role</label>
                   <select
                     value={role}
-                    onChange={e => setRole(e.target.value as any)}
+                    onChange={e => setRole(e.target.value as UserRole)}
                     className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 focus:outline-none"
                   >
+                    <option value="Super Admin">Super Admin</option>
+                    <option value="Company Admin">Company Admin</option>
                     <option value="Fleet Manager">Fleet Manager</option>
                     <option value="Dispatcher">Dispatcher</option>
-                    <option value="Company Admin">Company Admin</option>
+                    <option value="Driver">Driver</option>
                   </select>
                 </div>
                 <div>

@@ -290,6 +290,16 @@ export const INITIAL_USERS: User[] = [
     department: 'Compliance',
     status: 'Invited',
     lastActive: 'Pending Invite'
+  },
+  {
+    id: 'u-5',
+    fullName: 'Ramesh Kumar',
+    email: 'ramesh.k@trucksaathi.in',
+    phone: '+91 98765 43210',
+    role: 'Driver',
+    department: 'Fleet Logistics',
+    status: 'Active',
+    lastActive: '10 mins ago'
   }
 ];
 

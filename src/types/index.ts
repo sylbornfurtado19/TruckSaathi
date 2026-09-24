@@ -59,16 +59,41 @@ export interface Driver {
   };
 }
 
+export type UserRole =
+  | 'Super Admin'
+  | 'Company Admin'
+  | 'Fleet Manager'
+  | 'Dispatcher'
+  | 'Driver';
+
 export interface User {
   id: string;
   fullName: string;
   email: string;
   phone: string;
-  role: 'Super Admin' | 'Company Admin' | 'Fleet Manager' | 'Dispatcher';
+  role: UserRole;
   department: string;
   status: 'Active' | 'Invited' | 'Suspended';
   lastActive: string;
+  companyId?: string | null;
 }
+
+export interface UserProfile {
+  id: string;
+  userId: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  companyId?: string | null;
+  companyName: string;
+  phone?: string;
+  department?: string;
+  status?: 'Active' | 'Invited' | 'Suspended';
+  createdAt?: string;
+}
+
+export interface CurrentUser extends UserProfile {}
+
 
 export interface Branch {
   id: string;

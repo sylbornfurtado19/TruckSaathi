@@ -2,7 +2,7 @@
  * Lightweight generic CSV export utility function.
  * Converts an array of objects into CSV format and triggers a browser file download.
  */
-export function exportToCSV<T extends Record<string, any>>(data: T[], filename: string): void {
+export function exportToCSV<T extends Record<string, unknown>>(data: T[], filename: string): void {
   if (!data || data.length === 0) return;
 
   // Extract keys for headers
@@ -14,13 +14,14 @@ export function exportToCSV<T extends Record<string, any>>(data: T[], filename: 
 
   for (const row of data) {
     const values = headers.map(header => {
-      let val = row[header];
-      if (val === null || val === undefined) {
+      const rawValue = row[header];
+      let val: string;
+      if (rawValue === null || rawValue === undefined) {
         val = '';
-      } else if (typeof val === 'object') {
-        val = JSON.stringify(val);
+      } else if (typeof rawValue === 'object') {
+        val = JSON.stringify(rawValue);
       } else {
-        val = String(val);
+        val = String(rawValue);
       }
       return `"${val.replace(/"/g, '""')}"`;
     });

@@ -3,10 +3,11 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Save } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { UserRole } from '@/types';
 import { PageHeader, Card, Button, AnimatedPage, itemVariants } from '@/components/ui';
 
 export function RolesContent() {
-  const [selectedRole, setSelectedRole] = useState<'Company Admin' | 'Fleet Manager' | 'Dispatcher'>('Fleet Manager');
+  const [selectedRole, setSelectedRole] = useState<UserRole>('Fleet Manager');
 
   // Permission Matrix State
   const [matrix, setMatrix] = useState<Record<string, Record<string, boolean>>>({
@@ -27,6 +28,14 @@ export function RolesContent() {
     }));
   };
 
+  const ROLES_LIST: UserRole[] = [
+    'Super Admin',
+    'Company Admin',
+    'Fleet Manager',
+    'Dispatcher',
+    'Driver'
+  ];
+
   return (
     <AnimatedPage>
       {/* Page Header */}
@@ -43,12 +52,12 @@ export function RolesContent() {
       </motion.div>
 
       {/* Role Selector Tabs */}
-      <motion.div variants={itemVariants} className="flex border-b border-[#202736] gap-4">
-        {(['Company Admin', 'Fleet Manager', 'Dispatcher'] as const).map(role => (
+      <motion.div variants={itemVariants} className="flex border-b border-[#202736] gap-2 overflow-x-auto pb-px">
+        {ROLES_LIST.map(role => (
           <button
             key={role}
             onClick={() => setSelectedRole(role)}
-            className={`pb-3 px-2 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
+            className={`pb-3 px-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               selectedRole === role
                 ? 'border-blue-500 text-blue-400'
                 : 'border-transparent text-slate-400 hover:text-slate-200'

@@ -239,7 +239,7 @@ export function ReportsContent() {
                 <select
                   required
                   value={reportType}
-                  onChange={e => setReportType(e.target.value as any)}
+                  onChange={e => setReportType(e.target.value as ReportHistoryItem['type'])}
                   className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
                 >
                   <option value="Vehicle Compliance">Vehicle Compliance & RC/Insurance Vault</option>

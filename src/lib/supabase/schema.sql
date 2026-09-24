@@ -39,14 +39,17 @@ CREATE TABLE IF NOT EXISTS public.roles (
     is_system_role BOOLEAN DEFAULT false
 );
 
--- 4. USERS TABLE
+-- 4. USERS TABLE (Application Profiles)
 CREATE TABLE IF NOT EXISTS public.users (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    company_id UUID REFERENCES public.companies(id) ON DELETE CASCADE,
-    role_id UUID REFERENCES public.roles(id),
-    branch_id UUID REFERENCES public.branches(id),
+    email TEXT,
     full_name TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'Company Admin' CHECK (role IN ('Super Admin', 'Company Admin', 'Fleet Manager', 'Dispatcher', 'Driver')),
+    company_id UUID REFERENCES public.companies(id) ON DELETE CASCADE,
+    role_id UUID REFERENCES public.roles(id) ON DELETE SET NULL,
+    branch_id UUID REFERENCES public.branches(id) ON DELETE SET NULL,
     phone TEXT,
+    department TEXT,
     status TEXT DEFAULT 'active' CHECK (status IN ('active', 'invited', 'suspended')),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -127,3 +130,48 @@ CREATE POLICY "Tenant vehicles isolation" ON public.vehicles
 -- Driver Tenant Isolation Policy
 CREATE POLICY "Tenant drivers isolation" ON public.drivers
     FOR ALL USING (company_id = public.get_auth_company_id());
+
+-- User Profile RLS Policies
+CREATE POLICY "Users can view own profile" ON public.users
+    FOR SELECT TO authenticated
+    USING (auth.uid() = id);
+
+CREATE POLICY "Users can insert own profile" ON public.users
+    FOR INSERT TO authenticated
+    WITH CHECK (auth.uid() = id);
+
+CREATE POLICY "Users can update own profile" ON public.users
+    FOR UPDATE TO authenticated
+    USING (auth.uid() = id);
+
+-- Automatic Auth Profile Provisioning Trigger
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+DECLARE
+  default_comp_id UUID;
+BEGIN
+  SELECT id INTO default_comp_id FROM public.companies LIMIT 1;
+
+  INSERT INTO public.users (id, email, full_name, role, company_id, phone, status)
+  VALUES (
+    new.id,
+    new.email,
+    COALESCE(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', split_part(new.email, '@', 1)),
+    COALESCE(new.raw_user_meta_data->>'role', 'Company Admin'),
+    COALESCE((new.raw_user_meta_data->>'company_id')::UUID, default_comp_id),
+    new.raw_user_meta_data->>'phone',
+    'active'
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    email = EXCLUDED.email,
+    full_name = COALESCE(EXCLUDED.full_name, public.users.full_name),
+    role = COALESCE(EXCLUDED.role, public.users.role);
+
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();

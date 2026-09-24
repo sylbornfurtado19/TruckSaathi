@@ -245,7 +245,7 @@ export function DriversContent() {
                   <label className="block text-slate-400 mb-1 font-medium">License Category</label>
                   <select
                     value={licenseCategory}
-                    onChange={e => setLicenseCategory(e.target.value as any)}
+                    onChange={e => setLicenseCategory(e.target.value as Driver['licenseCategory'])}
                     className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 focus:outline-none"
                   >
                     <option value="HMV">HMV (Heavy Motor Vehicle)</option>
