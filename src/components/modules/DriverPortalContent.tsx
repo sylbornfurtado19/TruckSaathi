@@ -18,13 +18,26 @@ import { useApp } from '@/context/AppContext';
 import { PageHeader, Card, Button, Badge, AnimatedPage, itemVariants } from '@/components/ui';
 
 export function DriverPortalContent() {
-  const { trips, updateTrip } = useApp();
-  const [selectedTripId, setSelectedTripId] = useState(trips[0]?.id || '');
+  const { trips, updateTrip, currentUser, currentDriver } = useApp();
+
+  // Strictly isolate trips to the authenticated driver's ID
+  const driverTrips = React.useMemo(() => {
+    if (!currentDriver?.id) return [];
+    return trips.filter(t => t.driverId === currentDriver.id);
+  }, [trips, currentDriver]);
+
+  const [selectedTripId, setSelectedTripId] = useState('');
   const [podNotes, setPodNotes] = useState('');
   const [uploaded, setUploaded] = useState(false);
   const [sosSent, setSosSent] = useState(false);
 
-  const activeTrip = trips.find(t => t.id === selectedTripId) || trips[0];
+  // Active trip selected exclusively from this driver's assigned trips (no cross-driver leakage)
+  const activeTrip = React.useMemo(() => {
+    if (driverTrips.length === 0) return null;
+    return driverTrips.find(t => t.id === selectedTripId) || driverTrips[0];
+  }, [driverTrips, selectedTripId]);
+
+  const driverDisplayName = currentDriver?.fullName || currentUser?.name || 'Driver';
 
   const handleUploadPOD = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,14 +79,61 @@ export function DriverPortalContent() {
               </div>
               <div>
                 <div className="text-xs text-blue-400 font-mono font-bold uppercase">DRIVER MOBILE APP</div>
-                <h3 className="text-base font-bold text-slate-100">{activeTrip?.driverName || 'Ramesh Kumar'}</h3>
+                <h3 className="text-base font-bold text-slate-100">{driverDisplayName}</h3>
               </div>
             </div>
-            <Badge variant="success">Active Trip</Badge>
+            {activeTrip ? (
+              <Badge variant="success">Active Trip</Badge>
+            ) : (
+              <Badge variant="info">Standby</Badge>
+            )}
           </div>
 
-          {/* Active Trip Manifest Details */}
-          {activeTrip && (
+          {/* Driver Profile Snapshot */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 rounded-xl bg-[#1c2333]/60 border border-[#202736] text-xs">
+            <div>
+              <span className="text-slate-400 block text-[10px] uppercase tracking-wider font-semibold">Driver ID</span>
+              <span className="font-mono font-bold text-slate-200">{currentDriver?.id || currentUser?.driverId || 'Unlinked'}</span>
+            </div>
+            <div>
+              <span className="text-slate-400 block text-[10px] uppercase tracking-wider font-semibold">License</span>
+              <span className="font-mono font-bold text-slate-200">{currentDriver?.licenseNumber || 'Active DL'}</span>
+            </div>
+            <div>
+              <span className="text-slate-400 block text-[10px] uppercase tracking-wider font-semibold">Vehicle</span>
+              <span className="font-mono font-bold text-blue-400">
+                {activeTrip?.vehicleReg || currentDriver?.assignedVehicle || currentDriver?.assignedVehicleReg || 'Standby'}
+              </span>
+            </div>
+            <div>
+              <span className="text-slate-400 block text-[10px] uppercase tracking-wider font-semibold">Safety Score</span>
+              <span className="font-mono font-bold text-emerald-400">
+                {currentDriver?.safetyScore ? `${currentDriver.safetyScore}%` : '94%'}
+              </span>
+            </div>
+          </div>
+
+          {/* Trip Selector if Driver has multiple assigned trips */}
+          {driverTrips.length > 1 && (
+            <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#1c2333] border border-[#202736] text-xs">
+              <span className="text-slate-300 font-medium">Assigned Trips ({driverTrips.length})</span>
+              <select
+                value={activeTrip?.id || ''}
+                onChange={e => setSelectedTripId(e.target.value)}
+                aria-label="Select Assigned Trip"
+                className="bg-[#121824] border border-[#2e374a] text-slate-200 text-xs rounded-lg px-2.5 py-1 focus:outline-none focus:border-blue-500"
+              >
+                {driverTrips.map(t => (
+                  <option key={t.id} value={t.id}>
+                    {t.tripCode} ({t.origin.city} → {t.destination.city})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Active Trip Manifest Details or Standby Message */}
+          {activeTrip ? (
             <div className="space-y-4 text-xs">
               <div className="p-4 rounded-xl bg-[#1c2333]/80 border border-[#202736] space-y-3">
                 <div className="flex items-center justify-between">
@@ -134,6 +194,35 @@ export function DriverPortalContent() {
               </div>
 
               {/* SOS Emergency Panic Button */}
+              <div className="pt-2">
+                {sosSent ? (
+                  <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500 text-rose-300 font-bold text-center text-xs animate-pulse">
+                    🚨 EMERGENCY SOS BROADCASTED! Dispatchers & GPS Emergency Response Contacted!
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleTriggerSOS}
+                    className="w-full py-3 bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/40 rounded-xl text-rose-400 font-bold text-xs flex items-center justify-center gap-2 transition-all"
+                  >
+                    <AlertOctagon className="w-4 h-4" /> Trigger Emergency Highway SOS Alert
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4 text-xs">
+              <div className="p-6 rounded-xl bg-[#1c2333]/80 border border-[#202736] text-center space-y-3">
+                <div className="w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 mx-auto flex items-center justify-center">
+                  <Truck className="w-6 h-6" />
+                </div>
+                <div className="font-bold text-slate-100 text-sm">No Active Trips Dispatched</div>
+                <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                  You are currently on standby. Your fleet dispatcher will assign your next shipment manifest shortly.
+                </p>
+              </div>
+
+              {/* Emergency SOS Panic Button available on standby */}
               <div className="pt-2">
                 {sosSent ? (
                   <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500 text-rose-300 font-bold text-center text-xs animate-pulse">

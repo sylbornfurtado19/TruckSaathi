@@ -106,7 +106,7 @@ export const Sidebar: React.FC<{
       <div className="flex-1 py-4 px-3 space-y-1.5 overflow-y-auto">
         {!collapsed && (
           <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-            <span>Fleet Control Modules</span>
+            <span>{isDriver ? 'Driver Field Operations' : 'Fleet Control Modules'}</span>
           </div>
         )}
         {navItems.map(item => {
@@ -141,8 +141,8 @@ export const Sidebar: React.FC<{
         <div className="px-3 py-2 mx-3 mb-2 rounded-xl bg-gradient-to-r from-blue-900/30 via-indigo-900/20 to-slate-900/40 border border-blue-500/20 flex items-center gap-2 text-xs text-blue-300 shadow-lg">
           <Sparkles className="w-4 h-4 text-blue-400 animate-pulse shrink-0" />
           <div className="text-[11px] leading-tight">
-            <div className="font-bold text-white">Fleet AI Copilot</div>
-            <div className="text-[10px] text-slate-400">Monitoring 5 Live Units</div>
+            <div className="font-bold text-white">{isDriver ? 'Driver Road Copilot' : 'Fleet AI Copilot'}</div>
+            <div className="text-[10px] text-slate-400">{isDriver ? 'Road Telemetry Active' : 'Monitoring 5 Live Units'}</div>
           </div>
         </div>
       )}
@@ -183,6 +183,7 @@ export const Sidebar: React.FC<{
 
 export const Header: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
   const { currentUser } = useApp();
+  const isDriver = currentUser?.role === 'Driver';
   const pathname = usePathname();
   const [isCmdOpen, setIsCmdOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -227,7 +228,7 @@ export const Header: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
         {/* Left Breadcrumb */}
         <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
           <span className="text-slate-500 font-mono text-[10px] bg-[#1c2333] px-1.5 py-0.5 rounded border border-[#2e374a]">
-            FLEET-OS
+            {isDriver ? 'DRIVER-PORTAL' : 'FLEET-OS'}
           </span>
           <span className="text-slate-600">/</span>
           <span className="font-semibold text-slate-200">{getBreadcrumb()}</span>
@@ -242,7 +243,7 @@ export const Header: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
           <input
             type="text"
             readOnly
-            placeholder="Search vehicles, drivers, pages (Ctrl+K)..."
+            placeholder={isDriver ? 'Search driver portal or assigned trips (Ctrl+K)...' : 'Search vehicles, drivers, pages (Ctrl+K)...'}
             className="w-full bg-[#121824]/80 border border-[#2e374a] group-hover:border-blue-500/50 rounded-xl text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-8 py-2 transition-all shadow-inner cursor-pointer"
           />
           <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-400 bg-[#1c2333] px-1.5 py-0.5 rounded border border-[#2e374a]">

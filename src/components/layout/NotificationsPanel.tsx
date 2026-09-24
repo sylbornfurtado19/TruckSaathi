@@ -4,40 +4,72 @@ import React from 'react';
 import { X, Bell, ShieldAlert, CheckCircle2, Clock } from 'lucide-react';
 import { Badge, Button } from '@/components/ui';
 
+import { useApp } from '@/context/AppContext';
+
 interface NotificationsPanelProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
 export function NotificationsPanel({ isOpen, onClose }: NotificationsPanelProps) {
+  const { currentUser, currentDriver } = useApp();
   if (!isOpen) return null;
 
-  const notifications = [
-    {
-      id: 1,
-      title: 'RC Document Expired',
-      desc: 'Vehicle HR-55-AB-1290 Registration Certificate has expired.',
-      time: '10 mins ago',
-      group: 'Today',
-      severity: 'danger' as const
-    },
-    {
-      id: 2,
-      title: 'Insurance Renewal Warning',
-      desc: 'Vehicle KA-01-EA-9011 Insurance expires in 5 days.',
-      time: '1 hour ago',
-      group: 'Today',
-      severity: 'warning' as const
-    },
-    {
-      id: 3,
-      title: 'Driver License Verified',
-      desc: 'Driver Ramesh Kumar license verification completed successfully.',
-      time: 'Yesterday',
-      group: 'Earlier',
-      severity: 'success' as const
-    }
-  ];
+  const isDriver = currentUser?.role === 'Driver';
+
+  const notifications = isDriver
+    ? [
+        {
+          id: 1,
+          title: 'Dispatch Manifest Assigned',
+          desc: 'Your route manifest and digital e-way bill have been updated by dispatch.',
+          time: '15 mins ago',
+          group: 'Today',
+          severity: 'info' as const
+        },
+        {
+          id: 2,
+          title: 'Safety Telemetry Score',
+          desc: `Your safety compliance rating is currently ${currentDriver?.safetyScore || 94}%. Zero overspeed violations reported.`,
+          time: '2 hours ago',
+          group: 'Today',
+          severity: 'success' as const
+        },
+        {
+          id: 3,
+          title: 'Driver License Verified',
+          desc: `License ${currentDriver?.licenseNumber || 'Active'} is verified and compliant.`,
+          time: 'Yesterday',
+          group: 'Earlier',
+          severity: 'success' as const
+        }
+      ]
+    : [
+        {
+          id: 1,
+          title: 'RC Document Expired',
+          desc: 'Vehicle HR-55-AB-1290 Registration Certificate has expired.',
+          time: '10 mins ago',
+          group: 'Today',
+          severity: 'danger' as const
+        },
+        {
+          id: 2,
+          title: 'Insurance Renewal Warning',
+          desc: 'Vehicle KA-01-EA-9011 Insurance expires in 5 days.',
+          time: '1 hour ago',
+          group: 'Today',
+          severity: 'warning' as const
+        },
+        {
+          id: 3,
+          title: 'Driver License Verified',
+          desc: 'Driver license verification completed successfully.',
+          time: 'Yesterday',
+          group: 'Earlier',
+          severity: 'success' as const
+        }
+      ];
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">

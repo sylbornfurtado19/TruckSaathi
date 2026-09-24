@@ -33,8 +33,10 @@ export interface Vehicle {
 
 export interface Driver {
   id: string;
+  userId?: string | null;
   fullName: string;
   phone: string;
+  email?: string;
   licenseNumber: string;
   licenseCategory: 'HMV' | 'Trailer' | 'Hazardous Goods';
   licenseExpiry: string;
@@ -76,6 +78,7 @@ export interface User {
   status: 'Active' | 'Invited' | 'Suspended';
   lastActive: string;
   companyId?: string | null;
+  driverId?: string | null;
 }
 
 export interface UserProfile {
@@ -84,6 +87,7 @@ export interface UserProfile {
   name: string;
   email: string;
   role: UserRole;
+  driverId?: string | null;
   companyId?: string | null;
   companyName: string;
   phone?: string;

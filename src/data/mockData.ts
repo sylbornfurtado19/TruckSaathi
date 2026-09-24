@@ -146,7 +146,9 @@ export const INITIAL_VEHICLES: Vehicle[] = [
 export const INITIAL_DRIVERS: Driver[] = [
   {
     id: 'd-1',
+    userId: 'u-5',
     fullName: 'Ramesh Kumar',
+    email: 'ramesh.k@trucksaathi.in',
     phone: '+91 98765 43210',
     licenseNumber: 'MH12 20150091234',
     licenseCategory: 'HMV',
@@ -172,7 +174,9 @@ export const INITIAL_DRIVERS: Driver[] = [
   },
   {
     id: 'd-2',
+    userId: 'u-6',
     fullName: 'Suresh Patil',
+    email: 'suresh.p@trucksaathi.in',
     phone: '+91 98123 90812',
     licenseNumber: 'KA01 20180041239',
     licenseCategory: 'Trailer',
@@ -299,7 +303,19 @@ export const INITIAL_USERS: User[] = [
     role: 'Driver',
     department: 'Fleet Logistics',
     status: 'Active',
-    lastActive: '10 mins ago'
+    lastActive: '10 mins ago',
+    driverId: 'd-1'
+  },
+  {
+    id: 'u-6',
+    fullName: 'Suresh Patil',
+    email: 'suresh.p@trucksaathi.in',
+    phone: '+91 98123 90812',
+    role: 'Driver',
+    department: 'Fleet Logistics',
+    status: 'Active',
+    lastActive: '30 mins ago',
+    driverId: 'd-2'
   }
 ];
 

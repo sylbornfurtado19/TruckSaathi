@@ -13,7 +13,7 @@ interface CommandPaletteProps {
 
 export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const router = useRouter();
-  const { vehicles, drivers, trips, currentUser } = useApp();
+  const { vehicles, drivers, trips, currentUser, currentDriver } = useApp();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const selectedItemRef = useRef<HTMLDivElement | null>(null);
@@ -42,17 +42,64 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
     ? [{ name: 'Driver Field Portal & POD Upload', href: '/driver-portal', type: 'Page', icon: Smartphone }]
     : allPages.filter(p => p.href !== '/driver-portal');
 
-  const matchedTrips = trips
-    .filter(t => t.tripCode.toLowerCase().includes(query.toLowerCase()) || t.origin.city.toLowerCase().includes(query.toLowerCase()) || t.destination.city.toLowerCase().includes(query.toLowerCase()))
-    .map(t => ({ name: `${t.tripCode} (${t.origin.city} → ${t.destination.city})`, href: '/trips', type: 'Trip', icon: Route }));
+  const matchedTrips = isDriver
+    ? trips
+        .filter(
+          t =>
+            t.driverId === currentDriver?.id &&
+            (t.tripCode.toLowerCase().includes(query.toLowerCase()) ||
+              t.origin.city.toLowerCase().includes(query.toLowerCase()) ||
+              t.destination.city.toLowerCase().includes(query.toLowerCase()))
+        )
+        .map(t => ({
+          name: `${t.tripCode} (Assigned: ${t.origin.city} → ${t.destination.city})`,
+          href: '/driver-portal',
+          type: 'Assigned Trip',
+          icon: Smartphone
+        }))
+    : trips
+        .filter(
+          t =>
+            t.tripCode.toLowerCase().includes(query.toLowerCase()) ||
+            t.origin.city.toLowerCase().includes(query.toLowerCase()) ||
+            t.destination.city.toLowerCase().includes(query.toLowerCase())
+        )
+        .map(t => ({
+          name: `${t.tripCode} (${t.origin.city} → ${t.destination.city})`,
+          href: '/trips',
+          type: 'Trip',
+          icon: Route
+        }));
 
-  const matchedVehicles = vehicles
-    .filter(v => v.regNumber.toLowerCase().includes(query.toLowerCase()) || v.make.toLowerCase().includes(query.toLowerCase()))
-    .map(v => ({ name: `${v.regNumber} (${v.make} ${v.model})`, href: '/vehicles', type: 'Vehicle', icon: Truck }));
+  const matchedVehicles = isDriver
+    ? []
+    : vehicles
+        .filter(
+          v =>
+            v.regNumber.toLowerCase().includes(query.toLowerCase()) ||
+            v.make.toLowerCase().includes(query.toLowerCase())
+        )
+        .map(v => ({
+          name: `${v.regNumber} (${v.make} ${v.model})`,
+          href: '/vehicles',
+          type: 'Vehicle',
+          icon: Truck
+        }));
 
-  const matchedDrivers = drivers
-    .filter(d => d.fullName.toLowerCase().includes(query.toLowerCase()) || d.phone.includes(query))
-    .map(d => ({ name: `${d.fullName} (${d.phone})`, href: '/drivers', type: 'Driver', icon: Users }));
+  const matchedDrivers = isDriver
+    ? []
+    : drivers
+        .filter(
+          d =>
+            d.fullName.toLowerCase().includes(query.toLowerCase()) ||
+            d.phone.includes(query)
+        )
+        .map(d => ({
+          name: `${d.fullName} (${d.phone})`,
+          href: '/drivers',
+          type: 'Driver',
+          icon: Users
+        }));
 
   const results = useMemo(
     () => [
@@ -121,7 +168,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
               setQuery(e.target.value);
               setSelectedIndex(0);
             }}
-            placeholder="Fuzzy search vehicles, drivers, pages..."
+            placeholder={isDriver ? "Search driver portal or assigned trips..." : "Fuzzy search vehicles, drivers, pages..."}
             className="w-full bg-transparent text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none"
           />
           <kbd className="text-[10px] font-mono text-slate-400 bg-[#1c2333] px-2 py-0.5 rounded border border-[#2e374a]">

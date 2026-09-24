@@ -60,6 +60,7 @@ interface AppContextType {
   deleteTrip: (id: string) => void;
   addFuelLog: (log: Omit<FuelLog, 'id'>) => void;
   currentUser: CurrentUser | null;
+  currentDriver: Driver | null;
   session: Session | null;
   user: SupabaseUser | null;
   authLoading: boolean;
@@ -93,6 +94,37 @@ const AppProviderInner: React.FC<{ children: React.ReactNode }> = ({ children })
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [authLoading, setAuthLoading] = useState<boolean>(true);
+
+  // Architecture: Supabase Auth User -> TruckSaathi User Profile -> Driver Profile
+  const currentDriver = React.useMemo<Driver | null>(() => {
+    if (!currentUser || currentUser.role !== 'Driver') return null;
+
+    // 1. Primary: Direct driverId reference on user profile
+    if (currentUser.driverId) {
+      const match = drivers.find(d => d.id === currentUser.driverId);
+      if (match) return match;
+    }
+
+    // 2. Secondary: Matched by userId in driver entity
+    const matchByUserId = drivers.find(d => d.userId && d.userId === currentUser.id);
+    if (matchByUserId) return matchByUserId;
+
+    // 3. Match by email
+    if (currentUser.email) {
+      const matchByEmail = drivers.find(
+        d => d.email && d.email.toLowerCase() === currentUser.email?.toLowerCase()
+      );
+      if (matchByEmail) return matchByEmail;
+    }
+
+    // 4. Match by phone
+    if (currentUser.phone) {
+      const matchByPhone = drivers.find(d => d.phone && d.phone === currentUser.phone);
+      if (matchByPhone) return matchByPhone;
+    }
+
+    return null;
+  }, [currentUser, drivers]);
 
   // Sync session and profile from Supabase
   useEffect(() => {
@@ -290,6 +322,7 @@ const AppProviderInner: React.FC<{ children: React.ReactNode }> = ({ children })
         deleteTrip,
         addFuelLog,
         currentUser,
+        currentDriver,
         session,
         user,
         authLoading,

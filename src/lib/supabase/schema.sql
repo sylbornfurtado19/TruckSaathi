@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS public.users (
     branch_id UUID REFERENCES public.branches(id) ON DELETE SET NULL,
     phone TEXT,
     department TEXT,
+    driver_id UUID,
     status TEXT DEFAULT 'active' CHECK (status IN ('active', 'invited', 'suspended')),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -58,6 +59,7 @@ CREATE TABLE IF NOT EXISTS public.users (
 CREATE TABLE IF NOT EXISTS public.drivers (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     company_id UUID REFERENCES public.companies(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
     full_name TEXT NOT NULL,
     phone VARCHAR(15) NOT NULL,
     emergency_contact JSONB,
@@ -69,6 +71,9 @@ CREATE TABLE IF NOT EXISTS public.drivers (
     status TEXT DEFAULT 'active' CHECK (status IN ('active', 'on_leave', 'terminated')),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Add foreign key constraint from users.driver_id to drivers.id
+ALTER TABLE public.users ADD CONSTRAINT fk_users_driver_id FOREIGN KEY (driver_id) REFERENCES public.drivers(id) ON DELETE SET NULL;
 
 -- 6. VEHICLES TABLE
 CREATE TABLE IF NOT EXISTS public.vehicles (
@@ -127,9 +132,32 @@ $$ LANGUAGE sql STABLE SECURITY DEFINER;
 CREATE POLICY "Tenant vehicles isolation" ON public.vehicles
     FOR ALL USING (company_id = public.get_auth_company_id());
 
--- Driver Tenant Isolation Policy
-CREATE POLICY "Tenant drivers isolation" ON public.drivers
-    FOR ALL USING (company_id = public.get_auth_company_id());
+-- Helper function to get current user role
+CREATE OR REPLACE FUNCTION public.get_auth_user_role()
+RETURNS TEXT AS $$
+  SELECT role FROM public.users WHERE id = auth.uid();
+$$ LANGUAGE sql STABLE SECURITY DEFINER;
+
+-- Driver Tenant & Profile Isolation Policy: Management sees all company drivers; Driver sees only their own profile
+CREATE POLICY "Drivers can view own profile or management can view company drivers" ON public.drivers
+    FOR SELECT TO authenticated
+    USING (
+      CASE
+        WHEN public.get_auth_user_role() = 'Driver' THEN
+          (user_id = auth.uid() OR id IN (SELECT driver_id FROM public.users WHERE id = auth.uid()))
+        ELSE
+          company_id = public.get_auth_company_id()
+      END
+    );
+
+CREATE POLICY "Drivers can update own profile" ON public.drivers
+    FOR UPDATE TO authenticated
+    USING (
+      user_id = auth.uid() OR id IN (SELECT driver_id FROM public.users WHERE id = auth.uid())
+    )
+    WITH CHECK (
+      user_id = auth.uid() OR id IN (SELECT driver_id FROM public.users WHERE id = auth.uid())
+    );
 
 -- User Profile RLS Policies
 CREATE POLICY "Users can view own profile" ON public.users
