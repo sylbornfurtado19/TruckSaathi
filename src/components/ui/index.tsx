@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowUp, ArrowDown, Loader2, X, Search } from 'lucide-react';
+import { ArrowUp, ArrowDown, Loader2, X } from 'lucide-react';
 
 /* -------------------------------------------------------------------------- */
 /*                                   BUTTON                                   */
 /* -------------------------------------------------------------------------- */
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'amber';
   size?: 'sm' | 'md' | 'lg';
   icon?: React.ReactNode;
   loading?: boolean;
@@ -26,25 +26,27 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseStyle =
-    'inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 relative select-none';
+    'inline-flex items-center justify-center font-bold rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 relative select-none active:scale-[0.98]';
 
   const variants = {
     primary:
-      'bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white shadow-md shadow-blue-600/20 border border-blue-400/25',
+      'bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-600/25 border border-blue-400/25 hover:shadow-blue-500/40',
     secondary:
-      'bg-[#121c2e] hover:bg-[#1a273f] active:bg-[#0f1726] text-slate-200 border border-[#223352] hover:border-slate-400/30',
+      'bg-white/[0.05] hover:bg-white/[0.1] active:bg-white/[0.03] text-slate-200 border border-white/[0.1] hover:border-white/[0.2]',
     outline:
-      'bg-transparent border border-[#223352] text-slate-300 hover:bg-[#121c2e] hover:text-white hover:border-slate-400/40',
+      'bg-transparent border border-white/[0.12] text-slate-300 hover:bg-white/[0.06] hover:text-white hover:border-white/[0.25]',
     ghost:
-      'bg-transparent text-slate-400 hover:text-slate-100 hover:bg-[#121c2e]/70',
+      'bg-transparent text-slate-400 hover:text-white hover:bg-white/[0.06]',
     danger:
-      'bg-rose-500/15 hover:bg-rose-500/25 active:bg-rose-500/30 text-rose-400 border border-rose-500/30 shadow-sm shadow-rose-500/10'
+      'bg-rose-500/15 hover:bg-rose-500/25 active:bg-rose-500/30 text-rose-300 border border-rose-500/30 shadow-sm shadow-rose-500/10',
+    amber:
+      'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-extrabold shadow-lg shadow-amber-500/25 border border-amber-300/30'
   };
 
   const sizes = {
-    sm: 'text-xs px-2.5 py-1.5 gap-1.5 min-h-[30px]',
-    md: 'text-xs px-3.5 py-2 gap-2 min-h-[36px]',
-    lg: 'text-sm px-4.5 py-2.5 gap-2.5 min-h-[42px]'
+    sm: 'text-xs px-3 py-1.5 gap-1.5 min-h-[32px]',
+    md: 'text-xs px-4 py-2 gap-2 min-h-[38px]',
+    lg: 'text-sm px-5 py-2.5 gap-2.5 min-h-[44px]'
   };
 
   return (
@@ -77,25 +79,25 @@ export const Card: React.FC<{
   const shouldReduceMotion = useReducedMotion();
 
   const glowStyles = {
-    none: 'border-[#1b263b] hover:border-[#273857]',
-    blue: 'border-[#1b263b] hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10',
-    emerald: 'border-[#1b263b] hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-500/10',
-    amber: 'border-[#1b263b] hover:border-amber-500/50 hover:shadow-lg hover:shadow-amber-500/10',
-    rose: 'border-[#1b263b] hover:border-rose-500/50 hover:shadow-lg hover:shadow-rose-500/10',
-    cyan: 'border-[#1b263b] hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/10'
+    none: 'border-white/[0.08] hover:border-white/[0.16]',
+    blue: 'border-white/[0.08] hover:border-blue-500/40 hover:shadow-[0_12px_40px_rgba(59,130,246,0.15)]',
+    emerald: 'border-white/[0.08] hover:border-emerald-500/40 hover:shadow-[0_12px_40px_rgba(16,185,129,0.15)]',
+    amber: 'border-white/[0.08] hover:border-amber-500/40 hover:shadow-[0_12px_40px_rgba(245,158,11,0.15)]',
+    rose: 'border-white/[0.08] hover:border-rose-500/40 hover:shadow-[0_12px_40px_rgba(244,63,94,0.15)]',
+    cyan: 'border-white/[0.08] hover:border-cyan-500/40 hover:shadow-[0_12px_40px_rgba(6,182,212,0.15)]'
   };
 
   return (
     <motion.div
-      whileHover={shouldReduceMotion || !onClick ? {} : { y: -1 }}
-      transition={{ duration: 0.15, ease: 'easeOut' }}
+      whileHover={shouldReduceMotion || !onClick ? {} : { y: -2 }}
+      transition={{ duration: 0.18, ease: 'easeOut' }}
       onClick={onClick}
-      className={`bg-[#0a101d] rounded-xl p-5 border transition-all duration-200 relative ${glowStyles[glow]} ${
+      className={`bg-[#12151e]/90 backdrop-blur-xl rounded-2xl p-5 border transition-all duration-200 relative shadow-[0_8px_32px_rgba(0,0,0,0.36)] ${glowStyles[glow]} ${
         onClick ? 'cursor-pointer' : ''
       } ${className}`}
     >
       {/* Precision top edge highlight */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent pointer-events-none" />
       {children}
     </motion.div>
   );
@@ -107,17 +109,18 @@ export const Card: React.FC<{
 
 export const Badge: React.FC<{
   children: React.ReactNode;
-  variant?: 'success' | 'warning' | 'danger' | 'info' | 'cyan' | 'neutral';
+  variant?: 'success' | 'warning' | 'danger' | 'info' | 'cyan' | 'neutral' | 'vibe';
   pulse?: boolean;
   className?: string;
 }> = ({ children, variant = 'neutral', pulse = false, className = '' }) => {
   const styles = {
-    success: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',
-    warning: 'bg-amber-500/10 text-amber-400 border-amber-500/25',
-    danger: 'bg-rose-500/10 text-rose-400 border-rose-500/25',
-    info: 'bg-blue-500/10 text-blue-400 border-blue-500/25',
-    cyan: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/25',
-    neutral: 'bg-slate-500/10 text-slate-400 border-slate-500/20'
+    success: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25 shadow-[0_0_12px_rgba(16,185,129,0.12)]',
+    warning: 'bg-amber-500/10 text-amber-400 border-amber-500/25 shadow-[0_0_12px_rgba(245,158,11,0.12)]',
+    danger: 'bg-rose-500/10 text-rose-400 border-rose-500/25 shadow-[0_0_12px_rgba(244,63,94,0.12)]',
+    info: 'bg-blue-500/10 text-blue-400 border-blue-500/25 shadow-[0_0_12px_rgba(59,130,246,0.12)]',
+    cyan: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/25 shadow-[0_0_12px_rgba(6,182,212,0.12)]',
+    neutral: 'bg-white/[0.05] text-slate-300 border-white/[0.1]',
+    vibe: 'bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 text-amber-300 border-amber-400/30 shadow-[0_0_16px_rgba(245,158,11,0.15)]'
   };
 
   const dotStyles = {
@@ -126,12 +129,13 @@ export const Badge: React.FC<{
     danger: 'bg-rose-400',
     info: 'bg-blue-400',
     cyan: 'bg-cyan-400',
-    neutral: 'bg-slate-400'
+    neutral: 'bg-slate-400',
+    vibe: 'bg-amber-400'
   };
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold border ${styles[variant]} ${className}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border backdrop-blur-md ${styles[variant]} ${className}`}
     >
       {pulse && (
         <span className="relative flex h-1.5 w-1.5">
@@ -154,10 +158,10 @@ export const Input: React.FC<React.InputHTMLAttributes<HTMLInputElement> & { ico
   ...props
 }) => (
   <div className="relative w-full">
-    {icon && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">{icon}</span>}
+    {icon && <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">{icon}</span>}
     <input
-      className={`w-full bg-[#0c1322] border border-[#1e2d47] focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none rounded-lg text-xs text-slate-100 placeholder:text-slate-500 py-2 transition-colors ${
-        icon ? 'pl-9 pr-3' : 'px-3'
+      className={`w-full bg-white/[0.03] border border-white/[0.1] focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none rounded-xl text-xs text-white placeholder:text-slate-500 py-2.5 transition-all shadow-inner ${
+        icon ? 'pl-9 pr-3' : 'px-3.5'
       } ${className}`}
       {...props}
     />
@@ -174,21 +178,21 @@ export const PageHeader: React.FC<{
   badge?: React.ReactNode;
   actions?: React.ReactNode;
 }> = ({ title, description, badge, actions }) => (
-  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#1b273d]">
+  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
     <div className="space-y-1">
-      <div className="flex items-center gap-2.5">
-        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2.5">
+        <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
           {title}
         </h1>
         {badge && (
           typeof badge === 'string' ? (
-            <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/30">
+            <span className="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/30">
               {badge}
             </span>
           ) : badge
         )}
       </div>
-      <p className="text-xs text-slate-400 max-w-2xl">{description}</p>
+      <p className="text-xs sm:text-sm text-slate-400 max-w-2xl leading-relaxed">{description}</p>
     </div>
     {actions && <div className="flex items-center gap-2.5 self-start sm:self-auto shrink-0">{actions}</div>}
   </div>
@@ -222,7 +226,7 @@ export const AnimatedNumber: React.FC<{ value: number }> = ({ value }) => {
     return () => clearInterval(timer);
   }, [value]);
 
-  return <span className="tabular-nums font-mono">{displayValue}</span>;
+  return <span className="tabular-nums font-bold">{displayValue}</span>;
 };
 
 /* -------------------------------------------------------------------------- */
@@ -249,27 +253,37 @@ export const KPICard: React.FC<{
   const isUp = trend?.direction === 'up' || trend?.isPositive === true;
 
   return (
-    <Card glow={glow} className="relative overflow-hidden p-4 sm:p-5">
-      <div className="flex items-center justify-between">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">{title}</span>
-        <div className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 ${iconBg}`}>{icon}</div>
+    <Card glow={glow} className="relative overflow-hidden p-5 flex flex-col justify-between group">
+      <div>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">{title}</span>
+          <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 shadow-md ${iconBg}`}>{icon}</div>
+        </div>
+        <div className="mt-3 text-3xl sm:text-4xl font-black text-white tracking-tight flex items-baseline justify-between">
+          {typeof value === 'number' ? <AnimatedNumber value={value} /> : <span className="tabular-nums font-mono">{value}</span>}
+          {trend && (
+            <span
+              className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border flex items-center gap-1 font-mono ${
+                isUp
+                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+              }`}
+            >
+              {isUp ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
+              {trend.value}
+            </span>
+          )}
+        </div>
       </div>
-      <div className="mt-2 text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-baseline justify-between">
-        {typeof value === 'number' ? <AnimatedNumber value={value} /> : <span className="tabular-nums font-mono">{value}</span>}
-        {trend && (
-          <span
-            className={`text-[11px] font-semibold font-mono flex items-center gap-0.5 px-1.5 py-0.5 rounded border ${
-              isUp
-                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
-            }`}
-          >
-            {isUp ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
-            {trend.value}
-          </span>
-        )}
+      {subtext && <div className="mt-2 text-xs text-slate-400 flex items-center gap-1 font-medium">{subtext}</div>}
+
+      {/* Bottom glowing accent line */}
+      <div className="mt-3 pt-2 border-t border-white/[0.04] flex items-center justify-between text-[10px] text-slate-500 font-mono">
+        <span className="flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" /> Live Telemetry
+        </span>
+        <span className="group-hover:text-blue-400 transition-colors">Nominal</span>
       </div>
-      {subtext && <div className="mt-1.5 text-xs text-slate-400 flex items-center gap-1 font-medium">{subtext}</div>}
     </Card>
   );
 };
@@ -313,19 +327,19 @@ export const Modal: React.FC<{
   const resolvedWidth = maxWidth || sizeClasses[size] || 'max-w-2xl';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150">
       <div className="absolute inset-0" onClick={onClose} />
       <div
-        className={`relative z-10 w-full ${resolvedWidth} bg-[#0b1120] border border-[#1f2d48] rounded-2xl p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-150`}
+        className={`relative z-10 w-full ${resolvedWidth} bg-[#12151e]/95 backdrop-blur-2xl border border-white/[0.1] rounded-2xl p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-150`}
       >
-        <div className="flex items-start justify-between border-b border-[#1b263b] pb-3.5">
+        <div className="flex items-start justify-between border-b border-white/[0.08] pb-3.5">
           <div className="space-y-0.5">
-            <h2 className="text-base font-bold text-white">{title}</h2>
+            <h2 className="text-lg font-black text-white tracking-tight">{title}</h2>
             {description && <p className="text-xs text-slate-400">{description}</p>}
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-[#141d30] transition-colors"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -346,12 +360,12 @@ export const EmptyState: React.FC<{
   description: string;
   action?: React.ReactNode;
 }> = ({ icon, title, description, action }) => (
-  <div className="p-10 rounded-xl bg-[#090e1a] border border-[#1b263b] text-center space-y-3 flex flex-col items-center justify-center">
-    <div className="w-12 h-12 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
+  <div className="p-10 rounded-2xl bg-white/[0.02] border border-white/[0.08] text-center space-y-3 flex flex-col items-center justify-center">
+    <div className="w-12 h-12 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shadow-lg shadow-blue-500/10">
       {icon}
     </div>
     <div className="space-y-1 max-w-sm">
-      <h3 className="text-sm font-bold text-slate-200">{title}</h3>
+      <h3 className="text-sm font-bold text-white">{title}</h3>
       <p className="text-xs text-slate-400 leading-relaxed">{description}</p>
     </div>
     {action && <div className="pt-2">{action}</div>}
