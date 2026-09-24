@@ -18,6 +18,7 @@ import {
 import { useApp } from '@/context/AppContext';
 import { KPICard, PageHeader, Card, Button, Badge, RouteDivider } from '@/components/ui';
 import { LiveFleetMap } from './LiveFleetMap';
+import { SimulationControlBar } from '@/components/common/SimulationControlBar';
 import Link from 'next/link';
 
 export function DashboardFeature() {
@@ -114,7 +115,12 @@ export function DashboardFeature() {
         />
       </motion.div>
 
-      {/* 3. Interactive Live Telemetry Map Centerpiece */}
+      {/* 3. Interactive Cross-Window Transit Simulation Controller */}
+      <motion.div variants={itemVariants}>
+        <SimulationControlBar />
+      </motion.div>
+
+      {/* 4. Interactive Live Telemetry Map Centerpiece */}
       <motion.div variants={itemVariants}>
         <LiveFleetMap vehicles={vehicles} />
       </motion.div>

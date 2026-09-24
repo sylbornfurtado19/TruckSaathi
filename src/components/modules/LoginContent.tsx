@@ -14,7 +14,9 @@ import {
   Sparkles,
   User,
   Shield,
-  Info
+  Info,
+  Building2,
+  Truck
 } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
@@ -24,7 +26,7 @@ import { ensureUserProfile } from '@/lib/services/profileService';
 export function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { session, currentUser, authLoading } = useApp();
+  const { session, currentUser, authLoading, loginAsDemoRole } = useApp();
 
   const [portalRole, setPortalRole] = useState<'driver' | 'management'>('management');
   const [email, setEmail] = useState('sylborn@trucksaathi.in');
@@ -261,6 +263,46 @@ export function LoginContent() {
             <div className="text-center space-y-1.5">
               <h2 className="text-2xl font-bold tracking-tight text-white">Welcome Back</h2>
               <p className="text-xs text-slate-400">Select your portal role to log in</p>
+            </div>
+
+            {/* 2-Window Live Simulation Quick Demo Launcher */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-950/70 via-indigo-950/50 to-[#0e1627] border border-blue-500/40 shadow-xl space-y-2.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-white flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                  2-Window Live Simulation
+                </span>
+                <span className="text-[10px] font-mono text-cyan-300 font-bold bg-cyan-500/15 px-2 py-0.5 rounded-full border border-cyan-500/30">
+                  Real-Time Sync
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <button
+                  type="button"
+                  onClick={() => {
+                    loginAsDemoRole('Fleet Manager');
+                    router.push('/dashboard');
+                  }}
+                  className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-blue-600/30 transition-all cursor-pointer active:scale-[0.98]"
+                >
+                  <Building2 className="w-3.5 h-3.5" />
+                  <span>Fleet Manager</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    loginAsDemoRole('Driver', 'd-1');
+                    router.push('/driver-portal');
+                  }}
+                  className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-cyan-600/30 transition-all cursor-pointer active:scale-[0.98]"
+                >
+                  <Truck className="w-3.5 h-3.5" />
+                  <span>Driver (Ramesh)</span>
+                </button>
+              </div>
+              <p className="text-[10px] text-slate-400 leading-tight">
+                💡 <strong>Demo tip:</strong> Open one tab as <em>Fleet Manager</em> and another tab (or Incognito) as <em>Driver</em> to see the highway simulation and speed sync in real time!
+              </p>
             </div>
 
             {/* Role Selector Tabs (Customer vs Staff & Manager in PLATR reference) */}

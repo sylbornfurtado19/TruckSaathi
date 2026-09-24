@@ -178,3 +178,33 @@ export interface TripExpense {
   profitMarginPercent: number;
 }
 
+export interface TelemetrySimulationState {
+  isRunning: boolean;
+  stepIndex: number;
+  speedKmh: number;
+  odometerKm: number;
+  fuelPercent: number;
+  engineTempC: number;
+  engineRpm: number;
+  currentCheckpoint: string;
+  nextMilestone: string;
+  progressPercent: number;
+  distanceRemainingKm: number;
+  location: { lat: number; lng: number; city: string };
+  vehicleId: string;
+  vehicleReg: string;
+  driverId: string;
+  driverName: string;
+  tripId: string;
+  tripCode: string;
+  tripStatus: 'In Transit' | 'Delivered';
+  sosActive: boolean;
+  podUploaded: boolean;
+  speedMultiplier: number;
+  lastEvent?: {
+    type: 'checkpoint' | 'toll' | 'sos' | 'pod' | 'overspeed';
+    text: string;
+    timestamp: string;
+  };
+}
+
