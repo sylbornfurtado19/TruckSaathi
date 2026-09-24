@@ -2,19 +2,33 @@
 
 import React, { useState } from 'react';
 import {
-  UserCheck,
+  Users,
   Search,
   CheckCircle2,
   AlertTriangle,
   Phone,
-  X,
   UserPlus,
-  Download
+  Download,
+  ShieldCheck,
+  Award,
+  Eye,
+  CreditCard,
+  UserCheck
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
 import { Driver } from '@/types';
-import { PageHeader, Card, Button, Badge, AnimatedPage, itemVariants } from '@/components/ui';
+import {
+  PageHeader,
+  Card,
+  Button,
+  Badge,
+  AnimatedPage,
+  KPICard,
+  Modal,
+  EmptyState,
+  itemVariants
+} from '@/components/ui';
 import { exportToCSV } from '@/lib/csvExport';
 
 export function DriversContent() {
@@ -22,6 +36,7 @@ export function DriversContent() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
 
   // Form State
   const [fullName, setFullName] = useState('');
@@ -30,6 +45,14 @@ export function DriversContent() {
   const [licenseCategory, setLicenseCategory] = useState<Driver['licenseCategory']>('HMV');
   const [experienceYears, setExperienceYears] = useState(5);
   const [aadhaarNumber, setAadhaarNumber] = useState('');
+
+  // Stats calculation
+  const totalDrivers = drivers.length;
+  const activeDrivers = drivers.filter(d => d.status === 'Active').length;
+  const verifiedDrivers = drivers.filter(d => d.verificationStatus === 'Fully Verified').length;
+  const avgSafetyScore = Math.round(
+    drivers.reduce((acc, d) => acc + (d.safetyScore || 90), 0) / (totalDrivers || 1)
+  );
 
   const filteredDrivers = drivers.filter(
     d =>
@@ -61,7 +84,7 @@ export function DriversContent() {
     addDriver({
       fullName,
       phone: phone || '+91 98765 00000',
-      licenseNumber: licenseNumber.toUpperCase(),
+      licenseNumber: licenseNumber.toUpperCase().trim(),
       licenseCategory,
       licenseExpiry: '2029-10-30',
       experienceYears: Number(experienceYears),
@@ -70,7 +93,7 @@ export function DriversContent() {
       verificationStatus: 'Fully Verified',
       aadhaarNumber: aadhaarNumber || '9000 0000 0000',
       emergencyContact: {
-        name: 'Family Contact',
+        name: 'Family Emergency Contact',
         phone: '+91 98765 00001',
         relation: 'Spouse'
       }
@@ -78,23 +101,31 @@ export function DriversContent() {
 
     setIsModalOpen(false);
     setFullName('');
+    setPhone('');
     setLicenseNumber('');
+    setAadhaarNumber('');
   };
 
   return (
     <AnimatedPage>
-      {/* Page Header */}
+      {/* 1. Page Header */}
       <motion.div variants={itemVariants}>
         <PageHeader
+          badge={
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/30">
+              <Users className="w-3.5 h-3.5" />
+              Human Capital
+            </span>
+          }
           title="Human Capital & Drivers Directory"
-          description="Commercial driver profiles, license verification status, and vehicle assignments."
+          description="Commercial driver profiles, Sarathi DL verification status, telematics safety scores, and vehicle route assignments."
           actions={
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleExportCSV}
-                icon={<Download className="w-4 h-4" />}
+                icon={<Download className="w-3.5 h-3.5" />}
               >
                 Export CSV
               </Button>
@@ -102,7 +133,7 @@ export function DriversContent() {
                 variant="primary"
                 size="sm"
                 onClick={() => setIsModalOpen(true)}
-                icon={<UserPlus className="w-4 h-4" />}
+                icon={<UserPlus className="w-3.5 h-3.5" />}
               >
                 Onboard Driver
               </Button>
@@ -111,183 +142,318 @@ export function DriversContent() {
         />
       </motion.div>
 
-      {/* Search Bar */}
+      {/* 2. Drivers KPI Strip */}
+      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <KPICard
+          title="Total Registered Drivers"
+          value={totalDrivers}
+          subtext="Commercial transport roster"
+          icon={<Users className="w-4 h-4 text-blue-400" />}
+          iconBg="bg-blue-600/15 border border-blue-500/30 text-blue-400"
+        />
+        <KPICard
+          title="Active on Duty"
+          value={activeDrivers}
+          subtext={`${Math.round((activeDrivers / (totalDrivers || 1)) * 100)}% roster deployment rate`}
+          trend={{ value: `${activeDrivers} ready`, isPositive: true }}
+          icon={<CheckCircle2 className="w-4 h-4 text-emerald-400" />}
+          iconBg="bg-emerald-600/15 border border-emerald-500/30 text-emerald-400"
+        />
+        <KPICard
+          title="KYC & Sarathi Verified"
+          value={verifiedDrivers}
+          subtext="Government portal checked"
+          trend={{ value: "100% compliant", isPositive: true }}
+          icon={<ShieldCheck className="w-4 h-4 text-indigo-400" />}
+          iconBg="bg-indigo-600/15 border border-indigo-500/30 text-indigo-400"
+        />
+        <KPICard
+          title="Average Fleet Safety"
+          value={`${avgSafetyScore}/100`}
+          subtext="Telematics driving score"
+          trend={{ value: "Low accident risk", isPositive: true }}
+          icon={<Award className="w-4 h-4 text-cyan-400" />}
+          iconBg="bg-cyan-600/15 border border-cyan-500/30 text-cyan-400"
+        />
+      </motion.div>
+
+      {/* 3. Search & Filter Bar */}
       <motion.div variants={itemVariants}>
-        <Card glow="blue" className="p-4 flex items-center justify-between">
+        <Card className="p-4 flex items-center justify-between">
           <div className="w-full md:w-96 relative">
-            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              placeholder="Search driver name, phone, license..."
-              className="w-full bg-[#1c2333]/80 border border-[#2e374a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 transition-all backdrop-blur-md"
+              placeholder="Search driver name, phone, commercial license..."
+              className="w-full bg-[#0a0f1d] border border-[#1e2e4a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 transition-all font-sans"
             />
           </div>
         </Card>
       </motion.div>
 
-      {/* Driver Data Table */}
-      <motion.div variants={itemVariants} className="glass-panel rounded-xl overflow-hidden shadow-2xl">
+      {/* 4. Enterprise Driver Data Table */}
+      <motion.div variants={itemVariants} className="border border-[#1e2e4a] rounded-xl overflow-hidden bg-[#0b1120]/80 backdrop-blur-md shadow-xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-[#1c2333]/80 backdrop-blur-md text-slate-400 border-b border-[#202736] font-semibold uppercase tracking-wider sticky top-0 z-10">
-                <th className="py-3.5 px-4">Driver Name</th>
-                <th className="py-3.5 px-4">Contact Phone</th>
-                <th className="py-3.5 px-4">License Number</th>
+              <tr className="bg-[#0d1527] text-slate-400 border-b border-[#1e2e4a] font-semibold uppercase tracking-wider text-[11px]">
+                <th className="py-3.5 px-4">Driver Profile</th>
+                <th className="py-3.5 px-4 font-mono">Contact Phone</th>
+                <th className="py-3.5 px-4 font-mono">License Number</th>
                 <th className="py-3.5 px-4">Category</th>
                 <th className="py-3.5 px-4">Experience</th>
-                <th className="py-3.5 px-4">Assigned Vehicle</th>
-                <th className="py-3.5 px-4">Verification</th>
-                <th className="py-3.5 px-4">Status</th>
+                <th className="py-3.5 px-4 font-mono">Assigned Asset</th>
+                <th className="py-3.5 px-4">Safety Score</th>
+                <th className="py-3.5 px-4">KYC Status</th>
+                <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#202736]/60 text-slate-200">
-              {filteredDrivers.map(driver => (
-                <tr key={driver.id} className="hover:bg-[#1c2333]/50 transition-colors cursor-pointer border-l-2 border-transparent hover:border-blue-500">
-                  <td className="py-3.5 px-4 font-semibold text-slate-100 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center font-bold text-xs text-blue-400 shadow-md">
-                      {driver.fullName.charAt(0)}
-                    </div>
-                    <span>{driver.fullName}</span>
-                  </td>
-                  <td className="py-3.5 px-4 font-mono text-slate-300">
-                    <span className="flex items-center gap-1">
-                      <Phone className="w-3 h-3 text-slate-500" />
-                      {driver.phone}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-4 font-mono text-slate-300">{driver.licenseNumber}</td>
-                  <td className="py-3.5 px-4 text-slate-300">
-                    <span className="bg-[#1c2333] border border-[#2e374a] px-2 py-0.5 rounded text-[11px]">
-                      {driver.licenseCategory}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-4 text-slate-300">{driver.experienceYears} Years</td>
-                  <td className="py-3.5 px-4 font-mono font-medium text-blue-400">
-                    {driver.assignedVehicle || 'Unassigned'}
-                  </td>
-                  <td className="py-3.5 px-4">
-                    {driver.verificationStatus === 'Fully Verified' ? (
-                      <Badge variant="success">
-                        <CheckCircle2 className="w-3 h-3" /> Verified
-                      </Badge>
-                    ) : (
-                      <Badge variant="warning" pulse>
-                        <AlertTriangle className="w-3 h-3" /> Pending
-                      </Badge>
-                    )}
-                  </td>
-                  <td className="py-3.5 px-4">
-                    <span className="text-slate-400">{driver.status}</span>
+            <tbody className="divide-y divide-[#16233b] text-slate-200">
+              {filteredDrivers.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="py-12">
+                    <EmptyState
+                      icon={<Users className="w-8 h-8 text-slate-500" />}
+                      title="No Drivers Found"
+                      description="No driver records match your search criteria."
+                      action={
+                        <Button variant="secondary" size="sm" onClick={() => setSearchTerm('')}>
+                          Clear Search
+                        </Button>
+                      }
+                    />
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredDrivers.map(driver => (
+                  <tr
+                    key={driver.id}
+                    onClick={() => setSelectedDriver(driver)}
+                    className="hover:bg-[#131f38] transition-colors cursor-pointer group"
+                  >
+                    <td className="py-3.5 px-4 font-semibold text-slate-100 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-blue-600/15 border border-blue-500/30 flex items-center justify-center font-bold text-xs text-blue-400 shrink-0">
+                        {driver.fullName.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-slate-100">{driver.fullName}</div>
+                        <div className="text-[10px] text-slate-400 font-mono">ID: {driver.id.slice(0, 8)}</div>
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-4 font-mono text-slate-300">
+                      <span className="flex items-center gap-1.5">
+                        <Phone className="w-3 h-3 text-slate-500" />
+                        {driver.phone}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 font-mono text-slate-200 font-semibold">{driver.licenseNumber}</td>
+                    <td className="py-3.5 px-4">
+                      <Badge variant="neutral">{driver.licenseCategory}</Badge>
+                    </td>
+                    <td className="py-3.5 px-4 text-slate-300 font-mono">{driver.experienceYears} Years</td>
+                    <td className="py-3.5 px-4 font-mono font-medium">
+                      {driver.assignedVehicle === 'Unassigned' || !driver.assignedVehicle ? (
+                        <span className="text-slate-500">Standby</span>
+                      ) : (
+                        <span className="text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
+                          {driver.assignedVehicle}
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-12 h-1.5 bg-[#0a0f1d] rounded-full overflow-hidden border border-[#1e2e4a]">
+                          <div
+                            className="h-full bg-emerald-500 rounded-full"
+                            style={{ width: `${driver.safetyScore || 92}%` }}
+                          />
+                        </div>
+                        <span className="font-mono text-[11px] font-bold text-emerald-400">
+                          {driver.safetyScore || 92}%
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      {driver.verificationStatus === 'Fully Verified' ? (
+                        <Badge variant="success">
+                          <CheckCircle2 className="w-3 h-3" /> Verified
+                        </Badge>
+                      ) : (
+                        <Badge variant="warning">
+                          <AlertTriangle className="w-3 h-3" /> Pending
+                        </Badge>
+                      )}
+                    </td>
+                    <td className="py-3.5 px-4 text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={<Eye className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-400" />}
+                        onClick={e => {
+                          e.stopPropagation();
+                          setSelectedDriver(driver);
+                        }}
+                        title="View Profile"
+                      />
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </motion.div>
 
-      {/* Onboard Driver Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="glass-panel border border-[#202736] rounded-2xl w-full max-w-xl p-6 space-y-6 shadow-2xl relative">
-            <div className="flex items-center justify-between border-b border-[#202736] pb-4">
-              <div className="flex items-center gap-2 text-slate-100 font-bold text-lg">
-                <UserCheck className="w-5 h-5 text-indigo-400" />
-                <span>Onboard Commercial Driver</span>
+      {/* 5. Onboard Driver Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Onboard Commercial Driver"
+        description="Verify commercial driving license credentials and register personnel into the active fleet roster."
+        size="lg"
+      >
+        <form onSubmit={handleOnboardDriver} className="space-y-4 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-slate-300 mb-1 font-medium">Full Legal Name *</label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. Ramesh Kumar Verma"
+                value={fullName}
+                onChange={e => setFullName(e.target.value)}
+                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-slate-300 mb-1 font-medium">Contact Mobile Phone *</label>
+              <input
+                type="text"
+                required
+                placeholder="+91 98765 43210"
+                value={phone}
+                onChange={e => setPhone(e.target.value)}
+                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-slate-300 mb-1 font-medium">Commercial DL Number *</label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. MH12 20180091234"
+                value={licenseNumber}
+                onChange={e => setLicenseNumber(e.target.value)}
+                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono uppercase focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-slate-300 mb-1 font-medium">License Category</label>
+              <select
+                value={licenseCategory}
+                onChange={e => setLicenseCategory(e.target.value as Driver['licenseCategory'])}
+                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+              >
+                <option value="HMV">HMV (Heavy Motor Vehicle)</option>
+                <option value="Trailer">Multi-Axle Trailer Commercial</option>
+                <option value="Hazardous Goods">Hazardous & Flammable Cargo</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-slate-300 mb-1 font-medium">Highway Experience (Years)</label>
+              <input
+                type="number"
+                min={1}
+                max={40}
+                value={experienceYears}
+                onChange={e => setExperienceYears(Number(e.target.value))}
+                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-slate-300 mb-1 font-medium">Aadhaar Card Number</label>
+              <input
+                type="text"
+                placeholder="12-digit UIDAI Number"
+                value={aadhaarNumber}
+                onChange={e => setAadhaarNumber(e.target.value)}
+                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-[#1e2e4a] flex justify-end gap-3">
+            <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary">
+              Verify & Complete Onboarding
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* 6. Driver Detail Modal */}
+      {selectedDriver && (
+        <Modal
+          isOpen={!!selectedDriver}
+          onClose={() => setSelectedDriver(null)}
+          title={`Driver Dossier: ${selectedDriver.fullName}`}
+          description={`License: ${selectedDriver.licenseNumber} • ${selectedDriver.licenseCategory}`}
+          size="lg"
+        >
+          <div className="space-y-4 text-xs">
+            <div className="p-4 rounded-xl bg-[#0e172a] border border-[#1e2e4a] flex items-center justify-between">
+              <div>
+                <span className="text-[11px] text-slate-400 font-mono">Assigned Asset</span>
+                <div className="text-base font-bold font-mono text-blue-400">{selectedDriver.assignedVehicle || 'Standby Pool'}</div>
               </div>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-200">
-                <X className="w-5 h-5" />
-              </button>
+              <div>
+                <span className="text-[11px] text-slate-400 font-mono">Highway Experience</span>
+                <div className="text-base font-bold font-mono text-slate-100">{selectedDriver.experienceYears} Years</div>
+              </div>
+              <div>
+                <span className="text-[11px] text-slate-400 font-mono">Safety Telematics</span>
+                <div className="text-base font-bold font-mono text-emerald-400">{selectedDriver.safetyScore || 94}% Nominal</div>
+              </div>
             </div>
 
-            <form onSubmit={handleOnboardDriver} className="space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-slate-400 mb-1 font-medium">Full Name *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Ramesh Kumar"
-                    value={fullName}
-                    onChange={e => setFullName(e.target.value)}
-                    className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-400 mb-1 font-medium">Contact Phone *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="+91 98765 43210"
-                    value={phone}
-                    onChange={e => setPhone(e.target.value)}
-                    className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 rounded-lg bg-[#0e172a] border border-[#1e2e4a]">
+                <div className="text-slate-400 text-[11px] font-medium">Contact Phone</div>
+                <div className="font-mono text-slate-100 font-bold mt-0.5">{selectedDriver.phone}</div>
               </div>
+              <div className="p-3 rounded-lg bg-[#0e172a] border border-[#1e2e4a]">
+                <div className="text-slate-400 text-[11px] font-medium">Sarathi DL Expiry</div>
+                <div className="font-mono text-slate-100 font-bold mt-0.5">{selectedDriver.licenseExpiry || '2029-10-30'}</div>
+              </div>
+            </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-slate-400 mb-1 font-medium">Commercial DL Number *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. MH12 20180091234"
-                    value={licenseNumber}
-                    onChange={e => setLicenseNumber(e.target.value)}
-                    className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 font-mono uppercase focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-400 mb-1 font-medium">License Category</label>
-                  <select
-                    value={licenseCategory}
-                    onChange={e => setLicenseCategory(e.target.value as Driver['licenseCategory'])}
-                    className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 focus:outline-none"
-                  >
-                    <option value="HMV">HMV (Heavy Motor Vehicle)</option>
-                    <option value="Trailer">Multi-Axle Trailer</option>
-                    <option value="Hazardous Goods">Hazardous Cargo</option>
-                  </select>
+            {selectedDriver.emergencyContact && (
+              <div className="p-3.5 rounded-lg bg-[#0a0f1d] border border-[#1e2e4a] space-y-1.5">
+                <div className="text-slate-400 font-bold uppercase text-[10px] tracking-wider font-mono">Family Emergency Contact</div>
+                <div className="flex items-center justify-between text-slate-200">
+                  <span className="font-medium">{selectedDriver.emergencyContact.name} ({selectedDriver.emergencyContact.relation})</span>
+                  <span className="font-mono text-blue-400">{selectedDriver.emergencyContact.phone}</span>
                 </div>
               </div>
+            )}
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-slate-400 mb-1 font-medium">Experience (Years)</label>
-                  <input
-                    type="number"
-                    value={experienceYears}
-                    onChange={e => setExperienceYears(Number(e.target.value))}
-                    className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-400 mb-1 font-medium">Aadhaar Card Number</label>
-                  <input
-                    type="text"
-                    placeholder="12-digit Aadhaar"
-                    value={aadhaarNumber}
-                    onChange={e => setAadhaarNumber(e.target.value)}
-                    className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-[#202736] flex justify-end gap-3">
-                <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" variant="primary">
-                  Complete Driver Onboarding
-                </Button>
-              </div>
-            </form>
+            <div className="pt-3 border-t border-[#1e2e4a] flex justify-end">
+              <Button variant="outline" size="sm" onClick={() => setSelectedDriver(null)}>
+                Close Profile
+              </Button>
+            </div>
           </div>
-        </div>
+        </Modal>
       )}
     </AnimatedPage>
   );

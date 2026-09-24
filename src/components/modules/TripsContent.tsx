@@ -11,19 +11,28 @@ import {
   AlertTriangle,
   Clock,
   MapPin,
-  X,
   FileText,
   Truck,
   User,
   ArrowRight,
-  ShieldCheck,
-  CheckSquare,
   CreditCard,
-  Download
+  Download,
+  Eye,
+  CheckSquare
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { Trip } from '@/types';
-import { PageHeader, Card, Button, Badge, AnimatedPage, KPICard, itemVariants } from '@/components/ui';
+import {
+  PageHeader,
+  Card,
+  Button,
+  Badge,
+  AnimatedPage,
+  KPICard,
+  Modal,
+  EmptyState,
+  itemVariants
+} from '@/components/ui';
 import { exportToCSV } from '@/lib/csvExport';
 
 export function TripsContent() {
@@ -127,6 +136,10 @@ export function TripsContent() {
     setDriverId('');
     setOriginCity('');
     setDestCity('');
+    setOriginAddress('');
+    setDestAddress('');
+    setCargoDesc('');
+    setEwayBill('');
   };
 
   const handleMarkDelivered = (tripId: string) => {
@@ -173,15 +186,21 @@ export function TripsContent() {
       {/* 1. Page Header */}
       <motion.div variants={itemVariants}>
         <PageHeader
-          title="Trip & Dispatch Management"
-          description="Operational job assignments, route tracking, cargo manifests, and POD verification."
+          badge={
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/30">
+              <Route className="w-3.5 h-3.5" />
+              Dispatch Operations
+            </span>
+          }
+          title="Trip & Dispatch Operations"
+          description="Operational freight manifests, highway route tracking, consignee delivery verification, and FASTag toll reconciliation."
           actions={
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleExportCSV}
-                icon={<Download className="w-4 h-4" />}
+                icon={<Download className="w-3.5 h-3.5" />}
               >
                 Export CSV
               </Button>
@@ -189,7 +208,7 @@ export function TripsContent() {
                 variant="primary"
                 size="sm"
                 onClick={() => setIsModalOpen(true)}
-                icon={<Plus className="w-4 h-4" />}
+                icon={<Plus className="w-3.5 h-3.5" />}
               >
                 Dispatch New Trip
               </Button>
@@ -198,65 +217,65 @@ export function TripsContent() {
         />
       </motion.div>
 
-      {/* 2. KPI Cards Row */}
+      {/* 2. Primary Dispatch KPI Strip */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard
           title="Active In Transit"
           value={activeTripsCount}
-          subtext="On-route commercial movements"
-          icon={<Route className="w-4 h-4" />}
-          iconBg="bg-blue-500/10 text-blue-400 border-blue-500/30"
-          glow="blue"
+          subtext="Commercial freight en-route"
+          trend={{ value: `${activeTripsCount} on corridor`, isPositive: true }}
+          icon={<Route className="w-4 h-4 text-blue-400" />}
+          iconBg="bg-blue-600/15 border border-blue-500/30 text-blue-400"
         />
         <KPICard
           title="Delayed Freight"
           value={delayedTripsCount}
           subtext="Requires dispatcher intervention"
-          icon={<AlertTriangle className="w-4 h-4" />}
-          iconBg="bg-amber-500/10 text-amber-400 border-amber-500/30"
-          glow="amber"
+          trend={delayedTripsCount > 0 ? { value: `${delayedTripsCount} delayed`, isPositive: false } : { value: "On-time schedule", isPositive: true }}
+          icon={<AlertTriangle className="w-4 h-4 text-amber-400" />}
+          iconBg="bg-amber-600/15 border border-amber-500/30 text-amber-400"
         />
         <KPICard
           title="Delivered Trips"
           value={deliveredTodayCount}
-          subtext="Completed movements"
-          icon={<CheckCircle2 className="w-4 h-4" />}
-          iconBg="bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-          glow="emerald"
+          subtext="Successful cargo drop-offs"
+          trend={{ value: "POD recorded", isPositive: true }}
+          icon={<CheckCircle2 className="w-4 h-4 text-emerald-400" />}
+          iconBg="bg-emerald-600/15 border border-emerald-500/30 text-emerald-400"
         />
         <KPICard
-          title="FASTag Toll Spend"
-          value={totalTollSpendINR}
-          subtext="Total FASTag highway tolls (₹)"
-          icon={<CreditCard className="w-4 h-4" />}
-          iconBg="bg-indigo-500/10 text-indigo-400 border-indigo-500/30"
-          glow="blue"
+          title="FASTag Highway Tolls"
+          value={`₹${totalTollSpendINR.toLocaleString('en-IN')}`}
+          subtext="Automated electronic toll fee"
+          icon={<CreditCard className="w-4 h-4 text-indigo-400" />}
+          iconBg="bg-indigo-600/15 border border-indigo-500/30 text-indigo-400"
         />
       </motion.div>
 
-      {/* 3. Filter Bar */}
+      {/* 3. Filter & Search Toolbar */}
       <motion.div variants={itemVariants}>
-        <Card glow="blue" className="p-4 flex flex-col md:flex-row gap-3 items-center justify-between">
+        <Card className="p-4 flex flex-col md:flex-row gap-3 items-center justify-between">
           <div className="w-full md:w-96 relative">
-            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              placeholder="Search trip code, plate, driver, origin/dest..."
-              className="w-full bg-[#1c2333]/80 border border-[#2e374a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 transition-all backdrop-blur-md"
+              placeholder="Search trip code, registration, driver, city..."
+              className="w-full bg-[#0a0f1d] border border-[#1e2e4a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 focus:outline-none rounded-lg text-xs text-slate-200 placeholder:text-slate-500 pl-9 pr-3 py-2 transition-all font-sans"
             />
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-            <div className="flex items-center gap-1.5 text-xs text-slate-400">
-              <Filter className="w-3.5 h-3.5" />
-              <span>Status:</span>
+            <div className="flex items-center gap-1.5 text-xs text-slate-400 shrink-0">
+              <Filter className="w-3.5 h-3.5 text-blue-400" />
+              <span>Status Filter:</span>
             </div>
+
             <select
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value)}
-              className="bg-[#1c2333]/80 border border-[#2e374a] rounded-lg text-xs text-slate-200 px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/80"
+              className="bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg text-xs text-slate-200 px-3 py-2 focus:outline-none focus:border-blue-500 transition-colors"
             >
               <option value="All">All Trip Statuses</option>
               <option value="Scheduled">Scheduled</option>
@@ -270,25 +289,42 @@ export function TripsContent() {
       </motion.div>
 
       {/* 4. Trips Data Table */}
-      <motion.div variants={itemVariants} className="glass-panel rounded-xl overflow-hidden shadow-2xl">
+      <motion.div variants={itemVariants} className="border border-[#1e2e4a] rounded-xl overflow-hidden bg-[#0b1120]/80 backdrop-blur-md shadow-xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-[#1c2333]/80 backdrop-blur-md text-slate-400 border-b border-[#202736] font-semibold uppercase tracking-wider sticky top-0 z-10">
-                <th className="py-3.5 px-4">Trip Code</th>
-                <th className="py-3.5 px-4">Assigned Vehicle</th>
-                <th className="py-3.5 px-4">Assigned Driver</th>
+              <tr className="bg-[#0d1527] text-slate-400 border-b border-[#1e2e4a] font-semibold uppercase tracking-wider text-[11px]">
+                <th className="py-3.5 px-4 font-mono">Trip Code</th>
+                <th className="py-3.5 px-4 font-mono">Vehicle</th>
+                <th className="py-3.5 px-4">Driver</th>
                 <th className="py-3.5 px-4">Route Path</th>
-                <th className="py-3.5 px-4">Status</th>
+                <th className="py-3.5 px-4">Operational Status</th>
                 <th className="py-3.5 px-4">E-Way Bill Status</th>
-                <th className="py-3.5 px-4">Distance / Toll</th>
+                <th className="py-3.5 px-4 font-mono">Distance / Toll</th>
+                <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#202736]/60 text-slate-200">
+            <tbody className="divide-y divide-[#16233b] text-slate-200">
               {filteredTrips.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-slate-500">
-                    No trip dispatches found matching search criteria.
+                  <td colSpan={8} className="py-12">
+                    <EmptyState
+                      icon={<Route className="w-8 h-8 text-slate-500" />}
+                      title="No Trips Found"
+                      description="No commercial dispatch dispatches match your search filters."
+                      action={
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => {
+                            setSearchTerm('');
+                            setStatusFilter('All');
+                          }}
+                        >
+                          Clear Filters
+                        </Button>
+                      }
+                    />
                   </td>
                 </tr>
               ) : (
@@ -301,15 +337,22 @@ export function TripsContent() {
                         setSelectedTrip(trip);
                         setPodNotes(trip.podNotes || '');
                       }}
-                      className="hover:bg-[#1c2333]/50 transition-colors cursor-pointer group relative border-l-2 border-transparent hover:border-blue-500"
+                      className="hover:bg-[#131f38] transition-colors cursor-pointer group"
                     >
-                      <td className="py-3.5 px-4 font-mono font-bold text-slate-100 flex items-center gap-2">
-                        <span className="bg-[#1c2333] border border-[#2e374a] px-2 py-1 rounded text-xs text-blue-400">
+                      <td className="py-3.5 px-4 font-mono font-bold text-slate-100">
+                        <span className="bg-[#0a0f1d] border border-[#1e2e4a] px-2.5 py-1 rounded-md text-xs font-mono text-blue-400 group-hover:border-blue-500/50 transition-colors">
                           {trip.tripCode}
                         </span>
                       </td>
                       <td className="py-3.5 px-4 font-mono text-slate-200 font-semibold">{trip.vehicleReg}</td>
-                      <td className="py-3.5 px-4 text-slate-300 font-medium">{trip.driverName}</td>
+                      <td className="py-3.5 px-4 text-slate-300 font-medium">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-5 h-5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-[10px] flex items-center justify-center font-bold">
+                            {trip.driverName.charAt(0)}
+                          </span>
+                          <span>{trip.driverName}</span>
+                        </div>
+                      </td>
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-1.5 font-medium text-slate-200">
                           <span className="text-blue-400">{trip.origin.city}</span>
@@ -329,7 +372,7 @@ export function TripsContent() {
                           </Badge>
                         )}
                         {trip.status === 'Delayed' && (
-                          <Badge variant="warning" pulse>
+                          <Badge variant="warning">
                             <AlertTriangle className="w-3 h-3" /> Delayed
                           </Badge>
                         )}
@@ -348,6 +391,19 @@ export function TripsContent() {
                       <td className="py-3.5 px-4 font-mono text-slate-300">
                         {trip.distanceKm} km {trip.tollSpendINR ? `(₹${trip.tollSpendINR})` : ''}
                       </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          icon={<Eye className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-400" />}
+                          onClick={e => {
+                            e.stopPropagation();
+                            setSelectedTrip(trip);
+                            setPodNotes(trip.podNotes || '');
+                          }}
+                          title="View Manifest"
+                        />
+                      </td>
                     </tr>
                   );
                 })
@@ -358,267 +414,283 @@ export function TripsContent() {
       </motion.div>
 
       {/* 5. Dispatch New Trip Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="glass-panel border border-[#202736] rounded-2xl w-full max-w-xl p-6 space-y-6 shadow-2xl relative">
-            <div className="flex items-center justify-between border-b border-[#202736] pb-4">
-              <div className="flex items-center gap-2 text-slate-100 font-bold text-lg">
-                <Route className="w-5 h-5 text-blue-400" />
-                <span>Dispatch New Commercial Trip</span>
-              </div>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-200">
-                <X className="w-5 h-5" />
-              </button>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Dispatch New Commercial Trip"
+        description="Allocate an active commercial vehicle, verified driver, cargo specs, and destination hub."
+        size="lg"
+      >
+        <form onSubmit={handleCreateTrip} className="space-y-4 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-slate-300 mb-1 font-medium">Select Available Vehicle *</label>
+              <select
+                required
+                value={vehicleId}
+                onChange={e => setVehicleId(e.target.value)}
+                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+              >
+                <option value="">-- Choose Commercial Asset --</option>
+                {availableVehicles.map(v => (
+                  <option key={v.id} value={v.id}>
+                    {v.regNumber} ({v.make} {v.model} - {v.capacityTons}T)
+                  </option>
+                ))}
+              </select>
             </div>
-
-            <form onSubmit={handleCreateTrip} className="space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-slate-400 mb-1 font-medium">Select Available Vehicle *</label>
-                  <select
-                    required
-                    value={vehicleId}
-                    onChange={e => setVehicleId(e.target.value)}
-                    className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
-                  >
-                    <option value="">-- Choose Vehicle --</option>
-                    {availableVehicles.map(v => (
-                      <option key={v.id} value={v.id}>
-                        {v.regNumber} ({v.make} {v.model} - {v.capacityTons}T)
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-slate-400 mb-1 font-medium">Select Available Driver *</label>
-                  <select
-                    required
-                    value={driverId}
-                    onChange={e => setDriverId(e.target.value)}
-                    className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
-                  >
-                    <option value="">-- Choose Driver --</option>
-                    {availableDrivers.map(d => (
-                      <option key={d.id} value={d.id}>
-                        {d.fullName} ({d.phone})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-slate-400 mb-1 font-medium">Origin City *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Mumbai"
-                    value={originCity}
-                    onChange={e => setOriginCity(e.target.value)}
-                    className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-400 mb-1 font-medium">Destination City *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Pune"
-                    value={destCity}
-                    onChange={e => setDestCity(e.target.value)}
-                    className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-slate-400 mb-1 font-medium">Cargo Description</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Auto Spare Components"
-                    value={cargoDesc}
-                    onChange={e => setCargoDesc(e.target.value)}
-                    className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-400 mb-1 font-medium">Payload Weight (Tons)</label>
-                  <input
-                    type="number"
-                    value={cargoWeight}
-                    onChange={e => setCargoWeight(Number(e.target.value))}
-                    className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
-                  />
-                  {isOverloaded && (
-                    <div className="mt-1.5">
-                      <Badge variant="danger" pulse>
-                        <AlertTriangle className="w-3 h-3" /> Overloading Warning: Cargo exceeds vehicle capacity ({selectedVehicleObj.capacityTons}T)
-                      </Badge>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-slate-400 mb-1 font-medium">Distance (Km)</label>
-                  <input
-                    type="number"
-                    value={distanceKm}
-                    onChange={e => setDistanceKm(Number(e.target.value))}
-                    className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-400 mb-1 font-medium">E-Way Bill Number</label>
-                  <input
-                    type="text"
-                    placeholder="12-digit E-Way Bill"
-                    value={ewayBill}
-                    onChange={e => setEwayBill(e.target.value)}
-                    className="w-full bg-[#1c2333] border border-[#2e374a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-[#202736] flex justify-end gap-3">
-                <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" variant="primary">
-                  Dispatch Commercial Trip
-                </Button>
-              </div>
-            </form>
+            <div>
+              <label className="block text-slate-300 mb-1 font-medium">Select Available Driver *</label>
+              <select
+                required
+                value={driverId}
+                onChange={e => setDriverId(e.target.value)}
+                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+              >
+                <option value="">-- Choose Verified Driver --</option>
+                {availableDrivers.map(d => (
+                  <option key={d.id} value={d.id}>
+                    {d.fullName} ({d.phone})
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-        </div>
-      )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-slate-300 mb-1 font-medium">Origin Logistics Hub *</label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. Mumbai Hub"
+                value={originCity}
+                onChange={e => setOriginCity(e.target.value)}
+                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-slate-300 mb-1 font-medium">Destination Hub / City *</label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. Bengaluru Depot"
+                value={destCity}
+                onChange={e => setDestCity(e.target.value)}
+                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-slate-300 mb-1 font-medium">Origin Address</label>
+              <input
+                type="text"
+                placeholder="e.g. Gate 4, Bhiwandi Logistics Park"
+                value={originAddress}
+                onChange={e => setOriginAddress(e.target.value)}
+                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-slate-300 mb-1 font-medium">Destination Address</label>
+              <input
+                type="text"
+                placeholder="e.g. Nelamangala Cargo Terminal"
+                value={destAddress}
+                onChange={e => setDestAddress(e.target.value)}
+                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-slate-300 mb-1 font-medium">Cargo Description</label>
+              <input
+                type="text"
+                placeholder="e.g. Precision Engineering Parts & Modules"
+                value={cargoDesc}
+                onChange={e => setCargoDesc(e.target.value)}
+                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-slate-300 mb-1 font-medium">Payload Weight (Metric Tons)</label>
+              <input
+                type="number"
+                min={1}
+                max={50}
+                value={cargoWeight}
+                onChange={e => setCargoWeight(Number(e.target.value))}
+                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
+              />
+              {isOverloaded && (
+                <div className="mt-1.5">
+                  <Badge variant="danger">
+                    <AlertTriangle className="w-3 h-3" /> Overload Warning: Exceeds asset capacity ({selectedVehicleObj?.capacityTons}T)
+                  </Badge>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-slate-300 mb-1 font-medium">Estimated Distance (Km)</label>
+              <input
+                type="number"
+                value={distanceKm}
+                onChange={e => setDistanceKm(Number(e.target.value))}
+                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-slate-300 mb-1 font-medium">GST E-Way Bill Number</label>
+              <input
+                type="text"
+                placeholder="12-digit GST E-Way Bill"
+                value={ewayBill}
+                onChange={e => setEwayBill(e.target.value)}
+                className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-[#1e2e4a] flex justify-end gap-3">
+            <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary">
+              Confirm & Dispatch Trip
+            </Button>
+          </div>
+        </form>
+      </Modal>
 
       {/* 6. Trip Detail Pop-Up Modal */}
       {selectedTrip && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="absolute inset-0" onClick={() => setSelectedTrip(null)} />
-          <div className="glass-panel border border-[#202736] rounded-2xl w-full max-w-xl p-6 space-y-6 shadow-2xl relative z-10 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b border-[#202736] pb-4">
-              <div>
-                <span className="text-xs text-blue-400 font-mono font-bold">TRIP MANIFEST</span>
-                <h2 className="text-xl font-extrabold font-mono text-slate-50">{selectedTrip.tripCode}</h2>
+        <Modal
+          isOpen={!!selectedTrip}
+          onClose={() => setSelectedTrip(null)}
+          title={`Trip Manifest: ${selectedTrip.tripCode}`}
+          description={`${selectedTrip.origin.city} → ${selectedTrip.destination.city} • ${selectedTrip.vehicleReg}`}
+          size="lg"
+        >
+          <div className="space-y-4 text-xs">
+            {/* Route Timeline Card */}
+            <div className="p-4 rounded-xl bg-[#0e172a] border border-[#1e2e4a] space-y-3">
+              <div className="text-slate-400 font-medium flex items-center justify-between font-mono text-[11px]">
+                <span>Highway Route Corridor</span>
+                <span className="text-slate-200 font-bold">{selectedTrip.distanceKm} km</span>
               </div>
-              <button onClick={() => setSelectedTrip(null)} className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-[#1c2333]">
-                <X className="w-5 h-5" />
-              </button>
+              <div className="space-y-2">
+                <div className="flex items-start gap-2.5">
+                  <MapPin className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                  <div>
+                    <div className="font-bold text-slate-100">{selectedTrip.origin.city}</div>
+                    <div className="text-[11px] text-slate-400">{selectedTrip.origin.address}</div>
+                  </div>
+                </div>
+                <div className="ml-2 pl-4 border-l-2 border-dashed border-[#1e2e4a] py-1 text-[11px] text-slate-500 font-mono">
+                  Transit Corridor Leg
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <MapPin className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <div className="font-bold text-slate-100">{selectedTrip.destination.city}</div>
+                    <div className="text-[11px] text-slate-400">{selectedTrip.destination.address}</div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-4 text-xs">
-              {/* Route Card */}
-              <Card glow="blue" className="space-y-3">
-                <div className="text-slate-400 font-medium flex items-center justify-between">
-                  <span>Route & Distance</span>
-                  <span className="font-mono text-slate-200">{selectedTrip.distanceKm} km</span>
+            {/* Assets & Personnel */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 rounded-lg bg-[#0e172a] border border-[#1e2e4a] space-y-1">
+                <div className="text-slate-400 flex items-center gap-1.5 font-medium text-[11px]">
+                  <Truck className="w-3.5 h-3.5 text-blue-400" /> Commercial Asset
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-start gap-2">
-                    <MapPin className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-                    <div>
-                      <div className="font-bold text-slate-100">{selectedTrip.origin.city}</div>
-                      <div className="text-[11px] text-slate-400">{selectedTrip.origin.address}</div>
-                    </div>
-                  </div>
-                  <div className="ml-2 pl-3 border-l-2 border-dashed border-[#2e374a] py-1 text-[11px] text-slate-500 font-mono">
-                    Route Leg
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <MapPin className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                    <div>
-                      <div className="font-bold text-slate-100">{selectedTrip.destination.city}</div>
-                      <div className="text-[11px] text-slate-400">{selectedTrip.destination.address}</div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Assets & Personnel */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736] space-y-1">
-                  <div className="text-slate-400 flex items-center gap-1.5 font-medium">
-                    <Truck className="w-3.5 h-3.5 text-blue-400" /> Vehicle
-                  </div>
-                  <div className="font-mono font-bold text-slate-200">{selectedTrip.vehicleReg}</div>
-                </div>
-                <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736] space-y-1">
-                  <div className="text-slate-400 flex items-center gap-1.5 font-medium">
-                    <User className="w-3.5 h-3.5 text-indigo-400" /> Driver
-                  </div>
-                  <div className="font-semibold text-slate-200">{selectedTrip.driverName}</div>
-                </div>
+                <div className="font-mono font-bold text-slate-100">{selectedTrip.vehicleReg}</div>
               </div>
-
-              {/* Cargo & E-Way Bill */}
-              <div className="space-y-2">
-                <div className="text-slate-400 font-medium uppercase text-[10px] tracking-wider">Cargo & E-Way Compliance</div>
-                <div className="p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736] space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-300 font-semibold">{selectedTrip.cargoDescription}</span>
-                    <span className="font-mono text-slate-400">{selectedTrip.cargoWeightTons} Tons</span>
-                  </div>
-                  {selectedTrip.ewayBillNumber && (
-                    <div className="flex items-center justify-between pt-2 border-t border-[#202736]">
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-blue-400" />
-                        <span className="font-mono">{selectedTrip.ewayBillNumber}</span>
-                      </div>
-                      {(() => {
-                        const st = getEwayBillStatus(selectedTrip.ewayBillExpiry);
-                        return <Badge variant={st.variant}>{st.label}</Badge>;
-                      })()}
-                    </div>
-                  )}
-                  {selectedTrip.tollSpendINR && (
-                    <div className="flex items-center justify-between pt-2 border-t border-[#202736] text-[11px]">
-                      <span className="text-slate-400 flex items-center gap-1.5">
-                        <CreditCard className="w-3.5 h-3.5 text-indigo-400" /> FASTag Toll Spend:
-                      </span>
-                      <span className="font-mono font-bold text-slate-200">₹{selectedTrip.tollSpendINR}</span>
-                    </div>
-                  )}
+              <div className="p-3 rounded-lg bg-[#0e172a] border border-[#1e2e4a] space-y-1">
+                <div className="text-slate-400 flex items-center gap-1.5 font-medium text-[11px]">
+                  <User className="w-3.5 h-3.5 text-indigo-400" /> Assigned Driver
                 </div>
+                <div className="font-semibold text-slate-100">{selectedTrip.driverName}</div>
               </div>
+            </div>
 
-              {/* POD & Mark Delivered Action */}
-              <div className="space-y-3 pt-2">
-                <div className="text-slate-400 font-medium uppercase text-[10px] tracking-wider">Proof of Delivery (POD)</div>
-                {selectedTrip.podReceived ? (
-                  <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 space-y-1">
-                    <div className="flex items-center gap-2 font-bold text-xs">
-                      <CheckSquare className="w-4 h-4" /> POD Verified & Received
+            {/* Cargo & E-Way Bill Compliance */}
+            <div className="space-y-2">
+              <div className="text-slate-400 font-bold uppercase text-[10px] tracking-wider font-mono">Cargo & E-Way Compliance</div>
+              <div className="p-3 rounded-lg bg-[#0a0f1d] border border-[#1e2e4a] space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-200 font-semibold">{selectedTrip.cargoDescription}</span>
+                  <span className="font-mono text-slate-300 font-bold">{selectedTrip.cargoWeightTons} Tons</span>
+                </div>
+                {selectedTrip.ewayBillNumber && (
+                  <div className="flex items-center justify-between pt-2 border-t border-[#1e2e4a]">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-blue-400" />
+                      <span className="font-mono text-slate-300">{selectedTrip.ewayBillNumber}</span>
                     </div>
-                    {selectedTrip.podNotes && <div className="text-[11px] text-slate-300">{selectedTrip.podNotes}</div>}
+                    {(() => {
+                      const st = getEwayBillStatus(selectedTrip.ewayBillExpiry);
+                      return <Badge variant={st.variant}>{st.label}</Badge>;
+                    })()}
                   </div>
-                ) : (
-                  <div className="space-y-3 p-3 rounded-xl bg-[#1c2333]/50 border border-[#202736]">
-                    <textarea
-                      rows={2}
-                      value={podNotes}
-                      onChange={e => setPodNotes(e.target.value)}
-                      placeholder="Enter POD verification notes upon arrival..."
-                      className="w-full bg-[#121824] border border-[#2e374a] rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
-                    />
-                    <Button
-                      variant="primary"
-                      className="w-full"
-                      onClick={() => handleMarkDelivered(selectedTrip.id)}
-                      icon={<CheckCircle2 className="w-4 h-4" />}
-                    >
-                      Mark Trip Delivered
-                    </Button>
+                )}
+                {selectedTrip.tollSpendINR && (
+                  <div className="flex items-center justify-between pt-2 border-t border-[#1e2e4a] text-[11px]">
+                    <span className="text-slate-400 flex items-center gap-1.5">
+                      <CreditCard className="w-3.5 h-3.5 text-indigo-400" /> FASTag Highway Toll:
+                    </span>
+                    <span className="font-mono font-bold text-slate-100">₹{selectedTrip.tollSpendINR}</span>
                   </div>
                 )}
               </div>
             </div>
+
+            {/* Proof of Delivery (POD) Section */}
+            <div className="space-y-3 pt-2">
+              <div className="text-slate-400 font-bold uppercase text-[10px] tracking-wider font-mono">Proof of Delivery (POD) Verification</div>
+              {selectedTrip.podReceived ? (
+                <div className="p-3.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 space-y-1">
+                  <div className="flex items-center gap-2 font-bold text-xs">
+                    <CheckSquare className="w-4 h-4" /> POD Physically Verified & Logged
+                  </div>
+                  {selectedTrip.podNotes && <div className="text-[11px] text-slate-300">{selectedTrip.podNotes}</div>}
+                </div>
+              ) : (
+                <div className="space-y-3 p-3.5 rounded-lg bg-[#0e172a] border border-[#1e2e4a]">
+                  <textarea
+                    rows={2}
+                    value={podNotes}
+                    onChange={e => setPodNotes(e.target.value)}
+                    placeholder="Enter consignee signature notes, seal number, or gate receipt details..."
+                    className="w-full bg-[#0a0f1d] border border-[#1e2e4a] rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
+                  />
+                  <Button
+                    variant="primary"
+                    className="w-full"
+                    onClick={() => handleMarkDelivered(selectedTrip.id)}
+                    icon={<CheckCircle2 className="w-4 h-4" />}
+                  >
+                    Confirm Delivery & Record POD
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            <div className="pt-3 border-t border-[#1e2e4a] flex justify-end">
+              <Button variant="outline" size="sm" onClick={() => setSelectedTrip(null)}>
+                Close Manifest
+              </Button>
+            </div>
           </div>
-        </div>
+        </Modal>
       )}
     </AnimatedPage>
   );
