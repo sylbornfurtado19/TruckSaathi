@@ -13,12 +13,14 @@ interface CommandPaletteProps {
 
 export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const router = useRouter();
-  const { vehicles, drivers, trips } = useApp();
+  const { vehicles, drivers, trips, currentUser } = useApp();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const selectedItemRef = useRef<HTMLDivElement | null>(null);
 
-  const pages = [
+  const isDriver = currentUser?.role === 'Driver';
+
+  const allPages = [
     { name: 'Dashboard Overview', href: '/dashboard', type: 'Page', icon: LayoutDashboard },
     { name: 'Trip & Dispatch Management', href: '/trips', type: 'Page', icon: Route },
     { name: 'AI Smart Dispatch Engine', href: '/ai-dispatch', type: 'Page', icon: Bot },
@@ -35,6 +37,10 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
     { name: 'Roles & RBAC Matrix', href: '/roles', type: 'Page', icon: ShieldCheck },
     { name: 'System Settings & Audit Logs', href: '/settings', type: 'Page', icon: Settings },
   ];
+
+  const pages = isDriver
+    ? [{ name: 'Driver Field Portal & POD Upload', href: '/driver-portal', type: 'Page', icon: Smartphone }]
+    : allPages.filter(p => p.href !== '/driver-portal');
 
   const matchedTrips = trips
     .filter(t => t.tripCode.toLowerCase().includes(query.toLowerCase()) || t.origin.city.toLowerCase().includes(query.toLowerCase()) || t.destination.city.toLowerCase().includes(query.toLowerCase()))

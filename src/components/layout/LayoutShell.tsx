@@ -52,23 +52,28 @@ export const Sidebar: React.FC<{
     router.push('/login');
   };
 
-  const navItems = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Trips & Dispatch', href: '/trips', icon: Route },
-    { name: 'AI Smart Dispatch', href: '/ai-dispatch', icon: Bot },
-    { name: 'Vehicles', href: '/vehicles', icon: Truck },
-    { name: 'Predictive Maintenance', href: '/maintenance', icon: Wrench },
-    { name: 'Fuel Telemetry', href: '/fuel', icon: Fuel },
-    { name: 'Trip Expenses & P&L', href: '/expenses', icon: DollarSign },
-    { name: 'Drivers', href: '/drivers', icon: UserCheck },
-    { name: 'AI Safety Center', href: '/safety', icon: ShieldAlert },
-    { name: 'Driver Field Portal', href: '/driver-portal', icon: Smartphone },
-    { name: 'Reports & Exports', href: '/reports', icon: FileText },
-    { name: 'Company Profile', href: '/company', icon: Building2 },
-    { name: 'User Management', href: '/users', icon: Users },
-    { name: 'Roles & Permissions', href: '/roles', icon: ShieldCheck },
-    { name: 'System Settings', href: '/settings', icon: Settings },
-  ];
+  const isDriver = currentUser?.role === 'Driver';
+
+  const navItems = isDriver
+    ? [
+        { name: 'Driver Field Portal', href: '/driver-portal', icon: Smartphone }
+      ]
+    : [
+        { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+        { name: 'Trips & Dispatch', href: '/trips', icon: Route },
+        { name: 'AI Smart Dispatch', href: '/ai-dispatch', icon: Bot },
+        { name: 'Vehicles', href: '/vehicles', icon: Truck },
+        { name: 'Predictive Maintenance', href: '/maintenance', icon: Wrench },
+        { name: 'Fuel Telemetry', href: '/fuel', icon: Fuel },
+        { name: 'Trip Expenses & P&L', href: '/expenses', icon: DollarSign },
+        { name: 'Drivers', href: '/drivers', icon: UserCheck },
+        { name: 'AI Safety Center', href: '/safety', icon: ShieldAlert },
+        { name: 'Reports & Exports', href: '/reports', icon: FileText },
+        { name: 'Company Profile', href: '/company', icon: Building2 },
+        { name: 'User Management', href: '/users', icon: Users },
+        { name: 'Roles & Permissions', href: '/roles', icon: ShieldCheck },
+        { name: 'System Settings', href: '/settings', icon: Settings },
+      ];
 
   return (
     <aside
@@ -247,13 +252,15 @@ export const Header: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
 
         {/* Right Controls */}
         <div className="flex items-center gap-3">
-          <Link
-            href="/vehicles"
-            className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 px-3.5 py-2 rounded-xl transition-all shadow-lg shadow-blue-600/25 hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-blue-500/80"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Add Asset</span>
-          </Link>
+          {currentUser?.role !== 'Driver' && (
+            <Link
+              href="/vehicles"
+              className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 px-3.5 py-2 rounded-xl transition-all shadow-lg shadow-blue-600/25 hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-blue-500/80"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Asset</span>
+            </Link>
+          )}
 
           <button
             onClick={() => setIsNotifOpen(true)}

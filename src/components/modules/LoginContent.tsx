@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   Mail,
@@ -15,9 +15,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
+import { useApp } from '@/context/AppContext';
+import { ensureUserProfile } from '@/lib/services/profileService';
 
 export function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { session, currentUser, authLoading } = useApp();
   const [email, setEmail] = useState('sylborn@trucksaathi.in');
   const [password, setPassword] = useState('');
   const [resetEmail, setResetEmail] = useState('');
@@ -28,6 +32,20 @@ export function LoginContent() {
   const shouldReduceMotion = useReducedMotion();
 
   const isConfigured = isSupabaseConfigured();
+
+  // If already authenticated, redirect to the appropriate destination
+  useEffect(() => {
+    if (!authLoading && session && currentUser) {
+      const redirectParam = searchParams.get('redirect');
+      if (currentUser.role === 'Driver') {
+        router.replace('/driver-portal');
+      } else if (redirectParam && redirectParam.startsWith('/') && redirectParam !== '/driver-portal') {
+        router.replace(redirectParam);
+      } else {
+        router.replace('/dashboard');
+      }
+    }
+  }, [authLoading, session, currentUser, router, searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +74,17 @@ export function LoginContent() {
       }
 
       if (data.session) {
-        router.push('/dashboard');
+        // Fetch profile to route user according to their role
+        const profile = await ensureUserProfile(data.session.user);
+        const redirectParam = searchParams.get('redirect');
+
+        if (profile.role === 'Driver') {
+          router.push('/driver-portal');
+        } else if (redirectParam && redirectParam.startsWith('/') && redirectParam !== '/driver-portal') {
+          router.push(redirectParam);
+        } else {
+          router.push('/dashboard');
+        }
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Authentication failed';
