@@ -25,7 +25,7 @@ export function LeafletMapInner({ vehicles, selectedVehicleId = null }: { vehicl
   const corridorCoords = CORRIDOR_WAYPOINTS.map(point => [point.lat, point.lng] as [number, number]);
   return <MapContainer center={[19.2, 75]} zoom={6} scrollWheelZoom={false} className="h-full min-h-[320px] w-full" style={{ background: 'var(--bg-surface-muted)' }}>
     <FocusVehicle vehicles={vehicles} selectedVehicleId={selectedVehicleId} />
-    <TileLayer attribution="&copy; OpenStreetMap contributors &copy; CARTO" url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
+    <TileLayer attribution="&copy; OpenStreetMap contributors &copy; CARTO" url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
     <Polyline positions={corridorCoords} pathOptions={{ color: 'var(--color-focus)', weight: 3, opacity: 0.7, dashArray: '6 6' }} />
     {vehicles.map(vehicle => {
       const location = vehicle.lastKnownLocation || { lat: 20.5937, lng: 78.9629, city: 'Transit corridor' };

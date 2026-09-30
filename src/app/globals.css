@@ -6,69 +6,54 @@
   --color-surface: var(--bg-surface);
   --color-surface-muted: var(--bg-surface-muted);
   --color-border: var(--border-default);
-  --color-brand-navy: #0b2545;
-  --color-brand-orange: #f97316;
-  --color-focus: #2563eb;
+  --color-brand-navy: #07111f;
+  --color-brand-orange: #ff6b00;
+  --color-focus: #3b82f6;
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
   --radius-control: 8px;
   --radius-card: 12px;
-  --shadow-popover: 0 12px 32px rgb(16 24 40 / 14%);
+  --shadow-popover: 0 16px 40px rgb(0 0 0 / 35%);
 }
 
 :root {
-  --bg-canvas: #f6f7f9;
-  --bg-surface: #ffffff;
-  --bg-surface-muted: #f2f4f7;
-  --border-default: #e4e7ec;
-  --border-subtle: #f0f2f5;
-  --text-primary: #101828;
-  --text-secondary: #475467;
-  --text-muted: #98a2b3;
-  --status-green: #16a34a;
-  --status-amber: #d97706;
-  --status-red: #dc2626;
-  --status-violet: #7c3aed;
-  color-scheme: light;
-}
-
-[data-theme='dark'] {
-  --bg-canvas: #1f242b;
-  --bg-surface: #272d35;
-  --bg-surface-muted: #303740;
-  --border-default: #46505c;
-  --border-subtle: #39434e;
+  --bg-canvas: #050b14;
+  --bg-surface: #0b1726;
+  --bg-surface-muted: #0f1d2e;
+  --border-default: rgb(255 255 255 / 8%);
+  --border-subtle: rgb(255 255 255 / 5%);
   --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --status-green: #4ade80;
-  --status-amber: #fbbf24;
-  --status-red: #f87171;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --status-green: #22c55e;
+  --status-amber: #f59e0b;
+  --status-red: #ef4444;
   --status-violet: #a78bfa;
   color-scheme: dark;
 }
 
-body { min-width: 320px; background: var(--bg-canvas); color: var(--text-primary); font-family: Arial, Helvetica, sans-serif; font-size: 14px; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+html, body { min-width: 320px; background: var(--bg-canvas); color: var(--text-primary); }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 14px; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
 .tabular-nums { font-variant-numeric: tabular-nums; }
 button, input, select, textarea { font: inherit; }
-button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
-
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-canvas); }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-.leaflet-container { background: #e2e8f0 !important; font-family: inherit; }
-.leaflet-popup-content-wrapper { background: var(--bg-surface) !important; color: var(--text-primary) !important; border-radius: 8px !important; border: 1px solid var(--border-default) !important; box-shadow: var(--shadow-popover) !important; padding: 6px !important; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #475569; }
+.leaflet-container { background: var(--bg-canvas) !important; font-family: inherit; }
+.leaflet-popup-content-wrapper { background: var(--bg-surface) !important; color: var(--text-primary) !important; border: 1px solid var(--border-default) !important; border-radius: 8px !important; box-shadow: var(--shadow-popover) !important; padding: 6px !important; }
 .leaflet-popup-tip { background: var(--bg-surface) !important; }
 .leaflet-popup-close-button { color: var(--text-secondary) !important; }
 .leaflet-control-zoom { border: 1px solid var(--border-default) !important; border-radius: 8px !important; overflow: hidden; }
 .leaflet-control-zoom a { background: var(--bg-surface) !important; color: var(--text-primary) !important; border: none !important; transition: background 150ms ease; }
-.leaflet-control-zoom a:hover { background: var(--bg-surface-muted) !important; color: #2563eb !important; }
+.leaflet-control-zoom a:hover { background: var(--bg-surface-muted) !important; color: #ff6b00 !important; }
 .leaflet-control-zoom-in { border-bottom: 1px solid var(--border-default) !important; }
 .route-line-divider { height: 1px; background: var(--border-default); }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
-}
+/* Legacy module utility compatibility: keep older screens dark while their data markup is preserved. */
+[class*="bg-white"], [class*="bg-blue-50"], [class*="bg-green-50"], [class*="bg-red-50"], [class*="bg-amber-50"] { background-color: var(--bg-surface-muted) !important; }
+[class*="border-blue-200"], [class*="border-green-200"], [class*="border-red-200"], [class*="border-amber-200"] { border-color: var(--border-default) !important; }
+[class*="text-blue-700"], [class*="text-green-700"], [class*="text-green-800"], [class*="text-red-700"], [class*="text-amber-800"] { color: var(--text-primary) !important; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }

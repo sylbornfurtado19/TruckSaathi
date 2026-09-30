@@ -13,9 +13,7 @@ import {
   Sparkles,
   User,
   Shield,
-  Info,
-  Building2,
-  Truck
+  Info
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
 import { useApp } from '@/context/AppContext';
@@ -24,7 +22,7 @@ import { ensureUserProfile } from '@/lib/services/profileService';
 export function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { session, currentUser, authLoading, loginAsDemoRole } = useApp();
+  const { session, currentUser, authLoading } = useApp();
 
   const [portalRole, setPortalRole] = useState<'driver' | 'management'>('management');
   const [email, setEmail] = useState('sylborn@trucksaathi.in');
@@ -185,7 +183,7 @@ export function LoginContent() {
         >
           {/* Brand Logo & Name */}
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-card bg-brand-navy p-0.5">
+            <div className="flex h-11 w-11 items-center justify-center rounded-card border border-white/10 bg-brand-navy p-0.5">
               <div className="flex h-full w-full items-center justify-center rounded-control bg-brand-navy p-1.5">
                 <img
                   src="/logo-dark.png"
@@ -194,7 +192,7 @@ export function LoginContent() {
                 />
               </div>
             </div>
-            <span className="font-mono text-xl font-black tracking-tight text-brand-navy sm:text-2xl">
+            <span className="font-mono text-xl font-black tracking-tight text-text-primary sm:text-2xl">
               TRUCK<span className="text-brand-orange">SAATHI</span>
             </span>
           </div>
@@ -207,13 +205,9 @@ export function LoginContent() {
 
           {/* Headline inspired by PLATR design */}
           <div className="space-y-2">
-            <h1 className="max-w-2xl text-4xl font-extrabold leading-[1.04] tracking-tight text-brand-navy sm:text-5xl lg:text-[3.75rem]">
-              Logistics, without the guesswork. <br />
-              <span className="text-brand-orange">
-                effortless
-              </span>{' '}
-              <br />
-              Built for the road.
+            <h1 className="max-w-2xl text-4xl font-extrabold leading-[1.04] tracking-tight text-text-primary sm:text-5xl lg:text-[3.75rem]">
+              Keep every truck moving. <br />
+              <span className="text-brand-orange">One intelligent control center.</span>
             </h1>
           </div>
 
@@ -253,47 +247,7 @@ export function LoginContent() {
               <p className="text-sm text-text-secondary">Sign in to your operations workspace</p>
             </div>
 
-            {/* 2-Window Live Simulation Quick Demo Launcher */}
-            <div className="space-y-2 rounded-card border border-border bg-surface-muted p-3.5">
-              <div className="flex items-center justify-between text-xs">
-                <span className="flex items-center gap-1.5 font-semibold text-text-primary">
-                  <Sparkles className="h-4 w-4 text-brand-orange" />
-                  2-Window Live Simulation
-                </span>
-                <span className="rounded-full border border-border bg-surface px-2 py-1 font-mono text-xs font-bold text-text-secondary">
-                  Real-Time Sync
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <button
-                  type="button"
-                  onClick={() => {
-                    loginAsDemoRole('Fleet Manager');
-                    router.push('/dashboard');
-                  }}
-                  className="flex cursor-pointer items-center justify-center gap-1.5 rounded-control bg-brand-orange px-3 py-2.5 text-sm font-semibold text-white transition-colors duration-150 hover:bg-orange-700"
-                >
-                  <Building2 className="w-3.5 h-3.5" />
-                  <span>Fleet Manager</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    loginAsDemoRole('Driver', 'd-1');
-                    router.push('/driver-portal');
-                  }}
-                  className="py-2.5 px-3 rounded-control bg-brand-navy hover:bg-slate-800 text-white font-semibold text-sm flex items-center justify-center gap-1.5 transition-colors duration-150 cursor-pointer"
-                >
-                  <Truck className="w-3.5 h-3.5" />
-                  <span>Driver (Ramesh)</span>
-                </button>
-              </div>
-              <p className="text-xs leading-tight text-text-secondary">
-                Use the demo buttons to preview both operating roles.
-              </p>
-            </div>
-
-            {/* Role Selector Tabs (Customer vs Staff & Manager in PLATR reference) */}
+            {/* Single portal role selector */}
             <div className="grid grid-cols-2 gap-1 rounded-control border border-border bg-surface-muted p-1 text-sm">
               <button
                 type="button"

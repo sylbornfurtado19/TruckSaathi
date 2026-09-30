@@ -198,7 +198,7 @@ export function DriverPortalContent() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="space-y-2 rounded-card border-2 border-red-300 bg-red-50 p-4 text-center text-sm font-bold text-status-red dark:border-red-800 dark:bg-red-950/20"
+                className="space-y-2 rounded-card border-2 border-red-500/30 bg-red-500/10 p-4 text-center text-sm font-bold text-status-red"
               >
                 <div className="text-base font-black flex items-center justify-center gap-2 text-rose-300">
                   <AlertOctagon className="w-5 h-5 text-rose-400 animate-spin" />
@@ -220,7 +220,7 @@ export function DriverPortalContent() {
               <button
                 type="button"
                 onClick={handleTriggerSOS}
-                className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-2.5 rounded-card border border-red-300 bg-red-50 px-4 py-4 text-sm font-bold text-red-700 transition-colors duration-150 hover:bg-red-100"
+                className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-2.5 rounded-card border border-red-500/30 bg-red-500/10 px-4 py-4 text-sm font-bold text-red-300 transition-colors duration-150 hover:bg-red-500/20"
               >
                 <AlertOctagon className="w-4 h-4 text-rose-400" />
                 <span>Trigger Highway Emergency SOS Alert</span>
@@ -298,7 +298,7 @@ export function DriverPortalContent() {
             </div>
 
             {uploaded || simState.podUploaded ? (
-              <div className="space-y-1.5 rounded-card border border-green-200 bg-green-50 p-4 text-center text-green-800">
+              <div className="space-y-1.5 rounded-card border border-green-500/25 bg-green-500/10 p-4 text-center text-green-300">
                 <CheckCircle2 className="w-7 h-7 mx-auto text-emerald-400" />
                 <div className="font-black text-sm text-emerald-300">POD Uploaded & Delivery Synced!</div>
                 <div className="text-xs text-slate-300">
@@ -335,8 +335,8 @@ export function DriverPortalContent() {
       <nav className="sticky bottom-2 z-20 mx-auto grid w-full max-w-2xl grid-cols-4 gap-1 rounded-card border border-border bg-surface p-2" aria-label="Driver actions">
         <button type="button" onClick={() => startSimulation(simState.speedMultiplier || 1)} className="flex min-h-12 flex-col items-center justify-center rounded-control px-2 text-xs font-semibold text-text-secondary hover:bg-surface-muted">Start trip</button>
         <a href="#pod-upload" className="flex min-h-12 flex-col items-center justify-center rounded-control px-2 text-xs font-semibold text-text-secondary hover:bg-surface-muted">Upload POD</a>
-        <button type="button" onClick={handleTriggerSOS} className="flex min-h-12 flex-col items-center justify-center rounded-control px-2 text-xs font-semibold text-red-700 hover:bg-red-50">Report issue</button>
-        <button type="button" onClick={handleTriggerSOS} className="flex min-h-12 flex-col items-center justify-center rounded-control px-2 text-xs font-semibold text-red-700 hover:bg-red-50">SOS</button>
+        <button type="button" onClick={handleTriggerSOS} className="flex min-h-12 flex-col items-center justify-center rounded-control px-2 text-xs font-semibold text-red-300 hover:bg-red-500/10">Report issue</button>
+        <button type="button" onClick={handleTriggerSOS} className="flex min-h-12 flex-col items-center justify-center rounded-control px-2 text-xs font-semibold text-red-300 hover:bg-red-500/10">SOS</button>
       </nav>
     </AnimatedPage>
   );

@@ -152,7 +152,7 @@ export function FuelContent() {
       {/* 3. Fuel Theft Alert Hero Notice */}
       {theftAlertsCount > 0 && (
         <motion.div variants={itemVariants}>
-          <div className="rounded-card border border-red-200 bg-red-50 p-4 dark:border-red-900/60 dark:bg-red-950/20">
+          <div className="rounded-card border border-red-500/25 bg-red-500/10 p-4">
             <div className="flex items-start gap-3.5">
               <div className="w-10 h-10 rounded-lg bg-rose-600/15 border border-rose-500/30 flex items-center justify-center text-rose-400 shrink-0">
                 <AlertTriangle className="h-5 w-5" />

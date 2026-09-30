@@ -191,7 +191,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                   onClick={() => handleSelect(item.href)}
                   onMouseEnter={() => setSelectedIndex(index)}
                   className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-colors ${
-                    isSelected ? 'border border-blue-200 bg-blue-50 text-text-primary' : 'text-text-secondary hover:bg-surface-muted'
+                    isSelected ? 'border border-blue-500/30 bg-blue-500/10 text-text-primary' : 'text-text-secondary hover:bg-surface-muted'
                   }`}
                 >
                   <div className="flex items-center gap-3">

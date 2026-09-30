@@ -33,7 +33,7 @@ export function SimulationControlBar() {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            className="mb-4 flex flex-col items-center justify-between gap-3 rounded-card border-2 border-red-300 bg-red-50 p-4 text-text-primary dark:border-red-800 dark:bg-red-950/20 sm:flex-row"
+              className="mb-4 flex flex-col items-center justify-between gap-3 rounded-card border-2 border-red-500/30 bg-red-500/10 p-4 text-text-primary sm:flex-row"
           >
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 shrink-0">
@@ -77,7 +77,7 @@ export function SimulationControlBar() {
               </span>
 
               {simState.tripStatus === 'Delivered' && (
-                <span className="flex items-center gap-1 rounded-full border border-green-200 bg-green-50 px-2.5 py-1 font-mono text-xs font-bold text-status-green dark:border-green-900/60 dark:bg-green-950/20">
+                  <span className="flex items-center gap-1 rounded-full border border-green-500/25 bg-green-500/10 px-2.5 py-1 font-mono text-xs font-bold text-status-green">
                   <CheckCircle2 className="w-3.5 h-3.5" /> Delivered & Handed Over
                 </span>
               )}
