@@ -172,20 +172,20 @@ export function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen bg-canvas text-text-primary flex flex-col justify-between overflow-hidden">
+    <div className="min-h-screen bg-canvas text-text-primary">
       {/* Main Container */}
-      <div className="flex-1 max-w-7xl mx-auto w-full px-6 lg:px-12 py-10 lg:py-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center relative z-10">
+      <div className="mx-auto grid min-h-screen w-full max-w-[1360px] grid-cols-1 items-center gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:px-16 lg:py-12">
         
         {/* Left Hero Branding Section */}
         <motion.div
           initial={{ opacity: 0, x: shouldReduceMotion ? 0 : -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="lg:col-span-7 space-y-8"
+          className="space-y-6 lg:pt-2"
         >
           {/* Brand Logo & Name */}
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-card bg-brand-navy p-0.5">
+            <div className="flex h-11 w-11 items-center justify-center rounded-card bg-brand-navy p-0.5">
               <div className="flex h-full w-full items-center justify-center rounded-control bg-brand-navy p-1.5">
                 <img
                   src="/logo-dark.png"
@@ -194,7 +194,7 @@ export function LoginContent() {
                 />
               </div>
             </div>
-            <span className="font-mono text-2xl font-black tracking-tight text-brand-navy">
+            <span className="font-mono text-xl font-black tracking-tight text-brand-navy sm:text-2xl">
               TRUCK<span className="text-brand-orange">SAATHI</span>
             </span>
           </div>
@@ -207,23 +207,23 @@ export function LoginContent() {
 
           {/* Headline inspired by PLATR design */}
           <div className="space-y-2">
-            <h1 className="text-4xl font-extrabold leading-[1.12] tracking-tight text-brand-navy sm:text-5xl lg:text-6xl">
-              Seamless logistics, <br />
+            <h1 className="max-w-2xl text-4xl font-extrabold leading-[1.04] tracking-tight text-brand-navy sm:text-5xl lg:text-[3.75rem]">
+              Logistics, without the guesswork. <br />
               <span className="text-brand-orange">
                 effortless
               </span>{' '}
               <br />
-              fleet management.
+              Built for the road.
             </h1>
           </div>
 
           {/* Subtitle Description */}
-          <p className="text-base sm:text-lg text-slate-400 max-w-xl font-normal leading-relaxed">
-            Welcome to TruckSaathi — the modern fleet OS for instant digital dispatching, real-time GPS telemetry, and AI-driven India logistics.
+          <p className="max-w-xl text-base leading-relaxed text-text-secondary sm:text-lg">
+            Dispatch faster, keep every vehicle moving, and give your team one reliable view of the fleet.
           </p>
 
           {/* Value Highlights */}
-          <div className="grid max-w-lg grid-cols-3 gap-4 border-t border-border pt-4">
+          <div className="grid max-w-lg grid-cols-3 gap-4 border-t border-border pt-5">
             <div>
               <div className="font-mono text-xl font-black text-text-primary sm:text-2xl">99.8%</div>
               <div className="text-xs font-medium text-text-secondary">GPS telemetry uptime</div>
@@ -244,19 +244,19 @@ export function LoginContent() {
           initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
-          className="lg:col-span-5"
+          className="flex w-full justify-center"
         >
-          <div className="space-y-6 rounded-card border border-border bg-surface p-6 shadow-popover sm:p-8">
+          <div className="w-full max-w-[480px] space-y-4 rounded-card border border-border bg-surface p-5 shadow-popover sm:p-7">
             {/* Card Header */}
             <div className="text-center space-y-1.5">
-              <h2 className="text-2xl font-bold tracking-tight text-text-primary">Welcome back</h2>
-              <p className="text-sm text-text-secondary">Select your portal role to log in</p>
+              <h2 className="text-xl font-bold tracking-tight text-text-primary">Welcome back</h2>
+              <p className="text-sm text-text-secondary">Sign in to your operations workspace</p>
             </div>
 
             {/* 2-Window Live Simulation Quick Demo Launcher */}
-            <div className="space-y-2.5 rounded-card border border-border bg-surface-muted p-4">
+            <div className="space-y-2 rounded-card border border-border bg-surface-muted p-3.5">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-white flex items-center gap-1.5">
+                <span className="flex items-center gap-1.5 font-semibold text-text-primary">
                   <Sparkles className="h-4 w-4 text-brand-orange" />
                   2-Window Live Simulation
                 </span>
@@ -289,7 +289,7 @@ export function LoginContent() {
                 </button>
               </div>
               <p className="text-xs leading-tight text-text-secondary">
-                💡 <strong>Demo tip:</strong> Open one tab as <em>Fleet Manager</em> and another tab (or Incognito) as <em>Driver</em> to see the highway simulation and speed sync in real time!
+                Use the demo buttons to preview both operating roles.
               </p>
             </div>
 
@@ -348,7 +348,7 @@ export function LoginContent() {
                 </div>
                 <p className="text-sm leading-relaxed text-text-secondary">
                   Click below to log in instantly as{' '}
-                  <strong className="text-white">
+                  <strong className="text-text-primary">
                     {portalRole === 'driver' ? 'Ramesh Kumar (Driver)' : 'Sylborn Furtado (Admin)'}
                   </strong>
                   .
@@ -373,11 +373,11 @@ export function LoginContent() {
 
             {/* Form */}
             {view === 'login' ? (
-              <form onSubmit={handleLogin} className="space-y-4 text-xs">
+              <form onSubmit={handleLogin} className="space-y-4 text-sm">
                 <div>
-                  <label className="block text-slate-300 mb-1.5 font-medium">Email Address</label>
+                  <label className="mb-1.5 block font-medium text-text-secondary">Email address</label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
                     <input
                       type="email"
                       required
@@ -391,7 +391,7 @@ export function LoginContent() {
 
                 <div>
                   <div className="flex justify-between mb-1.5">
-                    <label className="text-slate-300 font-medium">Password</label>
+                    <label className="font-medium text-text-secondary">Password</label>
                     <button
                       type="button"
                       onClick={() => {
@@ -405,7 +405,7 @@ export function LoginContent() {
                     </button>
                   </div>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
                     <input
                       type="password"
                       required={isConfigured}
@@ -421,7 +421,7 @@ export function LoginContent() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3.5 px-4 rounded-xl font-bold text-sm text-white bg-brand-orange hover:bg-orange-700 transition-colors duration-150 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] disabled:opacity-60"
+                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-control bg-brand-orange px-4 py-3.5 text-sm font-semibold text-white transition-colors duration-150 hover:bg-orange-700 disabled:opacity-60"
                   >
                   {loading ? (
                     <>
@@ -436,11 +436,11 @@ export function LoginContent() {
                 </button>
               </form>
             ) : (
-              <form onSubmit={handleResetPassword} className="space-y-4 text-xs">
+              <form onSubmit={handleResetPassword} className="space-y-4 text-sm">
                 <div>
-                  <label className="block text-slate-300 mb-1.5 font-medium">Email Address</label>
+                  <label className="mb-1.5 block font-medium text-text-secondary">Email address</label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
                     <input
                       type="email"
                       required
@@ -474,7 +474,7 @@ export function LoginContent() {
                     setError(null);
                     setMessage(null);
                   }}
-                  className="w-full text-slate-400 hover:text-slate-200 text-xs text-center block pt-1 cursor-pointer"
+                  className="block w-full cursor-pointer pt-1 text-center text-sm text-text-secondary hover:text-text-primary"
                 >
                   Back to Sign In
                 </button>
@@ -482,7 +482,7 @@ export function LoginContent() {
             )}
 
             {/* Bottom Card Footer */}
-            <div className="pt-2 text-center text-xs text-slate-400">
+            <div className="pt-2 text-center text-sm text-text-secondary">
               {portalRole === 'driver' ? (
                 <span>
                   New driver?{' '}
