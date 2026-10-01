@@ -9,12 +9,21 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- 2. Ensure all needed columns exist on public.users table (prevents column missing errors)
+-- 2. Safely add any missing columns to public.users & public.drivers
 ALTER TABLE public.users ADD COLUMN IF NOT EXISTS driver_id UUID;
 ALTER TABLE public.users ADD COLUMN IF NOT EXISTS department TEXT;
 ALTER TABLE public.users ADD COLUMN IF NOT EXISTS phone TEXT;
 ALTER TABLE public.users ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'active';
 ALTER TABLE public.users ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'Company Admin';
+
+ALTER TABLE public.drivers ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE public.drivers ADD COLUMN IF NOT EXISTS company_id UUID;
+ALTER TABLE public.drivers ADD COLUMN IF NOT EXISTS full_name TEXT;
+ALTER TABLE public.drivers ADD COLUMN IF NOT EXISTS phone VARCHAR(15);
+ALTER TABLE public.drivers ADD COLUMN IF NOT EXISTS license_number VARCHAR(30);
+ALTER TABLE public.drivers ADD COLUMN IF NOT EXISTS license_category TEXT DEFAULT 'HMV';
+ALTER TABLE public.drivers ADD COLUMN IF NOT EXISTS license_expiry DATE DEFAULT (CURRENT_DATE + INTERVAL '5 years');
+ALTER TABLE public.drivers ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'active';
 
 -- 3. Ensure default enterprise organization exists
 INSERT INTO public.companies (id, legal_name, trade_name, gstin, pan)
@@ -29,12 +38,12 @@ ON CONFLICT (id) DO UPDATE SET
     legal_name = EXCLUDED.legal_name,
     trade_name = EXCLUDED.trade_name;
 
--- 4. Function to easily create or update user accounts in both Supabase Auth & public.users
+-- 4. Function to create or update user accounts in both Supabase Auth & public.users
 CREATE OR REPLACE FUNCTION public.create_trucksaathi_user(
     p_email TEXT,
     p_password TEXT,
     p_full_name TEXT,
-    p_role TEXT,              -- 'Company Admin', 'Fleet Manager', or 'Driver'
+    p_role TEXT,
     p_phone TEXT DEFAULT NULL,
     p_department TEXT DEFAULT NULL
 )
@@ -49,7 +58,6 @@ DECLARE
     v_encrypted_pw TEXT;
     v_clean_role TEXT;
 BEGIN
-    -- Normalize role
     IF LOWER(p_role) IN ('admin', 'company admin', 'company_admin', 'super admin', 'superadmin') THEN
         v_clean_role := 'Company Admin';
     ELSIF LOWER(p_role) IN ('fleet manager', 'fleet_manager', 'manager') THEN
@@ -60,27 +68,16 @@ BEGIN
         v_clean_role := p_role;
     END IF;
 
-    -- Encrypt password with pgcrypto Blowfish
     v_encrypted_pw := crypt(p_password, gen_salt('bf'));
 
-    -- Check if user already exists in auth.users
     SELECT id INTO v_user_id FROM auth.users WHERE email = LOWER(TRIM(p_email));
 
     IF v_user_id IS NULL THEN
         v_user_id := gen_random_uuid();
 
         INSERT INTO auth.users (
-            instance_id,
-            id,
-            aud,
-            role,
-            email,
-            encrypted_password,
-            email_confirmed_at,
-            raw_app_meta_data,
-            raw_user_meta_data,
-            created_at,
-            updated_at
+            instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+            raw_app_meta_data, raw_user_meta_data, created_at, updated_at
         )
         VALUES (
             '00000000-0000-0000-0000-000000000000',
@@ -102,7 +99,6 @@ BEGIN
             NOW()
         );
     ELSE
-        -- Update password and metadata for existing user
         UPDATE auth.users
         SET encrypted_password = v_encrypted_pw,
             raw_user_meta_data = jsonb_build_object(
@@ -116,63 +112,36 @@ BEGIN
         WHERE id = v_user_id;
     END IF;
 
-    -- If the account is a Driver, ensure an entry exists in public.drivers
     IF v_clean_role = 'Driver' THEN
         SELECT id INTO v_driver_id FROM public.drivers WHERE user_id = v_user_id OR phone = p_phone LIMIT 1;
         
         IF v_driver_id IS NULL THEN
             v_driver_id := gen_random_uuid();
             INSERT INTO public.drivers (
-                id,
-                user_id,
-                company_id,
-                full_name,
-                phone,
-                license_number,
-                license_category,
-                status
+                id, user_id, company_id, full_name, phone, license_number, license_category, license_expiry, status
             )
             VALUES (
-                v_driver_id,
-                v_user_id,
-                v_company_id,
-                p_full_name,
+                v_driver_id, v_user_id, v_company_id, p_full_name,
                 COALESCE(p_phone, '+91 98000 00000'),
                 'IND-' || UPPER(SUBSTRING(MD5(p_email) FROM 1 FOR 10)),
                 'HMV',
+                CURRENT_DATE + INTERVAL '5 years',
                 'active'
             );
         ELSE
             UPDATE public.drivers
-            SET user_id = v_user_id,
-                full_name = p_full_name,
-                phone = COALESCE(p_phone, phone)
+            SET user_id = v_user_id, full_name = p_full_name, phone = COALESCE(p_phone, phone)
             WHERE id = v_driver_id;
         END IF;
     END IF;
 
-    -- Sync / insert into public.users table
     INSERT INTO public.users (
-        id,
-        email,
-        full_name,
-        role,
-        company_id,
-        department,
-        status,
-        phone,
-        driver_id
+        id, email, full_name, role, company_id, department, status, phone, driver_id
     )
     VALUES (
-        v_user_id,
-        LOWER(TRIM(p_email)),
-        p_full_name,
-        v_clean_role,
-        v_company_id,
+        v_user_id, LOWER(TRIM(p_email)), p_full_name, v_clean_role, v_company_id,
         COALESCE(p_department, CASE WHEN v_clean_role = 'Driver' THEN 'Fleet Logistics' WHEN v_clean_role = 'Fleet Manager' THEN 'Operations' ELSE 'Management' END),
-        'active',
-        p_phone,
-        v_driver_id
+        'active', p_phone, v_driver_id
     )
     ON CONFLICT (id) DO UPDATE SET
         email = EXCLUDED.email,
@@ -186,9 +155,7 @@ BEGIN
 END;
 $$;
 
--- ====================================================================================
--- 5. RUN QUERIES: PROVISION THE 3 PROPER ACCOUNTS DIRECTLY
--- ====================================================================================
+-- 5. RUN QUERIES: PROVISION ALL 3 ACCOUNTS
 
 -- Account 1: Admin
 SELECT public.create_trucksaathi_user(
