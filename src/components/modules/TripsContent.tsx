@@ -122,7 +122,7 @@ export function TripsContent() {
       destination: { city: destCity, address: destAddress || `${destCity} Industrial Freight Hub`, lat: 18.5204, lng: 73.8567 },
       cargoDescription: cargoDesc || 'General Cargo Payload',
       cargoWeightTons: Number(cargoWeight),
-      status: 'Scheduled',
+      status: selDriver ? 'Assigned' : 'Scheduled',
       scheduledDeparture: scheduledDeparture || new Date().toISOString().slice(0, 16).replace('T', ' '),
       scheduledArrival: scheduledArrival || new Date(Date.now() + 86400000).toISOString().slice(0, 16).replace('T', ' '),
       distanceKm: Number(distanceKm),

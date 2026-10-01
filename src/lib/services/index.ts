@@ -1,10 +1,9 @@
-import { Vehicle, Driver, User, Branch, ActivityLog } from '@/types';
+import { Vehicle, Driver, User, Branch } from '@/types';
 import {
   INITIAL_VEHICLES,
   INITIAL_DRIVERS,
   INITIAL_USERS,
-  INITIAL_BRANCHES,
-  INITIAL_ACTIVITY_LOGS
+  INITIAL_BRANCHES
 } from '@/data/mockData';
 
 class VehicleService {
@@ -97,3 +96,9 @@ export const driverService = new DriverService();
 export const userService = new UserService();
 export const companyService = new CompanyService();
 export * from './profileService';
+export * from './tripService';
+export * from './telemetryService';
+export * from './emergencyService';
+export * from './notificationService';
+export * from './activityService';
+export * from './simulationService';

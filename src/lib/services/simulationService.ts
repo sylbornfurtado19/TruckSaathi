@@ -1,6 +1,7 @@
-'use client';
-
-import { TelemetrySimulationState } from '@/types';
+import { TelemetrySimulationState, VehicleLiveState, Trip } from '@/types';
+import { telemetryService } from './telemetryService';
+import { emergencyService } from './emergencyService';
+import { tripService } from './tripService';
 
 export interface HighwayWaypoint {
   lat: number;
@@ -268,6 +269,27 @@ class SimulationManager {
       }
     }
     this.notifyListeners();
+
+    // Asynchronously push to Supabase backend so Fleet Manager receives real-time telemetry
+    telemetryService
+      .publishTelemetry({
+        vehicleId: newState.vehicleId,
+        tripId: newState.tripId,
+        latitude: newState.location.lat,
+        longitude: newState.location.lng,
+        speedKmh: newState.speedKmh,
+        fuelPercent: newState.fuelPercent,
+        engineTempC: newState.engineTempC,
+        engineRpm: newState.engineRpm,
+        odometerKm: newState.odometerKm,
+        progressPercent: newState.progressPercent,
+        distanceRemainingKm: newState.distanceRemainingKm,
+        currentCheckpoint: newState.currentCheckpoint,
+        nextMilestone: newState.nextMilestone,
+        isMoving: newState.speedKmh > 0,
+        isSos: newState.sosActive
+      })
+      .catch(err => console.warn('Supabase telemetry publish error:', err));
   }
 
   private handleRemoteUpdate(remoteState: TelemetrySimulationState) {
@@ -293,7 +315,7 @@ class SimulationManager {
 
   private startTimer() {
     this.stopTimer();
-    const intervalMs = Math.max(800, Math.floor(2400 / (this.state.speedMultiplier || 1)));
+    const intervalMs = Math.max(1200, Math.floor(2500 / (this.state.speedMultiplier || 1)));
     this.timer = setInterval(() => {
       this.tick();
     }, intervalMs);
@@ -393,6 +415,53 @@ class SimulationManager {
     };
   }
 
+  /**
+   * Bind simulation to active trip assigned to driver from Supabase
+   */
+  public bindActiveTrip(trip: Trip): void {
+    this.state = {
+      ...this.state,
+      tripId: trip.id,
+      tripCode: trip.tripCode,
+      vehicleId: trip.vehicleId || this.state.vehicleId,
+      vehicleReg: trip.vehicleReg || this.state.vehicleReg,
+      driverId: trip.driverId || this.state.driverId,
+      driverName: trip.driverName || this.state.driverName,
+      progressPercent: trip.progressPercent ?? this.state.progressPercent,
+      distanceRemainingKm: trip.distanceRemainingKm ?? this.state.distanceRemainingKm,
+      currentCheckpoint: trip.currentCheckpoint || this.state.currentCheckpoint,
+      nextMilestone: trip.nextMilestone || this.state.nextMilestone,
+      tripStatus: trip.status === 'Delivered' ? 'Delivered' : 'In Transit'
+    };
+    this.notifyListeners();
+  }
+
+  /**
+   * Sync telemetry updates arriving via Supabase Realtime from remote browser
+   */
+  public syncFromRemoteLiveState(live: VehicleLiveState): void {
+    this.state = {
+      ...this.state,
+      speedKmh: live.speedKmh,
+      fuelPercent: live.fuelPercent,
+      engineTempC: live.engineTempC,
+      engineRpm: live.engineRpm,
+      odometerKm: live.odometerKm,
+      progressPercent: live.progressPercent,
+      distanceRemainingKm: live.distanceRemainingKm,
+      currentCheckpoint: live.currentCheckpoint,
+      nextMilestone: live.nextMilestone,
+      location: {
+        lat: live.latitude,
+        lng: live.longitude,
+        city: live.currentCheckpoint
+      },
+      sosActive: live.isSos,
+      tripStatus: live.progressPercent >= 100 ? 'Delivered' : 'In Transit'
+    };
+    this.notifyListeners();
+  }
+
   public start(multiplier?: number): void {
     const updated: TelemetrySimulationState = {
       ...this.state,
@@ -401,6 +470,13 @@ class SimulationManager {
     };
     this.saveAndBroadcast(updated);
     this.startTimer();
+
+    // Trigger start trip in Supabase
+    if (this.state.tripId) {
+      tripService
+        .startTrip(this.state.tripId, this.state.location)
+        .catch(err => console.warn('Supabase startTrip error:', err));
+    }
   }
 
   public pause(): void {
@@ -452,6 +528,17 @@ class SimulationManager {
       }
     };
     this.saveAndBroadcast(updated);
+
+    // Write real emergency event to Supabase
+    emergencyService
+      .triggerSOS({
+        tripId: this.state.tripId,
+        vehicleId: this.state.vehicleId,
+        lat: this.state.location.lat,
+        lng: this.state.location.lng,
+        locationName: this.state.location.city
+      })
+      .catch(err => console.warn('Supabase triggerSOS error:', err));
   }
 
   public clearSOS(): void {
@@ -460,6 +547,9 @@ class SimulationManager {
       sosActive: false
     };
     this.saveAndBroadcast(updated);
+
+    // Resolve in Supabase
+    emergencyService.resolveSOS(this.state.tripId).catch(() => {});
   }
 
   public uploadPOD(notes?: string): void {
@@ -478,6 +568,13 @@ class SimulationManager {
     };
     this.stopTimer();
     this.saveAndBroadcast(updated);
+
+    // Commit to Supabase trips table
+    if (this.state.tripId) {
+      tripService
+        .completeTripWithPOD(this.state.tripId, notes || 'POD stamped and signed.')
+        .catch(err => console.warn('Supabase completeTripWithPOD error:', err));
+    }
   }
 }
 

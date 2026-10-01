@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
@@ -43,57 +43,46 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
   const { session, currentUser, authLoading } = useApp();
   const pathname = usePathname();
   const router = useRouter();
-  const [isAuthorized, setIsAuthorized] = useState(false);
 
+  const isConfigured = isSupabaseConfigured();
+
+  // Purely derive authorization status synchronously
+  const isAuthorized = useMemo(() => {
+    if (authLoading) return false;
+    if (!isConfigured) return true;
+    if (!session) return false;
+
+    const role = currentUser?.role;
+    if (role === 'Driver') {
+      return !isManagementRoute(pathname);
+    }
+    if (isDriverRoute(pathname)) {
+      return false;
+    }
+    return true;
+  }, [authLoading, isConfigured, session, currentUser?.role, pathname]);
+
+  // Handle side-effect navigation redirects only
   useEffect(() => {
-    // 1. Wait until initial auth check and profile load complete
-    if (authLoading) {
-      setIsAuthorized(false);
-      return;
-    }
+    if (authLoading || !isConfigured) return;
 
-    const isConfigured = isSupabaseConfigured();
-
-    // 2. If Supabase is unconfigured (offline demo mode), allow access
-    if (!isConfigured) {
-      setIsAuthorized(true);
-      return;
-    }
-
-    // 3. Authentication Check: if no session, redirect to /login
     if (!session) {
-      setIsAuthorized(false);
       const redirectUrl = pathname && pathname !== '/' ? `/login?redirect=${encodeURIComponent(pathname)}` : '/login';
       router.replace(redirectUrl);
       return;
     }
 
-    // 4. Role Authorization Check
     const role = currentUser?.role;
-
-    // Case A: Driver Role
-    if (role === 'Driver') {
-      if (isManagementRoute(pathname)) {
-        // Drivers are strictly forbidden from accessing management routes
-        setIsAuthorized(false);
-        router.replace('/driver-portal');
-        return;
-      }
-      setIsAuthorized(true);
+    if (role === 'Driver' && isManagementRoute(pathname)) {
+      router.replace('/driver-portal');
       return;
     }
 
-    // Case B: Management Roles (Super Admin, Company Admin, Fleet Manager, Dispatcher)
-    if (isDriverRoute(pathname)) {
-      // Management users must not be redirected into the Driver Portal
-      setIsAuthorized(false);
+    if (role !== 'Driver' && isDriverRoute(pathname)) {
       router.replace('/dashboard');
       return;
     }
-
-    // Management users on management routes
-    setIsAuthorized(true);
-  }, [pathname, session, currentUser, authLoading, router]);
+  }, [pathname, session, currentUser?.role, authLoading, isConfigured, router]);
 
   // Loading state while checking authorization
   if (!isAuthorized) {

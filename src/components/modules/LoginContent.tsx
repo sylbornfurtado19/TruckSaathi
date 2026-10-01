@@ -27,23 +27,13 @@ export function LoginContent() {
   const [resetEmail, setResetEmail] = useState('');
   const [view, setView] = useState<'login' | 'forgot'>('login');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
+  const errorParam = searchParams.get('error');
+  const msgParam = searchParams.get('message');
+  const [error, setError] = useState<string | null>(() => (errorParam ? decodeURIComponent(errorParam) : null));
+  const [message, setMessage] = useState<string | null>(() => (msgParam ? decodeURIComponent(msgParam) : null));
   const shouldReduceMotion = useReducedMotion();
 
   const isConfigured = isSupabaseConfigured();
-
-  // Listen for query error or message parameters (e.g. from callback or reset flow)
-  useEffect(() => {
-    const errorParam = searchParams.get('error');
-    const msgParam = searchParams.get('message');
-    if (errorParam) {
-      setError(decodeURIComponent(errorParam));
-    }
-    if (msgParam) {
-      setMessage(decodeURIComponent(msgParam));
-    }
-  }, [searchParams]);
 
   // If already authenticated in Supabase, redirect to the appropriate destination
   useEffect(() => {

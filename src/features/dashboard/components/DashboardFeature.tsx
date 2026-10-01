@@ -63,17 +63,26 @@ export function DashboardFeature() {
     activityLogs,
     currentUser,
     simState,
-    clearSOS
+    clearSOS,
+    activeEmergency,
+    acknowledgeSOS,
+    assignTrip
   } = useApp();
 
   // Local interactive states
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
+  const [assignDriverId, setAssignDriverId] = useState('');
+  const [assignVehicleId, setAssignVehicleId] = useState('');
+  const [assigning, setAssigning] = useState(false);
+  const [assignSuccess, setAssignSuccess] = useState(false);
   const [tripSearch, setTripSearch] = useState('');
   const [tripStatusFilter, setTripStatusFilter] = useState<'All' | 'In Transit' | 'Delayed' | 'Delivered' | 'Scheduled'>('All');
   const [currentTime, setCurrentTime] = useState('');
   const [activeTab, setActiveTab] = useState<'trips' | 'vehicles' | 'drivers'>('trips');
+
+
 
   // Live IST Clock
   useEffect(() => {
@@ -145,8 +154,21 @@ export function DashboardFeature() {
   const attentionItems: UrgentItem[] = useMemo(() => {
     const list: UrgentItem[] = [];
 
-    // 1. Live SOS
-    if (simState.sosActive) {
+    // 1. Live Realtime Emergency SOS (Database or Local Sim)
+    if (activeEmergency && activeEmergency.status === 'ACTIVE') {
+      list.push({
+        id: `sos-${activeEmergency.id}`,
+        urgency: 'critical',
+        type: 'sos',
+        title: `EMERGENCY SOS: ${activeEmergency.vehicleReg || simState.vehicleReg} (${activeEmergency.driverName || simState.driverName})`,
+        description: `CRITICAL PANIC BROADCAST TRIGGERED at ${activeEmergency.locationName || simState.currentCheckpoint || 'Highway Corridor'} [${activeEmergency.latitude?.toFixed(4) || '18.75'}, ${activeEmergency.longitude?.toFixed(4) || '73.40'}]. Immediate dispatch response required.`,
+        actionLabel: 'Acknowledge Emergency SOS',
+        onAction: async () => {
+          await acknowledgeSOS(activeEmergency.id);
+          clearSOS();
+        }
+      });
+    } else if (simState.sosActive) {
       list.push({
         id: 'sos-active',
         urgency: 'critical',
@@ -241,7 +263,7 @@ export function DashboardFeature() {
       });
 
     return list;
-  }, [simState, vehicles, trips, fuelLogs, clearSOS]);
+  }, [activeEmergency, acknowledgeSOS, simState, vehicles, trips, fuelLogs, clearSOS]);
 
   // Live Fleet Stream: Combines real trips and vehicles
   const liveFleetFeed = useMemo(() => {
@@ -1346,6 +1368,94 @@ export function DashboardFeature() {
                   <span className="text-text-muted block">Billed Weight:</span>
                   <span className="font-mono font-semibold text-text-primary">{selectedTrip.cargoWeightTons} Metric Tons</span>
                 </div>
+              </div>
+            </div>
+
+            {/* Realtime Driver & Vehicle Assignment Module */}
+            <div className="space-y-3 rounded-lg border border-cyan-500/30 bg-cyan-950/20 p-3.5">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-cyan-300">
+                  Dispatcher Realtime Assignment
+                </h4>
+                <span className="rounded bg-cyan-500/20 px-1.5 py-0.5 font-mono text-[9px] font-bold text-cyan-300">
+                  SUPABASE REALTIME
+                </span>
+              </div>
+              <p className="text-[11px] text-text-secondary leading-relaxed">
+                Assign pilot and vehicle to trigger instant real-time synchronization on the Driver Portal without page refresh.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label className="block text-text-muted mb-1 font-semibold">Assign Pilot</label>
+                  <select
+                    value={assignDriverId || selectedTrip.driverId || ''}
+                    onChange={(e) => setAssignDriverId(e.target.value)}
+                    className="w-full rounded-control border border-border bg-surface px-2.5 py-1.5 text-xs text-text-primary focus:border-cyan-500 focus:outline-none"
+                  >
+                    <option value="">-- Choose Pilot --</option>
+                    {drivers.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.fullName} ({d.status})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-text-muted mb-1 font-semibold">Assign Asset</label>
+                  <select
+                    value={assignVehicleId || selectedTrip.vehicleId || ''}
+                    onChange={(e) => setAssignVehicleId(e.target.value)}
+                    className="w-full rounded-control border border-border bg-surface px-2.5 py-1.5 text-xs text-text-primary focus:border-cyan-500 focus:outline-none"
+                  >
+                    <option value="">-- Choose Vehicle --</option>
+                    {vehicles.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.regNumber} ({v.capacityTons}T {v.model})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              {assignSuccess && (
+                <div className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1.5">
+                  <CheckCircle2 className="h-3.5 w-3.5" /> Assignment dispatched to driver portal in realtime!
+                </div>
+              )}
+              <div className="pt-1 flex justify-end">
+                <Button
+                  size="sm"
+                  variant="primary"
+                  disabled={!(assignDriverId || selectedTrip.driverId) || !(assignVehicleId || selectedTrip.vehicleId) || assigning}
+                  onClick={async () => {
+                    const dId = assignDriverId || selectedTrip.driverId;
+                    const vId = assignVehicleId || selectedTrip.vehicleId;
+                    if (!dId || !vId) return;
+                    setAssigning(true);
+                    setAssignSuccess(false);
+                    const res = await assignTrip(selectedTrip.id, dId, vId);
+                    setAssigning(false);
+                    if (res.success) {
+                      setAssignSuccess(true);
+                      const selD = drivers.find((d) => d.id === dId);
+                      const selV = vehicles.find((v) => v.id === vId);
+                      setSelectedTrip((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              status: 'Assigned',
+                              driverId: dId,
+                              driverName: selD?.fullName || prev.driverName,
+                              vehicleId: vId,
+                              vehicleReg: selV?.regNumber || prev.vehicleReg
+                            }
+                          : null
+                      );
+                    }
+                  }}
+                  className="font-bold text-xs"
+                >
+                  {assigning ? 'Dispatching...' : 'Assign Pilot & Asset →'}
+                </Button>
               </div>
             </div>
 

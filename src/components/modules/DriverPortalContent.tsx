@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   CheckCircle2,
@@ -65,12 +65,18 @@ export function DriverPortalContent() {
     resetSimulation,
     triggerSOS,
     clearSOS,
-    uploadSimulationPOD
+    uploadSimulationPOD,
+    acceptTrip,
+    startTrip,
+    completeTripWithPOD,
+    activeEmergency,
+    realtimeConnected
   } = useApp();
 
   const [podNotes, setPodNotes] = useState('');
   const [uploaded, setUploaded] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
+  const [actionLoading, setActionLoading] = useState(false);
 
   // Clock ticker for digital cockpit feel
   useEffect(() => {
@@ -90,20 +96,38 @@ export function DriverPortalContent() {
     return () => clearInterval(interval);
   }, []);
 
-  // Active trip matching current driver or default to primary trip
-  const activeTrip = trips.find(t => t.id === simState.tripId) || trips[0];
-  const assignedVehicle =
-    vehicles.find(v => v.regNumber === simState.vehicleReg) || vehicles[0];
   const driverDisplayName = currentDriver?.fullName || currentUser?.name || 'Ramesh Kumar';
+
+  // Active trip matching current driver or default to primary trip
+  const activeTrip = useMemo(() => {
+    const driverMatch = trips.find(
+      t =>
+        (t.driverId === currentDriver?.id || t.driverName?.toLowerCase() === driverDisplayName.toLowerCase()) &&
+        (t.status === 'Assigned' || t.status === 'Accepted' || t.status === 'In Transit')
+    );
+    if (driverMatch) return driverMatch;
+
+    const simTrip = trips.find(t => t.id === simState.tripId);
+    if (simTrip) return simTrip;
+
+    return trips[0];
+  }, [trips, currentDriver, driverDisplayName, simState.tripId]);
+
+  const assignedVehicle =
+    vehicles.find(v => v.regNumber === (activeTrip?.vehicleReg || simState.vehicleReg)) || vehicles[0];
 
   // Determine current greeting based on time of day
   const hour = new Date().getHours();
   const greeting =
     hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
-  const handleUploadPOD = (e: React.FormEvent) => {
+  const handleUploadPOD = async (e: React.FormEvent) => {
     e.preventDefault();
-    uploadSimulationPOD(podNotes || 'Signed LR physical receipt captured via on-duty driver camera.');
+    if (activeTrip) {
+      await completeTripWithPOD(activeTrip.id, podNotes || 'Signed LR physical receipt captured via on-duty driver camera.');
+    } else {
+      uploadSimulationPOD(podNotes || 'Signed LR physical receipt captured via on-duty driver camera.');
+    }
     setUploaded(true);
     setTimeout(() => setUploaded(false), 6000);
   };
@@ -196,6 +220,87 @@ export function DriverPortalContent() {
           </div>
         </div>
       </div>
+
+      {/* Real-time Lifecycle Callout 1: New Assignment Awaiting Driver Acceptance */}
+      {activeTrip && activeTrip.status === 'Assigned' && (
+        <div className="rounded-xl border-2 border-cyan-500/40 bg-cyan-950/30 p-5 shadow-lg space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-cyan-500/30 pb-3">
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-3 w-3 rounded-full bg-cyan-400 animate-ping" />
+              <span className="font-mono text-sm font-black text-cyan-300">
+                NEW TRIP ASSIGNED BY FLEET COMMAND: #{activeTrip.tripCode}
+              </span>
+            </div>
+            <Badge variant="cyan">AWAITING DRIVER ACCEPTANCE</Badge>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div>
+              <span className="text-text-muted block text-[11px]">Route Corridor</span>
+              <span className="font-bold text-white text-sm">
+                {activeTrip.origin.city} → {activeTrip.destination.city}
+              </span>
+            </div>
+            <div>
+              <span className="text-text-muted block text-[11px]">Commercial Asset</span>
+              <span className="font-mono font-bold text-cyan-300 text-sm">{activeTrip.vehicleReg}</span>
+            </div>
+            <div>
+              <span className="text-text-muted block text-[11px]">Cargo Weight</span>
+              <span className="font-semibold text-text-primary text-sm">
+                {activeTrip.cargoWeightTons} Tons ({activeTrip.cargoDescription})
+              </span>
+            </div>
+          </div>
+          <div className="pt-2 flex justify-end">
+            <Button
+              variant="primary"
+              size="md"
+              disabled={actionLoading}
+              onClick={async () => {
+                setActionLoading(true);
+                await acceptTrip(activeTrip.id);
+                setActionLoading(false);
+              }}
+              className="font-bold text-sm tracking-wide bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500"
+            >
+              {actionLoading ? 'Accepting...' : 'ACCEPT TRIP ASSIGNMENT →'}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Real-time Lifecycle Callout 2: Accepted Trip Ready for Departure */}
+      {activeTrip && activeTrip.status === 'Accepted' && (
+        <div className="rounded-xl border-2 border-emerald-500/40 bg-emerald-950/30 p-5 shadow-lg space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-emerald-500/30 pb-3">
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+              <span className="font-mono text-sm font-black text-emerald-300">
+                TRIP ACCEPTED: #{activeTrip.tripCode} • PRE-TRIP CHECKS COMPLETE
+              </span>
+            </div>
+            <Badge variant="success">READY TO DEPART</Badge>
+          </div>
+          <p className="text-xs text-emerald-200/80">
+            Commercial unit <strong>{activeTrip.vehicleReg}</strong> is authorized for transit. Click below to depart hub and activate telematics radar.
+          </p>
+          <div className="pt-2 flex justify-end">
+            <Button
+              variant="primary"
+              size="md"
+              disabled={actionLoading}
+              onClick={async () => {
+                setActionLoading(true);
+                await startTrip(activeTrip.id);
+                setActionLoading(false);
+              }}
+              className="font-bold text-sm tracking-wide bg-emerald-600 hover:bg-emerald-500 text-white"
+            >
+              {actionLoading ? 'Starting...' : 'START TRIP (DEPART HUB) →'}
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* =========================================================================
           2. ACTIVE TRIP COMMAND PANEL (HERO)
@@ -463,7 +568,30 @@ export function DriverPortalContent() {
 
             <div className="mt-4">
               <AnimatePresence>
-                {simState.sosActive ? (
+                {activeEmergency?.status === 'ACKNOWLEDGED' ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.96 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.96 }}
+                    className="rounded-xl border-2 border-emerald-500/40 bg-emerald-950/40 p-4 text-center space-y-2"
+                  >
+                    <div className="flex items-center justify-center gap-2 text-emerald-300 font-black text-sm">
+                      <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                      <span>SOS ACKNOWLEDGED BY FLEET COMMAND</span>
+                    </div>
+                    <p className="text-xs text-emerald-200/90 leading-relaxed">
+                      Emergency assistance mobilized. Fleet command has acknowledged your broadcast and dispatched highway highway medical/patrol support.
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={clearSOS}
+                      className="border-emerald-500/50 bg-black/40 text-xs font-bold text-emerald-200 hover:bg-black/60"
+                    >
+                      Dismiss Alert
+                    </Button>
+                  </motion.div>
+                ) : (activeEmergency?.status === 'ACTIVE' || simState.sosActive) ? (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.96 }}
                     animate={{ opacity: 1, scale: 1 }}

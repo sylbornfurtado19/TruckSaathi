@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
-import { UserProfile, UserRole, Driver } from '@/types';
+import { UserProfile, UserRole } from '@/types';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { INITIAL_DRIVERS, INITIAL_USERS } from '@/data/mockData';
 

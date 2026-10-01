@@ -96,7 +96,7 @@ export interface UserProfile {
   createdAt?: string;
 }
 
-export interface CurrentUser extends UserProfile {}
+export type CurrentUser = UserProfile;
 
 
 export interface Branch {
@@ -119,23 +119,38 @@ export interface ActivityLog {
   module: string;
 }
 
+export type TripStatus =
+  | 'Scheduled'
+  | 'Assigned'
+  | 'Accepted'
+  | 'In Transit'
+  | 'Delayed'
+  | 'Delivered'
+  | 'Cancelled';
+
 export interface Trip {
   id: string;
+  companyId?: string;
   tripCode: string;
   vehicleId: string;
   vehicleReg: string;
   driverId: string;
   driverName: string;
-  origin: { city: string; address: string; lat: number; lng: number };
-  destination: { city: string; address: string; lat: number; lng: number };
+  origin: { city: string; address: string; lat?: number; lng?: number };
+  destination: { city: string; address: string; lat?: number; lng?: number };
   cargoDescription: string;
   cargoWeightTons: number;
-  status: 'Scheduled' | 'In Transit' | 'Delayed' | 'Delivered' | 'Cancelled';
+  status: TripStatus;
   scheduledDeparture: string;
   scheduledArrival: string;
   actualDeparture?: string;
   actualArrival?: string;
   distanceKm: number;
+  distanceRemainingKm?: number;
+  progressPercent?: number;
+  currentLocation?: { lat: number; lng: number; city: string };
+  currentCheckpoint?: string;
+  nextMilestone?: string;
   ewayBillNumber?: string;
   ewayBillExpiry?: string;
   tollSpendINR?: number;
@@ -146,6 +161,8 @@ export interface Trip {
   podNotes?: string;
   podImageUrl?: string;
   fuelEfficiencyKmpl?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface FuelLog {
@@ -206,5 +223,72 @@ export interface TelemetrySimulationState {
     text: string;
     timestamp: string;
   };
+}
+
+export interface VehicleLiveState {
+  vehicleId: string;
+  companyId: string;
+  tripId?: string | null;
+  driverId?: string | null;
+  vehicleReg: string;
+  driverName?: string | null;
+  latitude: number;
+  longitude: number;
+  speedKmh: number;
+  fuelPercent: number;
+  engineTempC: number;
+  engineRpm: number;
+  odometerKm: number;
+  progressPercent: number;
+  distanceRemainingKm: number;
+  currentCheckpoint: string;
+  nextMilestone: string;
+  isMoving: boolean;
+  isSos: boolean;
+  updatedAt: string;
+}
+
+export interface EmergencyEvent {
+  id: string;
+  companyId: string;
+  driverId?: string | null;
+  driverName?: string | null;
+  vehicleId?: string | null;
+  vehicleReg?: string | null;
+  tripId?: string | null;
+  tripCode?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  locationName: string;
+  status: 'ACTIVE' | 'ACKNOWLEDGED' | 'RESOLVED';
+  triggeredAt: string;
+  acknowledgedBy?: string | null;
+  acknowledgedAt?: string | null;
+  resolvedAt?: string | null;
+  notes?: string | null;
+  createdAt?: string;
+}
+
+export interface Notification {
+  id: string;
+  companyId: string;
+  recipientUserId?: string | null;
+  recipientDriverId?: string | null;
+  type: string;
+  title: string;
+  message: string;
+  metadata?: Record<string, unknown>;
+  read: boolean;
+  createdAt: string;
+}
+
+export interface DriverPresence {
+  driverId: string;
+  companyId: string;
+  userId: string;
+  driverName: string;
+  isOnline: boolean;
+  currentVehicleReg?: string | null;
+  lastSeenAt: string;
 }
 
