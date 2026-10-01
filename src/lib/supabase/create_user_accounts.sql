@@ -3,18 +3,20 @@
 -- ====================================================================================
 -- Run this script in your Supabase Project's "SQL Editor" to create your proper
 -- Admin, Fleet Manager, and Driver accounts.
---
--- Roles Supported:
---   - 'Company Admin': Full control tower, all 14+ modules, and user management
---   - 'Fleet Manager': Operations, Live Fleet, Trips, Predictive Maintenance, Fuel & P&L
---   - 'Driver': Direct routing to the Driver Field Portal & camera POD upload
 -- ====================================================================================
 
 -- 1. Ensure required extensions exist
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- 2. Ensure default enterprise organization exists
+-- 2. Ensure all needed columns exist on public.users table (prevents column missing errors)
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS driver_id UUID;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS department TEXT;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS phone TEXT;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'active';
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'Company Admin';
+
+-- 3. Ensure default enterprise organization exists
 INSERT INTO public.companies (id, legal_name, trade_name, gstin, pan)
 VALUES (
     'a0000000-0000-0000-0000-000000000001',
@@ -27,7 +29,7 @@ ON CONFLICT (id) DO UPDATE SET
     legal_name = EXCLUDED.legal_name,
     trade_name = EXCLUDED.trade_name;
 
--- 3. Function to easily create or update a user account in both Supabase Auth & public.users
+-- 4. Function to easily create or update user accounts in both Supabase Auth & public.users
 CREATE OR REPLACE FUNCTION public.create_trucksaathi_user(
     p_email TEXT,
     p_password TEXT,
@@ -185,7 +187,7 @@ END;
 $$;
 
 -- ====================================================================================
--- 4. RUN QUERIES: PROVISION THE 3 PROPER ACCOUNTS DIRECTLY
+-- 5. RUN QUERIES: PROVISION THE 3 PROPER ACCOUNTS DIRECTLY
 -- ====================================================================================
 
 -- Account 1: Admin
