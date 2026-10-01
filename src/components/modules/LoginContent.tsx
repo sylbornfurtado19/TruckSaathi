@@ -83,7 +83,13 @@ export function LoginContent() {
       });
 
       if (authError) {
-        setError(authError.message);
+        if (authError.message === '{}' || authError.status === 500) {
+          setError('Unable to authenticate with this account. If you created this user directly via SQL, please make sure auth.identities was created or create the user via the Supabase Dashboard.');
+        } else if (authError.message.toLowerCase().includes('email not confirmed')) {
+          setError('Email not confirmed. Please click "Confirm user" in your Supabase Dashboard under Authentication > Users.');
+        } else {
+          setError(authError.message);
+        }
         setLoading(false);
         return;
       }
