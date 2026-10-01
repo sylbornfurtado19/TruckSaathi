@@ -1,158 +1,252 @@
 <div align="center">
 
-  <br />
+```
+  ████████╗██████╗ ██╗   ██╗ ██████╗██╗  ██╗███████╗ █████╗  █████╗ ████████╗██╗  ██╗██╗
+  ╚══██╔══╝██╔══██╗██║   ██║██╔════╝██║ ██╔╝██╔════╝██╔══██╗██╔══██╗╚══██╔══╝██║  ██║██║
+     ██║   ██████╔╝██║   ██║██║     █████═╝ ███████╗███████║███████║   ██║   ███████║██║
+     ██║   ██╔══██╗██║   ██║██║     ██╔═██╗ ╚════██║██╔══██║██╔══██║   ██║   ██╔══██║██║
+     ██║   ██║  ██║╚██████╔╝╚██████╗██║ ╚██╗███████║██║  ██║██║  ██║   ██║   ██║  ██║██║
+     ╚═╝   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝
+```
 
-  ```
-   _____              _     _____                 _  _   _ 
-  |_   _|            | |   /  ___|               | || | | |
-    | |_ __ _   _ ___| | __\ `--.  __ _  __ _ _| || |_| |
-    | | '__| | | / __| |/ / `--. \/ _` |/ _` |_  ..  _  |
-    | | |  | |_| \__ \   < /\__/ / (_| | (_| |_  || | | |
-    \_/_|   \__,_|___/_|\_\\____/ \__,_|\__,_| |_||_| |_|
-  ```
+### 🛰️ **THE AUTONOMOUS OPERATING SYSTEM FOR PAN-INDIA COMMERCIAL FREIGHT**
+#### *Zero Downtime. Zero Fuel Pilferage. 100% Highway Dominance.*
 
-  ### 🚚 **TruckSaathi Enterprise Fleet Copilot**
-  *The Next-Generation AI-Powered Logistics & Commercial Telemetry Platform for Pan-India Freight Control.*
+<br/>
 
-  [![Next.js](https://img.shields.io/badge/Next.js-16.2_Turbopack-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-  [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-Modern_Glassmorphism-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-  [![Framer Motion](https://img.shields.io/badge/Framer_Motion-Dynamic_UI-0055FF?style=for-the-badge&logo=framer&logoColor=white)](https://www.framer.com/motion/)
-  [![License](https://img.shields.io/badge/License-MIT-emerald?style=for-the-badge)](LICENSE)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16.2_Turbopack-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0_Strict-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-Realtime_WebSockets-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+[![Google Maps](https://img.shields.io/badge/Google_Maps-Dark_Ops_Engine-4285F4?style=for-the-badge&logo=googlemaps&logoColor=white)](https://developers.google.com/maps)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-Cyber_Glassmorphism-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![NHAI FASTag](https://img.shields.io/badge/NHAI-FASTag_Integrated-FF9933?style=for-the-badge)](https://ihmcl.co.in/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-emerald?style=for-the-badge)](LICENSE)
 
-  <p align="center">
-    <a href="#-key-features">Key Features</a> •
-    <a href="#-architecture--tech-stack">Tech Stack</a> •
-    <a href="#-system-modules">System Modules</a> •
-    <a href="#-getting-started">Getting Started</a> •
-    <a href="#-india-compliance-engine">India Compliance</a>
-  </p>
+<br/>
 
-  ---
+```
+[LIVE TELEMETRY STREAM] 📡 FLEET STATUS: ACTIVE | 40-TON CORRIDOR: NH-48 | SYNC: 12ms | FASTag: ONLINE
+```
+
+<p align="center">
+  <a href="#-the-mission">The Mission</a> •
+  <a href="#-god-mode-capabilities">Capabilities</a> •
+  <a href="#-high-octane-architecture">Architecture</a> •
+  <a href="#-mission-control-modules">Modules</a> •
+  <a href="#-legacy-vs-trucksaathi">Comparison</a> •
+  <a href="#-ignite-the-engine-quickstart">Quickstart</a> •
+  <a href="#-highway-code-india-compliance">India Compliance</a>
+</p>
+
+---
 
 </div>
 
-<br />
+<br/>
 
-## 🌟 Overview
+## ⚡ The Mission: Taming the Beast of Indian Freight
 
-**TruckSaathi** is a state-of-the-art, hyper-modern AI enterprise fleet copilot engineered to unify fragmented commercial vehicle operations across India. By bridging isolated vehicle telemetry, driver analytics, compliance databases, and financial trip settlements into a single real-time glassmorphism control tower, TruckSaathi optimizes fleet efficiency, prevents fuel theft, eliminates breakdown downtime, and ensures 100% legal compliance.
+India's freight highway corridors move **over 4.6 billion tonnes of cargo** every year across rough terrains, chaotic checkpoints, extreme heatwaves, and congested interstate toll plazas. Yet, 90% of transport fleets are run on greasy notebook ledgers, frantic midnight phone calls, and mysterious diesel disappearances.
+
+**TruckSaathi is the antidote.** 
+
+Built from the ground up as a **military-grade, real-time logistics control tower**, TruckSaathi turns raw GPS feeds, OBD-II sensor telematics, driver habits, and NHAI toll records into an intelligent autonomous copilot. From Kashmir to Kanyakumari, it manages your heavy vehicles like an air traffic control room.
+
+> **"HORN OK PLEASE" meets Silicon Valley Artificial Intelligence.** 🚚💨
 
 ---
 
-## ⚡ Key Features & Capabilities
+## 🔥 God-Mode Capabilities
 
 ```mermaid
-graph TD
-    A[🚛 Fleet Assets & Drivers] --> B[🛰️ Real-Time Telemetry Stream]
-    B --> C{🧠 TruckSaathi AI Copilot}
-    C -->|Auto Match & Route| D[🤖 AI Smart Dispatch]
-    C -->|Fuel Drop Alert| E[⛽ Fuel Telemetry & Theft Engine]
-    C -->|Health Score| F[🔧 Predictive Maintenance]
-    C -->|Risk Assessment| G[🛡️ AI Driver Safety Center]
-    C -->|E-Way Bill & FASTag| H[📑 Compliance & P&L Settlement]
+flowchart LR
+    subgraph SENSORS ["🛰️ LIVE HIGHWAY TELEMETRY"]
+        A1[📡 GPS Ping / Speed]
+        A2[⛽ Ultrasonic Fuel Float]
+        A3[🔧 OBD-II Diagnostic Bus]
+        A4[🛑 Accelerometer G-Force]
+    end
+
+    subgraph CORE ["🧠 TRUCKSAATHI AI CO-PILOT"]
+        B1{⚡ Real-Time Engine}
+        B2[🤖 95%+ Smart Dispatch Matcher]
+        B3[🚨 Nocturnal Fuel Theft Hunter]
+        B4[🔮 Predictive Maintenance Matrix]
+        B5[🛡️ AI Driver Safety Scoring]
+    end
+
+    subgraph ACTIONS ["🎯 INSTANT HIGHWAY ACTION"]
+        C1[🗺️ Dark Google Maps Tracking]
+        C2[📱 Driver Field SOS & Digital POD]
+        C3[💳 Automated Trip P&L & FASTag]
+        C4[📑 E-Way Bill Auto-Audit]
+    end
+
+    SENSORS ==> CORE
+    CORE ==> ACTIONS
 ```
 
-- 🤖 **AI Smart Dispatch Engine:** Machine learning vehicle-driver pairing that evaluates payload capacity vs. cargo weight, driver safety scores, and vehicle maintenance health to output 95%+ match scores and optimized highway route corridors.
-- ⛽ **Fuel Telemetry & Theft Analytics:** Real-time tank capacity tracking (liters & %), distance efficiency metrics (KMPL), refuel logging, and instant critical alerts for sudden nocturnal fuel drops.
-- 🧾 **Financial Settlement & Trip P&L:** Complete commercial trip revenue accounting — tracking Gross Freight Income, FASTag Toll Spend, Fuel Costs, Driver Allowances, Net Profit, and Profit Margin percentages per trip.
-- 🔧 **Predictive Maintenance:** Subsystem component health monitoring (Brakes, Battery, Engine, Tyre Tread Wear) with automated service urgency scoring and workshop bay prognosis.
-- 🛡️ **AI Safety Center:** Telemetry event monitoring including overspeeding, harsh braking, rapid acceleration, fatigue alerts, and seatbelt compliance with driver safety rank leaderboards.
-- 📱 **Mobile Driver Field Portal:** Driver-facing field app for viewing trip manifests, uploading digital Proof of Delivery (POD) bills, and triggering emergency highway SOS panic alerts.
-- 🇮🇳 **India-Specific Compliance Vault:** Integrated E-Way Bill status tracking (Compliant / Expiring Soon / Expired), FASTag toll auto-deduction, and cargo overloading prevention warnings.
-- 🪟 **Centered Pop-Up Modal System:** Fluid glassmorphism modals for detailed trip manifests, vehicle telemetry, driver profiles, and notifications with smooth backdrop blur overlays.
+### 🧠 1. AI Smart Dispatch Matrix (95%+ Match Confidence)
+Forget guessing which truck can haul what load. The **Smart Dispatch Algorithm** dynamically calculates:
+- Permissible GVW vs. cargo weight (blocks dangerous RTO overload penalties).
+- Real-time engine health, brake wear, and battery status.
+- Driver safety leaderboard ratings and hours-of-service fatigue scores.
+- Highway corridor topography (Golden Quadrilateral, Western Dedicated Freight Corridor, etc.).
+
+### ⛽ 2. Nocturnal Fuel Pilferage Hunter
+Diesel theft is the silent killer of fleet profitability. TruckSaathi's telemetry engine detects:
+- Sudden tank capacity drops (Liters & %) while ignition is switched **OFF**.
+- Real-time KMPL fuel economy deviations against load tonnage.
+- Instant audible warnings and red-zone telemetry alerts for fleet controllers.
+
+### 🛡️ 3. Driver Safety & Telematics Black Box
+- Real-time G-force monitoring: harsh braking, sudden lane whip, overspeeding, and jackrabbit acceleration.
+- Automatic Driver Safety Index (0-100) dynamically ranking the fleet.
+- Fatigue detection triggers safety reminders to stop at verified highway dhabas.
+
+### 🔧 4. Predictive Breakdown Prevention
+- Continuous wear metrics for **Brakes, Battery, Engine Thermals, and Tyre Tread Depth**.
+- Service urgency index flags vehicles *before* a catastrophic axle snap on the ghats.
+
+### 📑 5. India Logistics Sovereign Compliance
+- **E-Way Bill Expiry Countdown:** Real-time sync with estimated arrival times; alerts dispatchers before GST fines strike.
+- **Automated FASTag Toll Audits:** Direct ledger reconciliation of toll plaza charges with trip route corridors.
+- **Digital Proof-of-Delivery (e-POD):** Mobile consignment consignee sign-off with instant image upload.
 
 ---
 
-## 🛠 Architecture & Tech Stack
+## 💻 Tech Stack Built for Pure Speed
 
-| Component | Technology | Description |
+```
+  Frontend Core       ──► Next.js 16 (Turbopack Engine) + React 19 + TypeScript 5
+  Real-Time Comms     ──► Supabase Edge WebSockets (Multi-Portal Subscriptions)
+  Geospatial Engine   ──► Google Maps Platform (Custom Dark Vector Theme) + Dark OSM Fallback
+  UI & Glassmorphism  ──► TailwindCSS + Framer Motion (60 FPS Micro-Interactions)
+  Iconography         ──► Lucide Enterprise Industrial Vector Icons
+  Data Stream Export  ──► Zero-Latency In-Memory CSV Stream Generator
+```
+
+---
+
+## 🕹️ Mission Control Modules
+
+| Route | Ops Module | Cyber Deck Functionality |
 | :--- | :--- | :--- |
-| **Framework** | **Next.js 16 (App Router)** | High-performance React framework with Turbopack bundler |
-| **Language** | **TypeScript 5.0** | Strict type-safe schema modeling for vehicles, trips, drivers, and telemetry |
-| **Styling & UI** | **Vanilla CSS + TailwindCSS** | Bespoke HSL dark mode, neon glow tokens, and glassmorphism styling |
-| **Animation** | **Framer Motion** | 60 FPS page transitions, card tilts, modal zoom-in animations, and counters |
-| **Iconography** | **Lucide React** | Clean, modern vector icon set tailored for industrial telemetry |
-| **Export Engine**| **JS CSV Utility** | Zero-dependency high-speed data stream exporter for CSV reporting |
+| [`/dashboard`](src/app/dashboard/page.tsx) | **Fleet Control Tower** | Pan-India live radar, active telemetry ticker, revenue counters, and critical alarms. |
+| [`/ai-dispatch`](src/app/ai-dispatch/page.tsx) | **AI Dispatch Deck** | One-click ML matching between cargo orders, driver ratings, and vehicle chassis. |
+| [`/trips`](src/app/trips/page.tsx) | **Trip Command** | Manifest generator, route waypoints, live status chips, and POD verification modals. |
+| [`/vehicles`](src/app/vehicles/page.tsx) | **Asset Registry** | Heavy vehicle telemetry cards, RC/Insurance expiry timers, payload specs, and live stats. |
+| [`/fuel`](src/app/fuel/page.tsx) | **Fuel Telematics** | Tank depth sensors, fuel curve graphs, KMPL benchmarks, and theft detection log. |
+| [`/maintenance`](src/app/maintenance/page.tsx) | **Predictive Shop** | Component health degradation trackers (Brakes, Tyres, Battery, Engine) & bay booking. |
+| [`/safety`](src/app/safety/page.tsx) | **Safety War Room** | Telemetry risk radar, overspeed incident logs, and driver safety leaderboards. |
+| [`/expenses`](src/app/expenses/page.tsx) | **Trip P&L Ledger** | Commercial revenue vs. FASTag tolls, driver bata, fuel costs, and net margin ROI. |
+| [`/driver-portal`](src/app/driver-portal/page.tsx) | **Mobile Pilot Deck** | Smartphone-optimized UI for drivers: one-tap Highway SOS, trip GPS, & e-POD camera bill upload. |
+| [`/reports`](src/app/reports/page.tsx) | **Intelligence Hub** | Deep-dive CSV exporter for telematics, fuel logs, safety metrics, and financial audits. |
 
 ---
 
-## 📊 System Modules & Routes
+## ⚔️ Legacy Logistics vs. TruckSaathi
 
-| Route | Feature Module | Core Functionality |
+| Feature | Old-School Transport Office 👴 | TruckSaathi AI Copilot 🚀 |
 | :--- | :--- | :--- |
-| `/dashboard` | **Telemetry Control Center** | Live Pan-India map telemetry, active fleet status, total revenue & safety KPIs |
-| `/trips` | **Trips & Dispatch** | Trip creation, cargo overloading alerts, E-Way Bill badges, & POD verification modal |
-| `/ai-dispatch` | **AI Smart Dispatch** | One-click auto-dispatch engine with vehicle-driver AI matching scores |
-| `/vehicles` | **Asset Registry** | Commercial fleet vehicle database, chassis/engine serials, RC & Insurance vault |
-| `/maintenance` | **Predictive Maintenance** | Component health wear progress bars (Brakes, Battery, Engine, Tyres) & service dates |
-| `/fuel` | **Fuel Telemetry** | KMPL efficiency analytics, tank level monitoring, refuel logs, & fuel theft alert card |
-| `/expenses` | **Trip Expenses & P&L** | Commercial trip revenue vs expense breakdown, FASTag tolls, & net margin badges |
-| `/drivers` | **Human Capital** | Driver directory, license verification, contact details, & assigned vehicle status |
-| `/safety` | **AI Safety Center** | Fleet safety index KPI, safety event cards, risk breakdown, & driver leaderboard |
-| `/driver-portal` | **Mobile Field Portal** | Mobile-optimized driver interface for trip manifests, POD scanner, & highway SOS |
-| `/reports` | **Reporting & Exports** | Generated report history log & modal exporter (Vehicle, Driver, Trip datasets) |
+| **Fleet Tracking** | *"Driver ko phone lagao"* (Calls ignored) | **Sub-second GPS telemetry & dark map tracking** |
+| **Fuel Monitoring** | Fuel receipts on crumpled slips | **Ultrasonic tank level sensors + theft alerts** |
+| **Maintenance** | Wait for smoke on the highway | **Predictive wear analytics & bay scheduling** |
+| **Route Dispatch** | Gut feelings & scribbled notepads | **AI match engine (Payload, Health, Safety, Route)** |
+| **Trip Financials** | Month-end ledger headache | **Real-time Trip P&L with FASTag toll sync** |
+| **Highway Emergency** | Panic & hours lost on isolated roads | **Instant Mobile SOS panic beacon to dispatch** |
+| **GST / E-Way Bill** | Risky expired bills stuck at RTO | **Auto-expiry countdown & overload prevention** |
 
 ---
 
-## 🇮🇳 India-Specific Logistics Compliance
-
-TruckSaathi comes built out-of-the-box with native features tailored for the Indian logistics & interstate trucking ecosystem:
-
-> [!IMPORTANT]
-> **E-Way Bill Expiry Tracking:** Automatically evaluates validity windows against trip arrival times, flagging status badges as `Compliant`, `Expiring Soon (<24h)`, or `Expired`.
-
-> [!WARNING]
-> **Overload Alert Protection:** On trip creation, entered `cargoWeightTons` is compared against vehicle `capacityTons`. Highlights inline critical warnings if cargo exceeds permissible RTO limits.
-
-> [!NOTE]
-> **FASTag Toll Integration:** Automatically logs National Highways Authority of India (NHAI) toll gate expenditures into the trip financial P&L.
-
----
-
-## 🚀 Getting Started
+## 🚀 Ignite The Engine (Quickstart)
 
 ### Prerequisites
-- **Node.js**: `v18.0.0` or higher
-- **npm**: `v9.0.0` or higher
+Make sure you have **Node.js 18+** and **npm 9+** installed on your workstation.
 
-### Installation
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/sylbornfurtado19/TruckSaathi.git
-   cd TruckSaathi
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Run the local development server:**
-   ```bash
-   npm run dev
-   ```
-
-4. **Access the application:**
-   Open your browser and navigate to `http://localhost:3000`.
-
-### Production Build
-
-To verify and generate an optimized production bundle:
 ```bash
-npm run build
-npm run start
+# 1. Clone the repository
+git clone https://github.com/sylbornfurtado19/TruckSaathi.git
+
+# 2. Enter the cockpit
+cd TruckSaathi
+
+# 3. Install the dependencies
+npm install
+
+# 4. Configure your private environment variables
+cp .env.example .env.local
+```
+
+### Environment Setup (`.env.local`)
+Edit your `.env.local` file with your credentials:
+```env
+# Supabase Realtime Telemetry Sync
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+
+# Google Maps Platform (Maps JavaScript API)
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-restricted-google-maps-key
+```
+
+### Launch Mission Control
+```bash
+# Run the Turbopack high-speed dev server
+npm run dev
+```
+
+Open `http://localhost:3000` in your browser and prepare to command your fleet.
+
+---
+
+## 🇮🇳 Highway Code: India Logistics Engine
+
+TruckSaathi was custom-engineered to solve the hard realities of Indian transport:
+
+```
+  ┌────────────────────────────────────────────────────────────────────────┐
+  │  🇮🇳  NATIONAL LOGISTICS SOVEREIGNTY PROTOCOL                         │
+  ├────────────────────────────────────────────────────────────────────────┤
+  │  ✔ NHAI FASTag Toll Reconciliation (Electronic Toll Collection)       │
+  │  ✔ Parivahan / Vahan Payload Capacity Ceiling Compliance               │
+  │  ✔ GST E-Way Bill Validity Hour-Glass Radar                           │
+  │  ✔ Multi-State Permit & Fitness Certificate Reminders                 │
+  │  ✔ Golden Quadrilateral & North-South Corridor Route Optimization      │
+  └────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 👤 Author & Credits
+## 🛡️ Security & Zero-Leak Architecture
 
-Designed and built with ❤️ by **[sylbornfurtado19](https://github.com/sylbornfurtado19)** (`sylbornfurtado19@gmail.com`) for **TruckSaathi Enterprise**.
+- 🔒 **Zero Hardcoded Secrets**: Protected by automated scanning, `.gitignore` isolation, and domain HTTP referrer restrictions.
+- 🛡️ **Role-Based Telemetry Access**: Role isolation between Super Admins, Fleet Managers, Dispatch Operators, and Drivers.
+- 🌐 **Fail-Safe Offline Maps**: Seamless automatic fallback to dark OpenStreetMap if Google Maps quota or network drops on remote highways.
+
+---
+
+## 👑 The Architect
+
+Crafted with high-voltage passion and code by:
+<br/>
+
+**[sylbornfurtado19](https://github.com/sylbornfurtado19)**  
+📧 `sylbornfurtado19@gmail.com`  
+*Engineering the future of commercial autonomous telemetry.*
 
 ---
 
 <div align="center">
-  <sub>TruckSaathi © 2026. Empowering Commercial Logistics Across Pan-India Corridors.</sub>
+
+```
+  ___ ___                      ________     __   __________.__                              
+ /   |   \  ___________  ____  \_____  \   |  | _\______   \  |   _________    ______ ____  
+/    ~    \/  _ \_  __ \/    \  /   |   \  |  |/ /|     ___/  | _/ __ \__  \  /  ___// __ \ 
+\    Y    (  <_> )  | \/   |  \/    |    \ |    < |    |   |  |_\  ___/ / __ \_\___ \\  ___/ 
+ \___|_  / \____/|__|  |___|  /\_______  / |__|_ \|____|   |____/\___  >____  /____  >\___  >
+       \/                   \/         \/       \/                   \/     \/     \/     \/ 
+```
+
+**TruckSaathi Enterprise © 2026** • *Rule the Corridors. Deliver the Future.*
+
 </div>
