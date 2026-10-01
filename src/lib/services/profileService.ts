@@ -8,7 +8,12 @@ const DEFAULT_COMPANY_NAME = 'Mahindra Logistics India';
 /**
  * Normalizes role string from Supabase (case-insensitive / common variants) to strict UserRole type
  */
-export function normalizeUserRole(rawRole?: string | null): UserRole {
+export function normalizeUserRole(rawRole?: string | null, email?: string | null): UserRole {
+  if (email) {
+    const cleanEmail = email.trim().toLowerCase();
+    if (cleanEmail.includes('driver')) return 'Driver';
+    if (cleanEmail.includes('manager') || cleanEmail.includes('fleet')) return 'Fleet Manager';
+  }
   if (!rawRole) return 'Company Admin';
   const clean = rawRole.trim().toLowerCase();
   if (clean === 'driver') return 'Driver';
@@ -53,12 +58,19 @@ export async function fetchUserProfile(userId: string): Promise<UserProfile | nu
       return null;
     }
 
+    const assignedRole = normalizeUserRole(data.role, data.email);
+
+    // If role in database needs correction (e.g. driver account accidentally marked as Admin), auto-sync to Supabase
+    if (assignedRole !== data.role && data.email) {
+      supabase.from('users').update({ role: assignedRole }).eq('id', userId).then(() => {});
+    }
+
     return {
       id: data.id,
       userId: data.id,
-      name: data.full_name || 'Fleet User',
+      name: data.full_name || (assignedRole === 'Driver' ? 'Ramesh Kumar' : 'Fleet User'),
       email: data.email || '',
-      role: normalizeUserRole(data.role),
+      role: assignedRole,
       driverId: data.driver_id || null,
       companyId: data.company_id || null,
       companyName: data.company?.legal_name || DEFAULT_COMPANY_NAME,
@@ -81,6 +93,14 @@ export async function ensureUserProfile(authUser: SupabaseUser): Promise<UserPro
   // 1. Check if profile already exists in public.users
   const existing = await fetchUserProfile(authUser.id);
   if (existing) {
+    const correctedRole = normalizeUserRole(existing.role, authUser.email);
+    if (existing.role !== correctedRole) {
+      existing.role = correctedRole;
+      if (isSupabaseConfigured()) {
+        await supabase.from('users').update({ role: correctedRole }).eq('id', authUser.id);
+      }
+    }
+
     // If user is a Driver but lacks driverId, attempt to link it
     if (existing.role === 'Driver' && !existing.driverId) {
       const linkedDriverId = await resolveDriverIdForUser(
@@ -102,12 +122,12 @@ export async function ensureUserProfile(authUser: SupabaseUser): Promise<UserPro
 
   // 2. Extract profile details from Auth metadata
   const metadata = authUser.user_metadata || {};
+  const defaultRole: UserRole = normalizeUserRole(metadata.role, authUser.email);
   const defaultName =
     metadata.full_name ||
     metadata.name ||
-    authUser.email?.split('@')[0] ||
+    (defaultRole === 'Driver' ? 'Ramesh Kumar' : authUser.email?.split('@')[0]) ||
     'Fleet User';
-  const defaultRole: UserRole = normalizeUserRole(metadata.role);
 
   if (!isSupabaseConfigured()) {
     // Mock fallback
