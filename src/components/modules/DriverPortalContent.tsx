@@ -39,15 +39,15 @@ import {
 } from '@/components/ui';
 import { CORRIDOR_WAYPOINTS } from '@/lib/services/simulationService';
 
-// Dynamic import for Leaflet map component with dark CARTO tiles
-const LeafletMapInner = dynamic(
-  () => import('@/features/dashboard/components/LeafletMapInner').then(m => m.LeafletMapInner),
+// Dynamic import for Google Maps component with dark operations theme
+const GoogleFleetMap = dynamic(
+  () => import('@/components/maps/GoogleFleetMap').then(m => m.GoogleFleetMap),
   {
     ssr: false,
     loading: () => (
       <div className="flex h-56 w-full items-center justify-center rounded-xl bg-surface-muted/60 text-xs font-medium text-text-secondary">
         <Activity className="h-4 w-4 animate-spin mr-2 text-cyan-400" />
-        Connecting to GPS Satellite Feed...
+        Connecting to Google Maps Satellite Feed...
       </div>
     )
   }
@@ -642,9 +642,11 @@ export function DriverPortalContent() {
             <div className="space-y-4">
               {/* Actual Embedded Map */}
               <div className="h-72 w-full rounded-xl overflow-hidden border border-border shadow-inner">
-                <LeafletMapInner
+                <GoogleFleetMap
                   vehicles={[assignedVehicle]}
                   selectedVehicleId={assignedVehicle.id}
+                  center={{ lat: simState.location.lat, lng: simState.location.lng }}
+                  zoom={10}
                 />
               </div>
 

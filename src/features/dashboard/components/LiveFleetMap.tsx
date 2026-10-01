@@ -2,18 +2,17 @@
 
 import React, { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { Activity, MapPin, Radio, ShieldAlert, Wrench, Layers } from 'lucide-react';
-import { StatusPill } from '@/components/ui';
+import { Activity, MapPin, Radio, Layers } from 'lucide-react';
 import { Vehicle } from '@/types';
 
-const LeafletMapInner = dynamic(
-  () => import('./LeafletMapInner').then(module => module.LeafletMapInner),
+const GoogleFleetMap = dynamic(
+  () => import('@/components/maps/GoogleFleetMap').then(module => module.GoogleFleetMap),
   {
     ssr: false,
     loading: () => (
       <div className="flex h-[400px] w-full flex-col items-center justify-center gap-2 rounded-xl bg-canvas border border-border/70 text-text-muted">
         <Radio className="h-6 w-6 animate-pulse text-cyan-400" />
-        <span className="font-mono text-xs tracking-wider uppercase">Initializing Geospatial Fleet Radar...</span>
+        <span className="font-mono text-xs tracking-wider uppercase">Initializing Google Maps Fleet Radar...</span>
       </div>
     )
   }
@@ -122,7 +121,7 @@ export function LiveFleetMap({
 
       {/* Map Body */}
       <div className="relative h-[420px] w-full bg-canvas">
-        <LeafletMapInner
+        <GoogleFleetMap
           vehicles={filteredVehicles}
           selectedVehicleId={selectedVehicleId}
           onSelectVehicle={onSelectVehicle}
