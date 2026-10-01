@@ -1,13 +1,13 @@
 -- ====================================================================================
 -- TRUCKSAATHI: CREATE PROPER USER ACCOUNTS IN SUPABASE
 -- ====================================================================================
--- You can run this script in your Supabase Project's "SQL Editor" to create proper accounts
--- for your team. You can customize the emails, names, passwords, and roles below.
+-- Run this script in your Supabase Project's "SQL Editor" to create your proper
+-- Admin, Fleet Manager, and Driver accounts.
 --
--- Supported Roles:
---   - 'Company Admin'  (or 'Super Admin'): Full control of all modules, users, and settings
---   - 'Fleet Manager': Full access to Operations, Fleet, Maintenance, Fuel, P&L, & Safety
---   - 'Driver': Direct routing to the Driver Field Portal & POD upload
+-- Roles Supported:
+--   - 'Company Admin': Full control tower, all 14+ modules, and user management
+--   - 'Fleet Manager': Operations, Live Fleet, Trips, Predictive Maintenance, Fuel & P&L
+--   - 'Driver': Direct routing to the Driver Field Portal & camera POD upload
 -- ====================================================================================
 
 -- 1. Ensure required extensions exist
@@ -185,35 +185,35 @@ END;
 $$;
 
 -- ====================================================================================
--- RUN EXAMPLES: REPLACE WITH YOUR OWN EMAILS, PASSWORDS, AND NAMES
+-- 4. RUN QUERIES: PROVISION THE 3 PROPER ACCOUNTS DIRECTLY
 -- ====================================================================================
 
--- 1. Create your Admin Account
--- SELECT public.create_trucksaathi_user(
---     'admin@yourcompany.com',
---     'YourStrongPassword123!',
---     'Admin Name',
---     'Company Admin',
---     '+91 9876543210',
---     'Executive Management'
--- );
+-- Account 1: Admin
+SELECT public.create_trucksaathi_user(
+    'admin@trucksaathi.com',
+    'Admin@TruckSaathi2026!',
+    'Sylborn Furtado',
+    'Company Admin',
+    '+91 9876543210',
+    'Executive Management'
+);
 
--- 2. Create your Fleet Manager Account
--- SELECT public.create_trucksaathi_user(
---     'manager@yourcompany.com',
---     'YourStrongPassword123!',
---     'Manager Name',
---     'Fleet Manager',
---     '+91 9876543211',
---     'Fleet Operations'
--- );
+-- Account 2: Fleet Manager
+SELECT public.create_trucksaathi_user(
+    'manager@trucksaathi.com',
+    'Manager@TruckSaathi2026!',
+    'Rajesh Varma',
+    'Fleet Manager',
+    '+91 9876543211',
+    'Operations'
+);
 
--- 3. Create your Driver Account
--- SELECT public.create_trucksaathi_user(
---     'driver@yourcompany.com',
---     'YourStrongPassword123!',
---     'Driver Name',
---     'Driver',
---     '+91 9876543212',
---     'Logistics Field'
--- );
+-- Account 3: Driver
+SELECT public.create_trucksaathi_user(
+    'driver@trucksaathi.com',
+    'Driver@TruckSaathi2026!',
+    'Ramesh Kumar',
+    'Driver',
+    '+91 9876543212',
+    'Fleet Logistics'
+);
