@@ -6,28 +6,34 @@ import { INITIAL_DRIVERS, INITIAL_USERS } from '@/data/mockData';
 const DEFAULT_COMPANY_NAME = 'Mahindra Logistics India';
 
 /**
+ * Normalizes role string from Supabase (case-insensitive / common variants) to strict UserRole type
+ */
+export function normalizeUserRole(rawRole?: string | null): UserRole {
+  if (!rawRole) return 'Company Admin';
+  const clean = rawRole.trim().toLowerCase();
+  if (clean === 'driver') return 'Driver';
+  if (
+    clean === 'fleet manager' ||
+    clean === 'fleet_manager' ||
+    clean === 'fleet-manager' ||
+    clean === 'manager'
+  ) return 'Fleet Manager';
+  if (clean === 'dispatcher') return 'Dispatcher';
+  if (clean === 'super admin' || clean === 'superadmin') return 'Super Admin';
+  if (
+    clean === 'admin' ||
+    clean === 'company admin' ||
+    clean === 'company_admin' ||
+    clean === 'company-admin'
+  ) return 'Company Admin';
+  return 'Company Admin';
+}
+
+/**
  * Retrieves the application profile for a given authenticated user ID from Supabase
  */
 export async function fetchUserProfile(userId: string): Promise<UserProfile | null> {
   if (!isSupabaseConfigured()) {
-    // In mock demo mode, check INITIAL_USERS
-    const mock = INITIAL_USERS.find(u => u.id === userId || u.email.toLowerCase() === userId.toLowerCase());
-    if (mock) {
-      return {
-        id: mock.id,
-        userId: mock.id,
-        name: mock.fullName,
-        email: mock.email,
-        role: mock.role,
-        driverId: mock.driverId || null,
-        companyId: mock.companyId || null,
-        companyName: DEFAULT_COMPANY_NAME,
-        phone: mock.phone,
-        department: mock.department,
-        status: mock.status,
-        createdAt: new Date().toISOString()
-      };
-    }
     return null;
   }
 
@@ -52,7 +58,7 @@ export async function fetchUserProfile(userId: string): Promise<UserProfile | nu
       userId: data.id,
       name: data.full_name || 'Fleet User',
       email: data.email || '',
-      role: (data.role as UserRole) || 'Company Admin',
+      role: normalizeUserRole(data.role),
       driverId: data.driver_id || null,
       companyId: data.company_id || null,
       companyName: data.company?.legal_name || DEFAULT_COMPANY_NAME,
@@ -101,7 +107,7 @@ export async function ensureUserProfile(authUser: SupabaseUser): Promise<UserPro
     metadata.name ||
     authUser.email?.split('@')[0] ||
     'Fleet User';
-  const defaultRole: UserRole = (metadata.role as UserRole) || 'Company Admin';
+  const defaultRole: UserRole = normalizeUserRole(metadata.role);
 
   if (!isSupabaseConfigured()) {
     // Mock fallback
@@ -191,7 +197,7 @@ export async function ensureUserProfile(authUser: SupabaseUser): Promise<UserPro
       userId: created.id,
       name: created.full_name,
       email: created.email || authUser.email || '',
-      role: (created.role as UserRole) || defaultRole,
+      role: normalizeUserRole(created.role) || defaultRole,
       driverId: created.driver_id || driverId,
       companyId: created.company_id,
       companyName: created.company?.legal_name || companyName,

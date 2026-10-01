@@ -10,10 +10,7 @@ import {
   AlertCircle,
   CheckCircle2,
   Loader2,
-  Sparkles,
-  User,
-  Shield,
-  Info
+  Sparkles
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
 import { useApp } from '@/context/AppContext';
@@ -25,8 +22,7 @@ export function LoginContent() {
   const searchParams = useSearchParams();
   const { session, currentUser, authLoading } = useApp();
 
-  const [portalRole, setPortalRole] = useState<'driver' | 'management'>('management');
-  const [email, setEmail] = useState('sylborn@trucksaathi.in');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [resetEmail, setResetEmail] = useState('');
   const [view, setView] = useState<'login' | 'forgot'>('login');
@@ -49,7 +45,7 @@ export function LoginContent() {
     }
   }, [searchParams]);
 
-  // If already authenticated, redirect to the appropriate destination
+  // If already authenticated in Supabase, redirect to the appropriate destination
   useEffect(() => {
     if (!authLoading && session && currentUser) {
       const redirectParam = searchParams.get('redirect');
@@ -63,37 +59,22 @@ export function LoginContent() {
     }
   }, [authLoading, session, currentUser, router, searchParams]);
 
-  // Handle switching role tabs
-  const handleRoleChange = (role: 'driver' | 'management') => {
-    setPortalRole(role);
-    setError(null);
-    if (role === 'driver') {
-      if (email === 'sylborn@trucksaathi.in' || !email) {
-        setEmail('ramesh.k@trucksaathi.in');
-      }
-    } else {
-      if (email === 'ramesh.k@trucksaathi.in' || !email) {
-        setEmail('sylborn@trucksaathi.in');
-      }
-    }
-  };
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setMessage(null);
-    setLoading(true);
 
     if (!isConfigured) {
-      // In offline/unconfigured prototype mode, allow direct access based on selected role
-      if (portalRole === 'driver') {
-        router.push('/driver-portal');
-      } else {
-        router.push('/dashboard');
-      }
-      setLoading(false);
+      setError('Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your .env.local file.');
       return;
     }
+
+    if (!email.trim() || !password) {
+      setError('Please enter both your email and password.');
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const { data, error: authError } = await supabase.auth.signInWithPassword({
@@ -108,7 +89,7 @@ export function LoginContent() {
       }
 
       if (data.session) {
-        // Fetch profile to route user according to their role
+        // Fetch verified profile from Supabase to route user according to their assigned role
         const profile = await ensureUserProfile(data.session.user);
         const redirectParam = searchParams.get('redirect');
 
@@ -129,16 +110,12 @@ export function LoginContent() {
 
   const handleGoogleLogin = async () => {
     if (!isConfigured) {
-      if (portalRole === 'driver') {
-        router.push('/driver-portal');
-      } else {
-        router.push('/dashboard');
-      }
+      setError('Supabase is not configured in .env.local');
       return;
     }
 
     try {
-      const targetDestination = searchParams.get('redirect') || (portalRole === 'driver' ? '/driver-portal' : '/dashboard');
+      const targetDestination = searchParams.get('redirect') || '/dashboard';
       const callbackUrl = getAuthCallbackUrl(targetDestination);
 
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
@@ -161,15 +138,19 @@ export function LoginContent() {
     setLoading(true);
 
     if (!isConfigured) {
-      setError(
-        'Supabase is not configured yet. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your .env.local file to enable password reset.'
-      );
+      setError('Supabase is not configured yet. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your .env.local file.');
       setLoading(false);
       return;
     }
 
     try {
       const targetEmail = resetEmail.trim() || email.trim();
+      if (!targetEmail) {
+        setError('Please enter your account email address.');
+        setLoading(false);
+        return;
+      }
+
       const resetRedirectUrl = `${getSiteUrl()}/login?message=${encodeURIComponent('Password reset email verified. Please sign in with your credentials.')}`;
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(targetEmail, {
         redirectTo: resetRedirectUrl
@@ -189,294 +170,239 @@ export function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen bg-canvas text-text-primary">
-      {/* Main Container */}
-      <div className="mx-auto grid min-h-screen w-full max-w-[1360px] grid-cols-1 items-center gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:px-16 lg:py-12">
-        
-        {/* Left Hero Branding Section */}
-        <motion.div
-          initial={{ opacity: 0, x: shouldReduceMotion ? 0 : -30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="space-y-6 lg:pt-2"
-        >
-          {/* Brand Logo & Name */}
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-card border border-white/10 bg-brand-navy p-0.5">
-              <div className="flex h-full w-full items-center justify-center rounded-control bg-brand-navy p-1.5">
-                <img
-                  src="/logo-dark.png"
-                  alt="TruckSaathi Logo"
-                  className="w-full h-full object-contain filter brightness-125 contrast-125"
-                />
+    <div className="flex h-screen min-h-screen flex-col justify-between overflow-x-hidden overflow-y-auto lg:overflow-hidden bg-canvas text-text-primary">
+      {/* Main Centered Content */}
+      <main className="flex flex-1 items-center justify-center px-4 py-3 sm:px-6 lg:px-12 w-full">
+        <div className="mx-auto grid w-full max-w-[1240px] grid-cols-1 items-center gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12">
+          
+          {/* Left Hero Branding Section */}
+          <motion.div
+            initial={{ opacity: 0, x: shouldReduceMotion ? 0 : -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="space-y-3.5 lg:space-y-4"
+          >
+            {/* Brand Logo & Name */}
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-card border border-white/10 bg-brand-navy p-0.5">
+                <div className="flex h-full w-full items-center justify-center rounded-control bg-brand-navy p-1">
+                  <img
+                    src="/logo-dark.png"
+                    alt="TruckSaathi Logo"
+                    className="w-full h-full object-contain filter brightness-125 contrast-125"
+                  />
+                </div>
               </div>
-            </div>
-            <span className="font-mono text-xl font-black tracking-tight text-text-primary sm:text-2xl">
-              TRUCK<span className="text-brand-orange">SAATHI</span>
-            </span>
-          </div>
-
-          {/* Badge Pill */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-muted px-3.5 py-1.5 text-sm font-semibold text-text-secondary">
-            <Sparkles className="h-4 w-4 text-brand-orange" />
-            <span>AI-powered logistics OS</span>
-          </div>
-
-          {/* Headline inspired by PLATR design */}
-          <div className="space-y-2">
-            <h1 className="max-w-2xl text-4xl font-extrabold leading-[1.04] tracking-tight text-text-primary sm:text-5xl lg:text-[3.75rem]">
-              Keep every truck moving. <br />
-              <span className="text-brand-orange">One intelligent control center.</span>
-            </h1>
-          </div>
-
-          {/* Subtitle Description */}
-          <p className="max-w-xl text-base leading-relaxed text-text-secondary sm:text-lg">
-            Dispatch faster, keep every vehicle moving, and give your team one reliable view of the fleet.
-          </p>
-
-          {/* Value Highlights */}
-          <div className="grid max-w-lg grid-cols-3 gap-4 border-t border-border pt-5">
-            <div>
-              <div className="font-mono text-xl font-black text-text-primary sm:text-2xl">99.8%</div>
-              <div className="text-xs font-medium text-text-secondary">GPS telemetry uptime</div>
-            </div>
-            <div>
-              <div className="font-mono text-xl font-black text-focus sm:text-2xl">14+</div>
-              <div className="text-xs font-medium text-text-secondary">Integrated modules</div>
-            </div>
-            <div>
-              <div className="font-mono text-xl font-black text-green-700 sm:text-2xl">&lt; 3s</div>
-              <div className="text-xs font-medium text-text-secondary">Digital POD sync</div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Right Auth Card Section */}
-        <motion.div
-          initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
-          className="flex w-full justify-center"
-        >
-          <div className="w-full max-w-[480px] space-y-4 rounded-card border border-border bg-surface p-5 shadow-popover sm:p-7">
-            {/* Card Header */}
-            <div className="text-center space-y-1.5">
-              <h2 className="text-xl font-bold tracking-tight text-text-primary">Welcome back</h2>
-              <p className="text-sm text-text-secondary">Sign in to your operations workspace</p>
-            </div>
-
-            {/* Single portal role selector */}
-            <div className="grid grid-cols-2 gap-1 rounded-control border border-border bg-surface-muted p-1 text-sm">
-              <button
-                type="button"
-                onClick={() => handleRoleChange('driver')}
-                  className={`flex cursor-pointer items-center justify-center gap-2 rounded-control px-3 py-2.5 font-semibold transition-colors duration-150 ${
-                  portalRole === 'driver'
-                    ? 'bg-brand-orange text-white'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-muted'
-                }`}
-              >
-                <User className="w-3.5 h-3.5" />
-                <span>Driver</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleRoleChange('management')}
-                  className={`flex cursor-pointer items-center justify-center gap-2 rounded-control px-3 py-2.5 font-semibold transition-colors duration-150 ${
-                  portalRole === 'management'
-                    ? 'bg-brand-orange text-white'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-muted'
-                }`}
-              >
-                <Shield className="w-3.5 h-3.5" />
-                <span>Staff & Manager</span>
-              </button>
-            </div>
-
-            {/* Google Social SSO Button */}
-            <button
-              type="button"
-              onClick={handleGoogleLogin}
-              className="flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-control border border-border bg-surface px-4 py-2.5 text-sm font-semibold text-text-primary transition-colors duration-150 hover:bg-surface-muted"
-            >
-              <span className="flex h-5 w-5 items-center justify-center rounded-full border border-border text-xs font-bold text-focus">G</span>
-              <span>Continue with Google</span>
-            </button>
-
-            {/* Divider */}
-            <div className="relative flex items-center justify-center">
-              <div className="w-full border-t border-border" />
-              <span className="absolute bg-surface px-3 text-xs font-semibold text-text-muted">
-                Or sign in with email
+              <span className="font-mono text-lg font-black tracking-tight text-text-primary sm:text-xl">
+                TRUCK<span className="text-brand-orange">SAATHI</span>
               </span>
             </div>
 
-            {/* Developer / Prototype Mode Notice */}
-            {!isConfigured && (
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-300 text-xs space-y-1">
-                <div className="flex items-center gap-1.5 font-semibold text-amber-200">
-                  <Info className="w-3.5 h-3.5 shrink-0" />
-                  <span>Prototype Demo Mode</span>
-                </div>
-                <p className="text-sm leading-relaxed text-text-secondary">
-                  Click below to log in instantly as{' '}
-                  <strong className="text-text-primary">
-                    {portalRole === 'driver' ? 'Ramesh Kumar (Driver)' : 'Sylborn Furtado (Admin)'}
-                  </strong>
-                  .
-                </p>
+            {/* Badge Pill */}
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-muted px-3 py-1 text-xs font-semibold text-text-secondary">
+              <Sparkles className="h-3.5 w-3.5 text-brand-orange" />
+              <span>AI-powered logistics OS</span>
+            </div>
+
+            {/* Headline */}
+            <div className="space-y-1">
+              <h1 className="max-w-2xl text-2xl font-extrabold leading-[1.1] tracking-tight text-text-primary sm:text-3xl lg:text-[2.6rem]">
+                Keep every truck moving. <br />
+                <span className="text-brand-orange">One intelligent control center.</span>
+              </h1>
+            </div>
+
+            {/* Subtitle Description */}
+            <p className="max-w-lg text-xs leading-relaxed text-text-secondary sm:text-sm">
+              Real-time dispatch, fleet telemetry, trip P&L, driver field portal, and intelligent route optimization for enterprise fleets.
+            </p>
+
+            {/* Value Highlights */}
+            <div className="grid max-w-md grid-cols-3 gap-3 border-t border-border pt-3">
+              <div>
+                <div className="font-mono text-lg font-black text-text-primary sm:text-xl">99.8%</div>
+                <div className="text-[11px] font-medium text-text-secondary">GPS uptime</div>
               </div>
-            )}
-
-            {/* Error & Feedback Alerts */}
-            {error && (
-              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                <span className="leading-snug">{error}</span>
+              <div>
+                <div className="font-mono text-lg font-black text-focus sm:text-xl">14+</div>
+                <div className="text-[11px] font-medium text-text-secondary">Modules</div>
               </div>
-            )}
-
-            {message && (
-              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
-                <span className="leading-snug">{message}</span>
+              <div>
+                <div className="font-mono text-lg font-black text-green-600 sm:text-xl">&lt; 3s</div>
+                <div className="text-[11px] font-medium text-text-secondary">POD sync</div>
               </div>
-            )}
+            </div>
+          </motion.div>
 
-            {/* Form */}
-            {view === 'login' ? (
-              <form onSubmit={handleLogin} className="space-y-4 text-sm">
-                <div>
-                  <label className="mb-1.5 block font-medium text-text-secondary">Email address</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
-                    <input
-                      type="email"
-                      required
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
-                      placeholder="name@example.com"
-                      className="w-full rounded-control border border-border bg-surface px-3.5 py-3 pl-10 font-mono text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
-                    />
-                  </div>
+          {/* Right Auth Card Section */}
+          <motion.div
+            initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
+            className="flex w-full justify-center"
+          >
+            <div className="w-full max-w-[430px] space-y-3.5 rounded-card border border-border bg-surface p-5 shadow-popover sm:p-6">
+              {/* Card Header */}
+              <div className="text-center space-y-1">
+                <h2 className="text-lg font-bold tracking-tight text-text-primary">Welcome to TruckSaathi</h2>
+                <p className="text-xs text-text-secondary">Sign in with your enterprise Supabase account</p>
+              </div>
+
+              {/* Google Social SSO Button */}
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-control border border-border bg-surface px-3 py-2 text-xs font-semibold text-text-primary transition-colors duration-150 hover:bg-surface-muted"
+              >
+                <span className="flex h-4 w-4 items-center justify-center rounded-full border border-border text-[10px] font-bold text-focus">G</span>
+                <span>Continue with Google</span>
+              </button>
+
+              {/* Divider */}
+              <div className="relative flex items-center justify-center my-0.5">
+                <div className="w-full border-t border-border" />
+                <span className="absolute bg-surface px-2.5 text-[11px] font-medium text-text-muted">
+                  Or sign in with email & password
+                </span>
+              </div>
+
+              {/* Error & Feedback Alerts */}
+              {error && (
+                <div className="p-2.5 rounded-control bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span className="leading-snug text-xs">{error}</span>
                 </div>
+              )}
 
-                <div>
-                  <div className="flex justify-between mb-1.5">
-                    <label className="font-medium text-text-secondary">Password</label>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setView('forgot');
-                        setError(null);
-                        setMessage(null);
-                      }}
-                      className="cursor-pointer text-sm text-focus hover:text-blue-700"
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
-                    <input
-                      type="password"
-                      required={isConfigured}
-                      value={password}
-                      onChange={e => setPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="w-full rounded-control border border-border bg-surface px-3.5 py-3 pl-10 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
-                    />
-                  </div>
+              {message && (
+                <div className="p-2.5 rounded-control bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span className="leading-snug text-xs">{message}</span>
                 </div>
+              )}
 
-                {/* Submit Action Button */}
+              {/* Form */}
+              {view === 'login' ? (
+                <form onSubmit={handleLogin} className="space-y-3 text-xs">
+                  <div>
+                    <label className="mb-1 block font-medium text-text-secondary">Email address</label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-muted" />
+                      <input
+                        type="email"
+                        required
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        placeholder="you@company.com"
+                        className="w-full rounded-control border border-border bg-surface px-3 py-2 pl-9 font-mono text-xs text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <label className="font-medium text-text-secondary">Password</label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setView('forgot');
+                          setError(null);
+                          setMessage(null);
+                        }}
+                        className="cursor-pointer text-[11px] text-focus hover:text-blue-700"
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-muted" />
+                      <input
+                        type="password"
+                        required
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full rounded-control border border-border bg-surface px-3 py-2 pl-9 text-xs text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Submit Action Button */}
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-control bg-brand-orange px-4 py-3.5 text-sm font-semibold text-white transition-colors duration-150 hover:bg-orange-700 disabled:opacity-60"
+                    className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-control bg-brand-orange px-4 py-2.5 text-xs font-semibold text-white transition-colors duration-150 hover:bg-orange-700 disabled:opacity-60"
                   >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Authenticating...</span>
-                    </>
-                  ) : (
-                    <span>
-                      {portalRole === 'driver' ? 'Sign In as Driver' : 'Sign In as Fleet Manager'}
-                    </span>
-                  )}
-                </button>
-              </form>
-            ) : (
-              <form onSubmit={handleResetPassword} className="space-y-4 text-sm">
-                <div>
-                  <label className="mb-1.5 block font-medium text-text-secondary">Email address</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
-                    <input
-                      type="email"
-                      required
-                      value={resetEmail || email}
-                      onChange={e => setResetEmail(e.target.value)}
-                      placeholder="name@example.com"
-                      className="w-full rounded-control border border-border bg-surface px-3.5 py-3 pl-10 font-mono text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-control bg-brand-orange px-4 py-3.5 text-sm font-semibold text-white transition-colors duration-150 hover:bg-orange-700 disabled:opacity-60"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Sending Reset Link...</span>
-                    </>
-                  ) : (
-                    <span>Send Reset Instructions</span>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setView('login');
-                    setError(null);
-                    setMessage(null);
-                  }}
-                  className="block w-full cursor-pointer pt-1 text-center text-sm text-text-secondary hover:text-text-primary"
-                >
-                  Back to Sign In
-                </button>
-              </form>
-            )}
-
-            {/* Bottom Card Footer */}
-            <div className="pt-2 text-center text-sm text-text-secondary">
-              {portalRole === 'driver' ? (
-                <span>
-                  New driver?{' '}
-                  <span className="text-blue-400 font-medium">Contact your dispatch fleet manager</span>
-                </span>
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Verifying credentials...</span>
+                      </>
+                    ) : (
+                      <span>Sign In</span>
+                    )}
+                  </button>
+                </form>
               ) : (
-                <span>
-                  New enterprise fleet?{' '}
-                  <span className="text-blue-400 font-medium">Create an account</span>
-                </span>
-              )}
-            </div>
-          </div>
-        </motion.div>
-      </div>
+                <form onSubmit={handleResetPassword} className="space-y-3 text-xs">
+                  <div>
+                    <label className="mb-1 block font-medium text-text-secondary">Account email address</label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-muted" />
+                      <input
+                        type="email"
+                        required
+                        value={resetEmail || email}
+                        onChange={e => setResetEmail(e.target.value)}
+                        placeholder="you@company.com"
+                        className="w-full rounded-control border border-border bg-surface px-3 py-2 pl-9 font-mono text-xs text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
+                      />
+                    </div>
+                  </div>
 
-      {/* Page Bottom Footer */}
-      <footer className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-4 border-t border-border px-6 py-6 text-sm text-text-muted sm:flex-row lg:px-12">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-control bg-brand-orange px-4 py-2.5 text-xs font-semibold text-white transition-colors duration-150 hover:bg-orange-700 disabled:opacity-60"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Sending Reset Link...</span>
+                      </>
+                    ) : (
+                      <span>Send Reset Instructions</span>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setView('login');
+                      setError(null);
+                      setMessage(null);
+                    }}
+                    className="block w-full cursor-pointer pt-0.5 text-center text-xs text-text-secondary hover:text-text-primary"
+                  >
+                    Back to Sign In
+                  </button>
+                </form>
+              )}
+
+              {/* Bottom Card Helper */}
+              <div className="pt-1 text-center text-[11px] text-text-muted">
+                <span>Role and permissions are automatically assigned from your Supabase profile.</span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </main>
+
+      {/* Page Bottom Slim Footer */}
+      <footer className="relative z-10 mx-auto flex w-full max-w-7xl shrink-0 items-center justify-between border-t border-border px-6 py-2.5 text-[11px] text-text-muted">
         <div>© 2026 TruckSaathi Inc. All rights reserved.</div>
-        <div className="flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-blue-400" />
+        <div className="flex items-center gap-1.5">
+          <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
           <span>Crafted for Indian Logistics & Enterprise Fleets</span>
         </div>
       </footer>

@@ -19,15 +19,104 @@ const sections = [
 ];
 
 export const Sidebar: React.FC<{ collapsed: boolean; setCollapsed: (value: boolean) => void }> = ({ collapsed, setCollapsed }) => {
-  const pathname = usePathname(); const router = useRouter(); const { currentUser, signOut } = useApp(); const isDriver = currentUser?.role === 'Driver';
+  const pathname = usePathname();
+  const router = useRouter();
+  const { currentUser, signOut } = useApp();
+
+  const isDriver = currentUser?.role === 'Driver';
+  const isFleetManager = currentUser?.role === 'Fleet Manager';
   const handleLogout = async () => { await signOut(); router.push('/login'); };
-  const visibleSections = isDriver ? [{ title: 'Driver operations', items: [{ name: 'Driver Field Portal', href: '/driver-portal', icon: Smartphone }] }] : sections;
-  return <aside className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-white/10 bg-brand-navy text-white transition-[width] duration-150 ${collapsed ? 'w-16' : 'w-60'}`}>
-    <div className="flex h-14 items-center justify-between border-b border-white/10 px-3"><Link href={isDriver ? '/driver-portal' : '/dashboard'} className="flex min-w-0 items-center gap-2"><div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-white"><img src="/logo-dark.png" alt="TruckSaathi" className="h-5 w-5 object-contain" /></div>{!collapsed && <span className="truncate text-sm font-bold">TruckSaathi</span>}</Link><button onClick={() => setCollapsed(!collapsed)} className="rounded-control p-1.5 text-white/70 hover:bg-white/10 hover:text-white" aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>{collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}</button></div>
-      <div className="flex h-14 items-center justify-between border-b border-white/10 px-3"><Link href={isDriver ? '/driver-portal' : '/dashboard'} className="flex min-w-0 items-center gap-2"><div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control border border-white/10 bg-surface"><img src="/logo-dark.png" alt="TruckSaathi" className="h-5 w-5 object-contain" /></div>{!collapsed && <span className="truncate text-sm font-bold">TruckSaathi</span>}</Link><button onClick={() => setCollapsed(!collapsed)} className="rounded-control p-1.5 text-white/70 hover:bg-white/10 hover:text-white" aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>{collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}</button></div>
-    <nav className="flex-1 space-y-5 overflow-y-auto px-2 py-5">{visibleSections.map(section => <div key={section.title}><div className={`mb-2 px-2 text-xs font-semibold text-white/50 ${collapsed ? 'sr-only' : ''}`}>{section.title}</div>{section.items.map(item => { const active = pathname === item.href || (item.href !== '/dashboard' && pathname?.startsWith(item.href)); const Icon = item.icon; return <Link key={item.href} href={item.href} title={collapsed ? item.name : undefined} className={`relative mb-1 flex h-9 items-center gap-3 rounded-control px-2.5 text-sm transition-colors duration-150 ${active ? 'bg-brand-orange/20 text-white' : 'text-white/75 hover:bg-white/10 hover:text-white'}`}>{active && <span className="absolute left-0 top-1 bottom-1 w-1 rounded-r bg-brand-orange" />}<Icon className="h-4 w-4 shrink-0" />{!collapsed && <span className="truncate">{item.name}</span>}</Link>; })}</div>)}</nav>
-    <div className="border-t border-white/10 p-3"><div className={`flex items-center gap-2 ${collapsed ? 'justify-center' : ''}`}><div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-xs font-bold">{getInitials(currentUser?.name)}</div>{!collapsed && <div className="min-w-0 flex-1"><p className="truncate text-xs font-semibold">{currentUser?.name || 'Fleet operator'}</p><p className="truncate text-xs text-white/60">{currentUser?.role || 'Admin'}</p></div>}{!collapsed && <button onClick={handleLogout} className="rounded-control p-1.5 text-white/60 hover:bg-white/10 hover:text-white" title="Log out" aria-label="Log out"><LogOut className="h-4 w-4" /></button>}</div></div>
-  </aside>;
+
+  // Role-based sidebar sections: Driver gets Field Portal, Fleet Manager gets Operations/Fleet/Finance, Admin gets all
+  const visibleSections = isDriver
+    ? [{ title: 'Driver operations', items: [{ name: 'Driver Field Portal', href: '/driver-portal', icon: Smartphone }] }]
+    : isFleetManager
+    ? sections.filter(s => s.title !== 'Admin')
+    : sections;
+
+  return (
+    <aside className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-white/10 bg-brand-navy text-white transition-[width] duration-150 ${collapsed ? 'w-16' : 'w-60'}`}>
+      {/* Sidebar Header with single logo & collapse button */}
+      <div className="flex h-14 items-center justify-between border-b border-white/10 px-3">
+        <Link href={isDriver ? '/driver-portal' : '/dashboard'} className="flex min-w-0 items-center gap-2">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-white">
+            <img src="/logo-dark.png" alt="TruckSaathi" className="h-5 w-5 object-contain" />
+          </div>
+          {!collapsed && <span className="truncate text-sm font-bold">TruckSaathi</span>}
+        </Link>
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="rounded-control p-1.5 text-white/70 hover:bg-white/10 hover:text-white"
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+        </button>
+      </div>
+
+      {/* Navigation Links */}
+      <nav className="flex-1 space-y-5 overflow-y-auto px-2 py-5">
+        {visibleSections.map(section => (
+          <div key={section.title}>
+            <div className={`mb-2 px-2 text-xs font-semibold text-white/50 ${collapsed ? 'sr-only' : ''}`}>
+              {section.title}
+            </div>
+            {section.items.map(item => {
+              const active = pathname === item.href || (item.href !== '/dashboard' && pathname?.startsWith(item.href));
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  title={collapsed ? item.name : undefined}
+                  className={`relative mb-1 flex h-9 items-center gap-3 rounded-control px-2.5 text-sm transition-colors duration-150 ${
+                    active ? 'bg-brand-orange/20 text-white' : 'text-white/75 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  {active && <span className="absolute left-0 top-1 bottom-1 w-1 rounded-r bg-brand-orange" />}
+                  <Icon className="h-4 w-4 shrink-0" />
+                  {!collapsed && <span className="truncate">{item.name}</span>}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
+      </nav>
+
+      {/* Footer Profile */}
+      <div className="border-t border-white/10 p-3">
+        <div className={`flex items-center gap-2 ${collapsed ? 'justify-center' : ''}`}>
+          <div
+            className="flex items-center gap-2 min-w-0 flex-1 rounded-control p-1"
+            title={currentUser?.email || currentUser?.name || 'Logged in user'}
+          >
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-orange/20 border border-brand-orange/40 text-xs font-bold text-brand-orange">
+              {getInitials(currentUser?.name)}
+            </div>
+            {!collapsed && (
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xs font-semibold text-white">{currentUser?.name || 'Fleet Operator'}</p>
+                <div className="flex items-center gap-1 text-[11px] text-white/60">
+                  <span className="truncate font-medium">
+                    {currentUser?.role === 'Company Admin' ? 'Admin' : currentUser?.role || 'Admin'}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+          {!collapsed && (
+            <button
+              onClick={handleLogout}
+              className="rounded-control p-1.5 text-white/60 hover:bg-white/10 hover:text-white"
+              title="Log out"
+              aria-label="Log out"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+      </div>
+    </aside>
+  );
 };
 
 const pageTitles: Record<string, string> = { '/dashboard': 'Dashboard', '/trips': 'Trips & Dispatch', '/ai-dispatch': 'AI Smart Dispatch', '/vehicles': 'Vehicles', '/drivers': 'Drivers', '/maintenance': 'Predictive Maintenance', '/fuel': 'Fuel Telemetry', '/expenses': 'Trip Expenses & P&L', '/safety': 'AI Safety Center', '/reports': 'Reports & Exports', '/company': 'Company Profile', '/users': 'User Management', '/roles': 'Roles & Permissions', '/settings': 'System Settings', '/driver-portal': 'Driver Field Portal' };

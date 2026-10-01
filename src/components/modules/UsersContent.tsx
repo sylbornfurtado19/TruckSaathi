@@ -19,12 +19,22 @@ export function UsersContent() {
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState<UserRole>('Fleet Manager');
   const [department, setDepartment] = useState('Operations');
+  const [roleFilter, setRoleFilter] = useState<'All' | 'Admin' | 'Fleet Manager' | 'Driver'>('All');
 
-  const filteredUsers = users.filter(
-    u =>
+  const filteredUsers = users.filter(u => {
+    const matchesSearch =
       u.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.department.toLowerCase().includes(searchTerm.toLowerCase());
+
+    if (!matchesSearch) return false;
+
+    if (roleFilter === 'All') return true;
+    if (roleFilter === 'Admin') return u.role === 'Company Admin' || u.role === 'Super Admin';
+    if (roleFilter === 'Fleet Manager') return u.role === 'Fleet Manager';
+    if (roleFilter === 'Driver') return u.role === 'Driver';
+    return true;
+  });
 
   const handleExportCSV = () => {
     const exportData = filteredUsers.map(u => ({
@@ -37,6 +47,17 @@ export function UsersContent() {
       LastActive: u.lastActive
     }));
     exportToCSV(exportData, `users_export_${new Date().toISOString().slice(0, 10)}`);
+  };
+
+  const handleRoleSelection = (selected: UserRole) => {
+    setRole(selected);
+    if (selected === 'Driver') {
+      setDepartment('Fleet Logistics');
+    } else if (selected === 'Fleet Manager') {
+      setDepartment('Operations');
+    } else if (selected === 'Company Admin' || selected === 'Super Admin') {
+      setDepartment('Executive Administration');
+    }
   };
 
   const handleInviteUser = (e: React.FormEvent) => {
@@ -95,20 +116,40 @@ export function UsersContent() {
         />
       </motion.div>
 
-      {/* 2. Search Toolbar */}
+      {/* 2. Search & Role Filter Toolbar */}
       <motion.div variants={itemVariants}>
-        <Card className="p-4 flex items-center justify-between">
-          <div className="w-full md:w-96 relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              placeholder="Search user name, email, department..."
-              className="w-full rounded-control border border-border bg-surface px-3 py-2 pl-9 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-focus"
-            />
+        <Card className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 flex-1">
+            <div className="w-full sm:w-80 relative">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                placeholder="Search user name, email, department..."
+                className="w-full rounded-control border border-border bg-surface px-3 py-2 pl-9 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-focus"
+              />
+            </div>
+
+            {/* Quick Role Filters */}
+            <div className="flex items-center gap-1 rounded-control border border-border bg-surface-muted p-1 text-xs">
+              {(['All', 'Admin', 'Fleet Manager', 'Driver'] as const).map(tab => (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setRoleFilter(tab)}
+                  className={`rounded-control px-2.5 py-1.5 font-medium transition-colors ${
+                    roleFilter === tab
+                      ? 'bg-brand-orange text-white shadow-sm'
+                      : 'text-text-secondary hover:text-text-primary'
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
           </div>
-          <span className="text-xs font-mono text-slate-400">{filteredUsers.length} Users Provisioned</span>
+          <span className="text-xs font-mono text-slate-400 shrink-0">{filteredUsers.length} Users Provisioned</span>
         </Card>
       </motion.div>
 
@@ -228,17 +269,17 @@ export function UsersContent() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-slate-300 mb-1 font-medium">Platform Role</label>
+              <label className="block text-slate-300 mb-1 font-medium">Platform Role *</label>
               <select
                 value={role}
-                onChange={e => setRole(e.target.value as UserRole)}
+                onChange={e => handleRoleSelection(e.target.value as UserRole)}
                 className="w-full rounded-control border border-border bg-surface px-3 py-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-focus"
               >
-                <option value="Super Admin">Super Admin</option>
-                <option value="Company Admin">Company Admin</option>
+                <option value="Company Admin">Admin (Company Admin)</option>
                 <option value="Fleet Manager">Fleet Manager</option>
-                <option value="Dispatcher">Dispatcher</option>
                 <option value="Driver">Driver</option>
+                <option value="Dispatcher">Dispatcher</option>
+                <option value="Super Admin">Super Admin</option>
               </select>
             </div>
             <div>
@@ -250,6 +291,20 @@ export function UsersContent() {
                 className="w-full rounded-control border border-border bg-surface px-3 py-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-focus"
               />
             </div>
+          </div>
+
+          {/* Role Entitlements Note */}
+          <div className="rounded-control border border-border bg-surface-muted p-2.5 text-xs text-text-secondary">
+            <span className="font-semibold text-text-primary">Role Permissions: </span>
+            {role === 'Company Admin' || role === 'Super Admin' ? (
+              <span>Full control tower access, user provisioning, role matrix config, system and finance management.</span>
+            ) : role === 'Fleet Manager' ? (
+              <span>Vehicles registry, driver assignments, live dispatches, predictive maintenance, and fuel telemetry.</span>
+            ) : role === 'Driver' ? (
+              <span>Mobile Field Portal, active trip navigation, inspection reporting, and proof-of-delivery (POD) uploads.</span>
+            ) : (
+              <span>Dispatch operations and live shipment routing.</span>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 border-t border-border pt-4">

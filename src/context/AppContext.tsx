@@ -28,30 +28,8 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
 import { ensureUserProfile, fetchUserProfile } from '@/lib/services/profileService';
 import { simulationService, INITIAL_SIMULATION_STATE } from '@/lib/services/simulationService';
 
+// Helper for unique IDs
 const createId = (prefix: string) => `${prefix}-${crypto.randomUUID()}`;
-
-// Offline fallback for prototype mode
-export const DEMO_FALLBACK_USER: CurrentUser = {
-  id: 'u-1',
-  userId: 'u-1',
-  name: 'Sylborn Furtado',
-  email: 'sylborn@trucksaathi.in',
-  role: 'Company Admin',
-  companyId: null,
-  companyName: 'Mahindra Logistics India'
-};
-
-export const DEMO_DRIVER_USER: CurrentUser = {
-  id: 'u-5',
-  userId: 'u-5',
-  name: 'Ramesh Kumar',
-  email: 'ramesh.k@trucksaathi.in',
-  role: 'Driver',
-  companyId: null,
-  companyName: 'Mahindra Logistics India',
-  driverId: 'd-1',
-  phone: '+91 98765 43210'
-};
 
 interface AppContextType {
   vehicles: Vehicle[];
@@ -91,7 +69,6 @@ interface AppContextType {
   triggerSOS: (driverName?: string) => void;
   clearSOS: () => void;
   uploadSimulationPOD: (notes?: string) => void;
-  loginAsDemoRole: (role: 'Fleet Manager' | 'Driver', driverId?: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -120,16 +97,10 @@ const AppProviderInner: React.FC<{ children: React.ReactNode }> = ({ children })
   const lastEventRef = useRef<string | null>(null);
 
   // Real Supabase Auth & Application Profile State
+  // Real Supabase Auth & Application Profile State
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<SupabaseUser | null>(null);
-  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(() => {
-    if (typeof window !== 'undefined') {
-      const storedRole = sessionStorage.getItem('trucksaathi_demo_role');
-      if (storedRole === 'Driver') return DEMO_DRIVER_USER;
-      if (storedRole === 'Manager') return DEMO_FALLBACK_USER;
-    }
-    return null;
-  });
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [authLoading, setAuthLoading] = useState<boolean>(true);
 
   // Connect simulationService to AppContext
@@ -206,21 +177,11 @@ const AppProviderInner: React.FC<{ children: React.ReactNode }> = ({ children })
     return null;
   }, [currentUser, drivers]);
 
-  // Sync session and profile from Supabase
+  // Sync session and profile strictly from Supabase
   useEffect(() => {
     let isMounted = true;
 
     if (!isSupabaseConfigured()) {
-      if (typeof window !== 'undefined') {
-        const storedRole = sessionStorage.getItem('trucksaathi_demo_role');
-        if (storedRole === 'Driver') {
-          setCurrentUser(DEMO_DRIVER_USER);
-        } else {
-          setCurrentUser(DEMO_FALLBACK_USER);
-        }
-      } else {
-        setCurrentUser(DEMO_FALLBACK_USER);
-      }
       setAuthLoading(false);
       return;
     }
@@ -239,21 +200,17 @@ const AppProviderInner: React.FC<{ children: React.ReactNode }> = ({ children })
           }
         } else {
           if (isMounted) {
-            const storedRole = sessionStorage.getItem('trucksaathi_demo_role');
-            if (storedRole === 'Driver') {
-              setCurrentUser(DEMO_DRIVER_USER);
-            } else if (storedRole === 'Manager') {
-              setCurrentUser(DEMO_FALLBACK_USER);
-            } else {
-              setCurrentUser(null);
-            }
+            setCurrentUser(null);
           }
         }
         if (isMounted) setAuthLoading(false);
       })
       .catch((err) => {
         console.warn('Failed to retrieve Supabase session:', err);
-        if (isMounted) setAuthLoading(false);
+        if (isMounted) {
+          setCurrentUser(null);
+          setAuthLoading(false);
+        }
       });
 
     const {
@@ -270,14 +227,7 @@ const AppProviderInner: React.FC<{ children: React.ReactNode }> = ({ children })
         }
       } else {
         if (isMounted) {
-          const storedRole = sessionStorage.getItem('trucksaathi_demo_role');
-          if (storedRole === 'Driver') {
-            setCurrentUser(DEMO_DRIVER_USER);
-          } else if (storedRole === 'Manager') {
-            setCurrentUser(DEMO_FALLBACK_USER);
-          } else {
-            setCurrentUser(null);
-          }
+          setCurrentUser(null);
         }
       }
       if (isMounted) setAuthLoading(false);
@@ -299,9 +249,6 @@ const AppProviderInner: React.FC<{ children: React.ReactNode }> = ({ children })
 
   const signOut = async () => {
     try {
-      if (typeof window !== 'undefined') {
-        sessionStorage.removeItem('trucksaathi_demo_role');
-      }
       if (isSupabaseConfigured()) {
         await supabase.auth.signOut();
       }
@@ -311,21 +258,6 @@ const AppProviderInner: React.FC<{ children: React.ReactNode }> = ({ children })
       setSession(null);
       setUser(null);
       setCurrentUser(null);
-    }
-  };
-
-  const loginAsDemoRole = (role: 'Fleet Manager' | 'Driver', driverId?: string) => {
-    if (typeof window !== 'undefined') {
-      if (role === 'Driver') {
-        sessionStorage.setItem('trucksaathi_demo_role', 'Driver');
-        const driverUser = driverId
-          ? { ...DEMO_DRIVER_USER, driverId }
-          : DEMO_DRIVER_USER;
-        setCurrentUser(driverUser);
-      } else {
-        sessionStorage.setItem('trucksaathi_demo_role', 'Manager');
-        setCurrentUser(DEMO_FALLBACK_USER);
-      }
     }
   };
 
@@ -459,8 +391,7 @@ const AppProviderInner: React.FC<{ children: React.ReactNode }> = ({ children })
         setSimulationSpeed: (m) => simulationService.setSpeed(m),
         triggerSOS: (name) => simulationService.triggerSOS(name),
         clearSOS: () => simulationService.clearSOS(),
-        uploadSimulationPOD: (notes) => simulationService.uploadPOD(notes),
-        loginAsDemoRole
+        uploadSimulationPOD: (notes) => simulationService.uploadPOD(notes)
       }}
     >
       {children}
