@@ -104,66 +104,89 @@ export function GoogleFleetMap({
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  // 1. Initialize Google Maps once
+  // 1. Initialize Google Maps
   useEffect(() => {
     let isCancelled = false;
 
-    try {
-      setOptions({
-        key: GOOGLE_MAPS_API_KEY,
-        v: 'weekly'
+    const setupMap = () => {
+      if (isCancelled || !containerRef.current || !window.google?.maps) return;
+
+      const mapInstance = new window.google.maps.Map(containerRef.current, {
+        center,
+        zoom,
+        styles: DARK_MAP_STYLE,
+        disableDefaultUI: false,
+        zoomControl: true,
+        mapTypeControl: false,
+        scaleControl: true,
+        streetViewControl: false,
+        rotateControl: false,
+        fullscreenControl: true,
+        backgroundColor: '#0b111e'
       });
-    } catch {
-      // Options may have already been set
-    }
 
-    Promise.all([
-      importLibrary('maps'),
-      importLibrary('places')
-    ])
-      .then(() => {
-        if (isCancelled || !containerRef.current || !window.google) return;
+      mapRef.current = mapInstance;
+      infoWindowRef.current = new window.google.maps.InfoWindow();
 
-        const mapInstance = new window.google.maps.Map(containerRef.current, {
-          center,
-          zoom,
-          styles: DARK_MAP_STYLE,
-          disableDefaultUI: false,
-          zoomControl: true,
-          mapTypeControl: false,
-          scaleControl: true,
-          streetViewControl: false,
-          rotateControl: false,
-          fullscreenControl: true,
-          backgroundColor: '#0b111e'
+      // Draw NH-48 Expressway corridor polyline
+      if (showCorridor) {
+        const path = CORRIDOR_WAYPOINTS.map((pt) => ({ lat: pt.lat, lng: pt.lng }));
+        const polyline = new window.google.maps.Polyline({
+          path,
+          geodesic: true,
+          strokeColor: '#06b6d4',
+          strokeOpacity: 0.8,
+          strokeWeight: 3.5,
+          map: mapInstance
         });
+        polylineRef.current = polyline;
+      }
 
-        mapRef.current = mapInstance;
-        infoWindowRef.current = new window.google.maps.InfoWindow();
-
-        // Draw NH-48 Expressway corridor polyline
-        if (showCorridor) {
-          const path = CORRIDOR_WAYPOINTS.map((pt) => ({ lat: pt.lat, lng: pt.lng }));
-          const polyline = new window.google.maps.Polyline({
-            path,
-            geodesic: true,
-            strokeColor: '#06b6d4',
-            strokeOpacity: 0.8,
-            strokeWeight: 3.5,
-            map: mapInstance
-          });
-          polylineRef.current = polyline;
+      // Auto-fit bounds to show all active vehicles on map
+      if (vehicles.length > 1 && !selectedVehicleId) {
+        const bounds = new window.google.maps.LatLngBounds();
+        let validPoints = 0;
+        vehicles.forEach((v) => {
+          if (v.lastKnownLocation) {
+            bounds.extend(new window.google.maps.LatLng(v.lastKnownLocation.lat, v.lastKnownLocation.lng));
+            validPoints++;
+          }
+        });
+        if (validPoints > 1) {
+          mapInstance.fitBounds(bounds, 40);
         }
+      }
 
-        setLoading(false);
-      })
-      .catch((err: unknown) => {
-        if (!isCancelled) {
-          console.error('Google Maps Load Error:', err);
-          setLoadError(err instanceof Error ? err.message : 'Failed to load Google Maps SDK');
-          setLoading(false);
-        }
-      });
+      setLoading(false);
+    };
+
+    if (window.google?.maps) {
+      setupMap();
+    } else {
+      try {
+        setOptions({
+          key: GOOGLE_MAPS_API_KEY,
+          v: 'weekly'
+        });
+      } catch {
+        // Options may have already been set
+      }
+
+      Promise.all([
+        importLibrary('maps'),
+        importLibrary('places')
+      ])
+        .then(() => {
+          setupMap();
+        })
+        .catch((err: unknown) => {
+          if (!isCancelled) {
+            console.error('Google Maps Load Error:', err);
+            setLoadError(err instanceof Error ? err.message : 'Failed to load Google Maps SDK');
+            setLoading(false);
+          }
+        });
+    }
 
     return () => {
       isCancelled = true;
@@ -295,7 +318,11 @@ export function GoogleFleetMap({
           </span>
         </div>
       )}
-      <div ref={containerRef} className="h-full min-h-[380px] w-full rounded-xl" />
+      <div
+        ref={containerRef}
+        className="h-full min-h-[380px] w-full rounded-xl overflow-hidden"
+        style={{ width: '100%', height: '100%', minHeight: '380px' }}
+      />
     </div>
   );
 }
