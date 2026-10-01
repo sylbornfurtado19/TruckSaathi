@@ -18,6 +18,7 @@ import {
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
 import { useApp } from '@/context/AppContext';
 import { ensureUserProfile } from '@/lib/services/profileService';
+import { getAuthCallbackUrl, getSiteUrl, sanitizeRedirectPath } from '@/lib/auth/url';
 
 export function LoginContent() {
   const router = useRouter();
@@ -36,6 +37,18 @@ export function LoginContent() {
 
   const isConfigured = isSupabaseConfigured();
 
+  // Listen for query error or message parameters (e.g. from callback or reset flow)
+  useEffect(() => {
+    const errorParam = searchParams.get('error');
+    const msgParam = searchParams.get('message');
+    if (errorParam) {
+      setError(decodeURIComponent(errorParam));
+    }
+    if (msgParam) {
+      setMessage(decodeURIComponent(msgParam));
+    }
+  }, [searchParams]);
+
   // If already authenticated, redirect to the appropriate destination
   useEffect(() => {
     if (!authLoading && session && currentUser) {
@@ -43,7 +56,7 @@ export function LoginContent() {
       if (currentUser.role === 'Driver') {
         router.replace('/driver-portal');
       } else if (redirectParam && redirectParam.startsWith('/') && redirectParam !== '/driver-portal') {
-        router.replace(redirectParam);
+        router.replace(sanitizeRedirectPath(redirectParam, '/dashboard'));
       } else {
         router.replace('/dashboard');
       }
@@ -102,7 +115,7 @@ export function LoginContent() {
         if (profile.role === 'Driver') {
           router.push('/driver-portal');
         } else if (redirectParam && redirectParam.startsWith('/') && redirectParam !== '/driver-portal') {
-          router.push(redirectParam);
+          router.push(sanitizeRedirectPath(redirectParam, '/dashboard'));
         } else {
           router.push('/dashboard');
         }
@@ -125,10 +138,13 @@ export function LoginContent() {
     }
 
     try {
+      const targetDestination = searchParams.get('redirect') || (portalRole === 'driver' ? '/driver-portal' : '/dashboard');
+      const callbackUrl = getAuthCallbackUrl(targetDestination);
+
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : undefined
+          redirectTo: callbackUrl
         }
       });
       if (oauthError) setError(oauthError.message);
@@ -154,7 +170,10 @@ export function LoginContent() {
 
     try {
       const targetEmail = resetEmail.trim() || email.trim();
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(targetEmail);
+      const resetRedirectUrl = `${getSiteUrl()}/login?message=${encodeURIComponent('Password reset email verified. Please sign in with your credentials.')}`;
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(targetEmail, {
+        redirectTo: resetRedirectUrl
+      });
 
       if (resetError) {
         setError(resetError.message);
