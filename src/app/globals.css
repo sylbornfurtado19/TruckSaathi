@@ -62,6 +62,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   top: 4px !important;
   right: 4px !important;
 }
+/* Inverted Dark Ops filter for Standard OpenStreetMap tiles */
+.osm-dark-tiles {
+  filter: invert(100%) hue-rotate(180deg) brightness(88%) contrast(92%);
+}
 .route-line-divider { height: 1px; background: var(--border-default); }
 
 /* Legacy module utility compatibility: keep older screens dark while their data markup is preserved. */

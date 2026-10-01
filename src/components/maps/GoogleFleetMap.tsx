@@ -4,7 +4,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
 import { CORRIDOR_WAYPOINTS } from '@/lib/services/simulationService';
 import { Vehicle } from '@/types';
-import { Radio, AlertTriangle } from 'lucide-react';
+import { Radio, AlertTriangle, ExternalLink, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { OsmFleetFallback } from './OsmFleetFallback';
 
 const GOOGLE_MAPS_API_KEY =
   process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyAOVYRIgupAurZup5y1PRh8Ismb1A3lLao';
@@ -102,11 +103,27 @@ export function GoogleFleetMap({
   const polylineRef = useRef<google.maps.Polyline | null>(null);
 
   const [loading, setLoading] = useState(true);
+  const [authFailed, setAuthFailed] = useState(false);
+  const [activeEngine, setActiveEngine] = useState<'google' | 'osm'>('google');
   const [loadError, setLoadError] = useState<string | null>(null);
+
+  // Global listener for Google Maps authentication failures (e.g. ApiNotActivatedMapError)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).gm_authFailure = () => {
+        console.warn('Google Maps Authentication Notice: Maps JavaScript API is not activated for this API key.');
+        setAuthFailed(true);
+        setActiveEngine('osm');
+        setLoading(false);
+      };
+    }
+  }, []);
 
   // 1. Initialize Google Maps
   useEffect(() => {
     let isCancelled = false;
+    if (activeEngine === 'osm') return;
 
     const setupMap = () => {
       if (isCancelled || !containerRef.current || !window.google?.maps) return;
@@ -183,6 +200,8 @@ export function GoogleFleetMap({
           if (!isCancelled) {
             console.error('Google Maps Load Error:', err);
             setLoadError(err instanceof Error ? err.message : 'Failed to load Google Maps SDK');
+            setAuthFailed(true);
+            setActiveEngine('osm');
             setLoading(false);
           }
         });
@@ -197,10 +216,11 @@ export function GoogleFleetMap({
       markersMapRef.current.clear();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [activeEngine]);
 
   // 2. Synchronize Vehicle Markers with Realtime Telemetry
   useEffect(() => {
+    if (activeEngine !== 'google') return;
     const map = mapRef.current;
     if (!map || typeof window === 'undefined' || !window.google) return;
 
@@ -238,7 +258,6 @@ export function GoogleFleetMap({
       const position = new window.google.maps.LatLng(loc.lat, loc.lng);
 
       if (existingMarker) {
-        // Animate position smoothly without recreating marker
         existingMarker.setPosition(position);
         existingMarker.setIcon(pinSvg);
       } else {
@@ -281,10 +300,11 @@ export function GoogleFleetMap({
         currentMarkers.set(vehicle.id, newMarker);
       }
     });
-  }, [vehicles, onSelectVehicle]);
+  }, [vehicles, onSelectVehicle, activeEngine]);
 
   // 3. Pan to selected vehicle if changed
   useEffect(() => {
+    if (activeEngine !== 'google') return;
     if (!selectedVehicleId || !mapRef.current) return;
     const target = vehicles.find((v) => v.id === selectedVehicleId);
     if (target?.lastKnownLocation) {
@@ -294,16 +314,53 @@ export function GoogleFleetMap({
       });
       mapRef.current.setZoom(8);
     }
-  }, [selectedVehicleId, vehicles]);
+  }, [selectedVehicleId, vehicles, activeEngine]);
 
-  if (loadError) {
+  // If in OpenStreetMap fallback mode (due to ApiNotActivated or manual toggle)
+  if (activeEngine === 'osm' || authFailed) {
     return (
-      <div className="flex h-[420px] w-full flex-col items-center justify-center gap-3 rounded-xl border border-rose-500/30 bg-rose-950/20 p-6 text-center text-rose-300">
-        <AlertTriangle className="h-8 w-8 text-rose-400" />
-        <div>
-          <h4 className="font-bold text-sm">Google Maps SDK Initialization</h4>
-          <p className="text-xs text-rose-200/80 mt-1 max-w-sm">{loadError}</p>
+      <div className={`relative h-full min-h-[380px] w-full bg-[#0b111e] ${className}`}>
+        {/* Diagnostic Banner explaining Google Cloud activation */}
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-500/30 bg-amber-950/40 px-3.5 py-2 backdrop-blur-md">
+          <div className="flex items-center gap-2 text-xs text-amber-200">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-amber-400" />
+            <span>
+              <strong>Google Maps Activation Required:</strong> {loadError ? `${loadError}. ` : ''}Enable &quot;Maps JavaScript API&quot; in Google Cloud Console for key <code className="bg-black/50 px-1 py-0.5 rounded font-mono text-[10px] text-amber-300">AIzaSy...Lao</code>.
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <a
+              href="https://console.cloud.google.com/apis/library/maps-backend.googleapis.com"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 rounded bg-amber-500 hover:bg-amber-400 text-black px-2.5 py-1 font-bold text-[11px] transition shadow-xs"
+            >
+              <ExternalLink className="h-3 w-3" />
+              Enable API (1-Click)
+            </a>
+            <button
+              type="button"
+              onClick={() => {
+                setAuthFailed(false);
+                setActiveEngine('google');
+                setLoading(true);
+              }}
+              className="inline-flex items-center gap-1 rounded border border-border bg-surface-muted hover:bg-surface px-2.5 py-1 text-[11px] font-medium text-text-primary transition"
+            >
+              <RefreshCw className="h-3 w-3 text-cyan-400" />
+              Retry Google Maps
+            </button>
+          </div>
         </div>
+
+        {/* Live Fallback Map: Standard OSM (Free, active, zero watermarks, zero API key) */}
+        <OsmFleetFallback
+          vehicles={vehicles}
+          selectedVehicleId={selectedVehicleId}
+          onSelectVehicle={onSelectVehicle}
+          zoom={zoom}
+          center={center}
+        />
       </div>
     );
   }
@@ -318,6 +375,22 @@ export function GoogleFleetMap({
           </span>
         </div>
       )}
+
+      {/* Engine Switcher bar */}
+      <div className="absolute top-3 right-3 z-[400] flex items-center gap-1.5 rounded-lg border border-border/80 bg-canvas/90 px-2 py-1 shadow-lg backdrop-blur-md text-[11px]">
+        <span className="inline-flex items-center gap-1 text-emerald-400 font-medium">
+          <CheckCircle2 className="h-3 w-3" />
+          Google Maps
+        </span>
+        <button
+          type="button"
+          onClick={() => setActiveEngine('osm')}
+          className="text-text-muted hover:text-text-primary text-[10px] underline ml-1"
+        >
+          OSM Mode
+        </button>
+      </div>
+
       <div
         ref={containerRef}
         className="h-full min-h-[380px] w-full rounded-xl overflow-hidden"
