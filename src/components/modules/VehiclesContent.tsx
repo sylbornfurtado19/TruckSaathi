@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Truck,
   Plus,
@@ -14,7 +14,13 @@ import {
   Download,
   Trash2,
   Eye,
-  Scale
+  Scale,
+  Fuel,
+  Activity,
+  MapPin,
+  Clock,
+  ArrowRight,
+  Wrench
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
@@ -22,19 +28,27 @@ import { Vehicle } from '@/types';
 import {
   PageHeader,
   Card,
+  Panel,
   Button,
   Badge,
   AnimatedPage,
   Modal,
   Drawer,
   EmptyState,
-  KPICard,
+  KpiStrip,
+  StatusPill,
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
   itemVariants
 } from '@/components/ui';
 import { exportToCSV } from '@/lib/csvExport';
 
 export function VehiclesContent() {
-  const { vehicles, addVehicle, deleteVehicle } = useApp();
+  const { vehicles, addVehicle, deleteVehicle, fuelLogs } = useApp();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('All');
@@ -58,15 +72,24 @@ export function VehiclesContent() {
   const expiringDocs = vehicles.filter(v => v.docStatus === 'Expiring Soon' || v.docStatus === 'Expired').length;
   const totalCapacityTons = vehicles.reduce((sum, v) => sum + (v.capacityTons || 0), 0);
 
-  const filteredVehicles = vehicles.filter(v => {
-    const matchesSearch =
-      v.regNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.model.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCat = categoryFilter === 'All' || v.category === categoryFilter;
-    const matchesDoc = docFilter === 'All' || v.docStatus === docFilter;
-    return matchesSearch && matchesCat && matchesDoc;
-  });
+  const filteredVehicles = useMemo(() => {
+    return vehicles.filter(v => {
+      const matchesSearch =
+        v.regNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        v.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        v.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (v.assignedDriver && v.assignedDriver.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchesCat = categoryFilter === 'All' || v.category === categoryFilter;
+      const matchesDoc = docFilter === 'All' || v.docStatus === docFilter;
+      return matchesSearch && matchesCat && matchesDoc;
+    });
+  }, [vehicles, searchTerm, categoryFilter, docFilter]);
+
+  // Helper to get fuel level for vehicle
+  const getVehicleFuel = (reg: string) => {
+    const log = fuelLogs.find(f => f.vehicleReg === reg);
+    return log ? log.fuelLevelPercent : 68;
+  };
 
   const handleExportCSV = () => {
     const exportData = filteredVehicles.map(v => ({
@@ -98,16 +121,30 @@ export function VehiclesContent() {
       assignedDriver: assignedDriver.trim() || 'Unassigned',
       docStatus: 'Compliant',
       maintenanceStatus: 'In Service',
-      chassisNumber: chassisNumber.trim() || 'MAT' + Math.floor(Math.random() * 10000000),
-      engineNumber: engineNumber.trim() || 'ENG' + Math.floor(Math.random() * 10000000),
+      chassisNumber: chassisNumber.toUpperCase().trim() || `MAT-${Math.floor(100000 + Math.random() * 900000)}`,
+      engineNumber: engineNumber.toUpperCase().trim() || `ENG-${Math.floor(100000 + Math.random() * 900000)}`,
       rcExpiry: '2028-12-31',
-      insuranceExpiry: '2027-10-15',
-      fitnessExpiry: '2027-08-20'
+      insuranceExpiry: '2027-06-30',
+      fitnessExpiry: '2028-04-15',
+      lastKnownLocation: {
+        lat: 19.076,
+        lng: 72.8777,
+        city: 'Mumbai Hub'
+      },
+      componentHealth: {
+        brakes: 90,
+        battery: 95,
+        engine: 92,
+        tyres: 88,
+        lastServiceDate: '2026-06-15',
+        predictedNextServiceDate: '2026-12-15'
+      }
     });
 
     setIsModalOpen(false);
     setRegNumber('');
     setModel('');
+    setCapacityTons(25);
     setChassisNumber('');
     setEngineNumber('');
     setAssignedDriver('Unassigned');
@@ -115,17 +152,17 @@ export function VehiclesContent() {
 
   return (
     <AnimatedPage>
-      {/* 1. Page Header */}
+      {/* 1. Header */}
       <motion.div variants={itemVariants}>
         <PageHeader
           badge={
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-muted px-2.5 py-1 text-xs font-medium text-text-secondary">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-0.5 font-mono text-[11px] font-bold text-cyan-300">
               <Truck className="w-3.5 h-3.5" />
-              Fleet Registry
+              FLEET INVENTORY
             </span>
           }
-          title="Vehicle Asset Registry"
-          description="Commercial fleet asset database, payload specifications, maintenance status, and government compliance vault."
+          title="Commercial Transport Asset Registry"
+          description="Live telematics state, Parivahan document compliance, payload metrics, and OBD-II health diagnostics."
           actions={
             <div className="flex items-center gap-2">
               <Button
@@ -149,64 +186,66 @@ export function VehiclesContent() {
         />
       </motion.div>
 
-      {/* 2. Quick Fleet Stats Strip */}
-      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KPICard
-          title="Registered Commercial Assets"
-          value={totalVehicles}
-          subtext="Total GPS-monitored fleet"
-          icon={<Truck className="w-4 h-4 text-blue-400" />}
-          iconBg="bg-blue-600/15 border border-blue-500/30 text-blue-400"
-        />
-        <KPICard
-          title="In-Service Units"
-          value={inServiceVehicles}
-          subtext={`${Math.round((inServiceVehicles / (totalVehicles || 1)) * 100)}% active duty readiness`}
-          trend={{ value: `${inServiceVehicles} ready`, isPositive: true }}
-          icon={<CheckCircle2 className="w-4 h-4 text-emerald-400" />}
-          iconBg="bg-emerald-600/15 border border-emerald-500/30 text-emerald-400"
-        />
-        <KPICard
-          title="Total Payload Capacity"
-          value={`${totalCapacityTons} T`}
-          subtext="Aggregate fleet cargo capacity"
-          icon={<Scale className="w-4 h-4 text-cyan-400" />}
-          iconBg="bg-cyan-600/15 border border-cyan-500/30 text-cyan-400"
-        />
-        <KPICard
-          title="Compliance & Audit Alerts"
-          value={expiringDocs}
-          subtext="RC, Insurance or Fitness renewals"
-          trend={expiringDocs > 0 ? { value: `${expiringDocs} action items`, isPositive: false } : { value: "Fully compliant", isPositive: true }}
-          icon={<AlertTriangle className="w-4 h-4 text-amber-400" />}
-          iconBg="bg-amber-600/15 border border-amber-500/30 text-amber-400"
+      {/* 2. Refined KPI Strip */}
+      <motion.div variants={itemVariants}>
+        <KpiStrip
+          items={[
+            {
+              label: 'REGISTERED ASSETS',
+              value: totalVehicles,
+              subtext: 'GPS-monitored commercial units',
+              icon: <Truck className="h-4 w-4 text-cyan-400" />,
+              status: 'cyan'
+            },
+            {
+              label: 'IN-SERVICE READINESS',
+              value: inServiceVehicles,
+              subtext: `${Math.round((inServiceVehicles / Math.max(totalVehicles, 1)) * 100)}% active duty readiness`,
+              icon: <CheckCircle2 className="h-4 w-4 text-emerald-400" />,
+              status: 'success'
+            },
+            {
+              label: 'FLEET PAYLOAD CAPACITY',
+              value: `${totalCapacityTons} T`,
+              subtext: 'Aggregate hauling capacity',
+              icon: <Scale className="h-4 w-4 text-sky-400" />,
+              status: 'info'
+            },
+            {
+              label: 'COMPLIANCE AUDIT ALERTS',
+              value: expiringDocs,
+              subtext: expiringDocs > 0 ? `${expiringDocs} renewals required` : 'All documents compliant',
+              icon: <AlertTriangle className="h-4 w-4 text-amber-400" />,
+              status: expiringDocs > 0 ? 'warning' : 'success'
+            }
+          ]}
         />
       </motion.div>
 
       {/* 3. Filter & Search Toolbar */}
       <motion.div variants={itemVariants}>
-        <Card className="p-4 flex flex-col md:flex-row gap-3 items-center justify-between">
+        <div className="flex flex-col md:flex-row gap-3 items-center justify-between rounded-xl border border-border bg-surface p-3 shadow-xs">
           <div className="w-full md:w-96 relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="h-3.5 w-3.5 text-text-muted absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               placeholder="Search registration, make, model, driver..."
-              className="w-full rounded-control border border-border bg-surface px-3 py-2 pl-9 text-sm text-text-primary placeholder:text-text-muted"
+              className="w-full rounded-lg border border-border bg-canvas px-3 py-1.5 pl-9 text-xs text-text-primary placeholder:text-text-muted transition-colors focus:border-cyan-500 focus:outline-hidden"
             />
           </div>
 
-          <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-            <div className="flex items-center gap-1.5 text-xs text-slate-400 shrink-0">
-              <Filter className="w-3.5 h-3.5 text-blue-400" />
-              <span>Filters:</span>
+          <div className="flex items-center gap-2.5 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+            <div className="flex items-center gap-1.5 text-xs text-text-muted shrink-0">
+              <Filter className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Filter:</span>
             </div>
 
             <select
               value={categoryFilter}
               onChange={e => setCategoryFilter(e.target.value)}
-              className="rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
+              className="rounded-lg border border-border bg-canvas px-2.5 py-1 text-xs text-text-primary focus:border-cyan-500 focus:outline-hidden"
             >
               <option value="All">All Categories</option>
               <option value="Container">Container</option>
@@ -220,7 +259,7 @@ export function VehiclesContent() {
             <select
               value={docFilter}
               onChange={e => setDocFilter(e.target.value)}
-              className="rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
+              className="rounded-lg border border-border bg-canvas px-2.5 py-1 text-xs text-text-primary focus:border-cyan-500 focus:outline-hidden"
             >
               <option value="All">All Compliance States</option>
               <option value="Compliant">Compliant</option>
@@ -228,140 +267,227 @@ export function VehiclesContent() {
               <option value="Expired">Expired</option>
             </select>
           </div>
-        </Card>
+        </div>
       </motion.div>
 
-      {/* 4. Enterprise Data Table */}
-      <motion.div variants={itemVariants} className="overflow-hidden rounded-card border border-border bg-surface">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="sticky top-0 border-b border-border bg-surface-muted text-xs font-semibold text-text-secondary">
-                <th className="py-3.5 px-4 font-mono">Registration Plate</th>
-                <th className="py-3.5 px-4">Category</th>
-                <th className="py-3.5 px-4">Make & Model</th>
-                <th className="py-3.5 px-4 font-mono">Capacity</th>
-                <th className="py-3.5 px-4">Assigned Driver</th>
-                <th className="py-3.5 px-4">Document Status</th>
-                <th className="py-3.5 px-4">Maintenance</th>
-                <th className="py-3.5 px-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border text-text-primary">
-              {filteredVehicles.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="py-12">
-                    <EmptyState
-                      icon={<Truck className="w-8 h-8 text-slate-500" />}
-                      title="No Commercial Vehicles Found"
-                      description="No vehicles match your active search terms or category filters."
-                      action={
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => {
-                            setSearchTerm('');
-                            setCategoryFilter('All');
-                            setDocFilter('All');
-                          }}
-                        >
-                          Clear All Filters
-                        </Button>
-                      }
-                    />
-                  </td>
-                </tr>
-              ) : (
-                filteredVehicles.map(vehicle => (
-                  <tr
+      {/* 4. MODERN TABLE / LIST HYBRID:
+             DESKTOP: Modern Table
+             SMALLER SCREENS: Stacked Vehicle Command Cards
+      */}
+      <motion.div variants={itemVariants}>
+        {filteredVehicles.length === 0 ? (
+          <div className="rounded-xl border border-border bg-surface p-12 text-center">
+            <EmptyState
+              icon={<Truck className="w-8 h-8 text-text-muted" />}
+              title="No Commercial Vehicles Found"
+              description="No vehicles match your active search terms or category filters."
+              action={
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    setSearchTerm('');
+                    setCategoryFilter('All');
+                    setDocFilter('All');
+                  }}
+                >
+                  Clear All Filters
+                </Button>
+              }
+            />
+          </div>
+        ) : (
+          <>
+            {/* DESKTOP VIEW: CLEAN STREAMLINED TABLE */}
+            <div className="hidden md:block overflow-x-auto rounded-xl border border-border bg-surface shadow-xs">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="font-mono">Registration</TableHead>
+                    <TableHead>Type & Specs</TableHead>
+                    <TableHead>Assigned Driver</TableHead>
+                    <TableHead>Current Location</TableHead>
+                    <TableHead>Operating Status</TableHead>
+                    <TableHead>Fuel Level</TableHead>
+                    <TableHead>Component Health</TableHead>
+                    <TableHead>Last Telemetry</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredVehicles.map((vehicle, index) => {
+                    const fuel = getVehicleFuel(vehicle.regNumber);
+                    const health = vehicle.componentHealth?.engine || 92;
+                    const minsAgo = 3 + (index * 4) % 30;
+
+                    return (
+                      <TableRow
+                        key={vehicle.id}
+                        onClick={() => setSelectedVehicle(vehicle)}
+                        className="cursor-pointer hover:bg-surface-muted/50"
+                      >
+                        <TableCell className="font-mono font-bold text-text-primary text-xs">
+                          <span className="rounded border border-cyan-500/30 bg-cyan-500/10 px-2 py-0.5 text-cyan-300">
+                            {vehicle.regNumber}
+                          </span>
+                        </TableCell>
+
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="neutral">{vehicle.category}</Badge>
+                            <span className="text-xs text-text-secondary truncate max-w-36">
+                              {vehicle.make}
+                            </span>
+                          </div>
+                        </TableCell>
+
+                        <TableCell>
+                          <span className="text-xs font-medium text-text-primary">
+                            {vehicle.assignedDriver || 'Standby Pool'}
+                          </span>
+                        </TableCell>
+
+                        <TableCell>
+                          <span className="text-xs text-text-secondary flex items-center gap-1">
+                            <MapPin className="h-3 w-3 text-text-muted" />
+                            {vehicle.lastKnownLocation?.city || 'Transit Corridor'}
+                          </span>
+                        </TableCell>
+
+                        <TableCell>
+                          <StatusPill
+                            status={
+                              vehicle.maintenanceStatus === 'In Service'
+                                ? 'success'
+                                : vehicle.maintenanceStatus === 'Scheduled Service'
+                                ? 'warning'
+                                : 'danger'
+                            }
+                          >
+                            {vehicle.maintenanceStatus}
+                          </StatusPill>
+                        </TableCell>
+
+                        <TableCell>
+                          <div className="flex items-center gap-2 min-w-24">
+                            <div className="h-1.5 w-14 bg-surface-muted rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full ${fuel < 25 ? 'bg-rose-500' : 'bg-cyan-400'}`}
+                                style={{ width: `${fuel}%` }}
+                              />
+                            </div>
+                            <span className="font-mono text-xs text-text-secondary">{fuel}%</span>
+                          </div>
+                        </TableCell>
+
+                        <TableCell>
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-mono text-xs font-bold text-emerald-400">
+                              {health}%
+                            </span>
+                            <span className="text-[10px] text-text-muted">Nominal</span>
+                          </div>
+                        </TableCell>
+
+                        <TableCell>
+                          <span className="font-mono text-xs text-text-muted">
+                            {minsAgo}m ago
+                          </span>
+                        </TableCell>
+
+                        <TableCell className="text-right">
+                          <div
+                            className="flex items-center justify-end gap-1"
+                            onClick={e => e.stopPropagation()}
+                          >
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              icon={<Eye className="w-3.5 h-3.5 text-text-muted hover:text-cyan-400" />}
+                              onClick={() => setSelectedVehicle(vehicle)}
+                              title="Inspect Asset"
+                            />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              icon={<Trash2 className="w-3.5 h-3.5 text-text-muted hover:text-rose-400" />}
+                              onClick={() => deleteVehicle(vehicle.id)}
+                              title="Delete Asset"
+                            />
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* MOBILE & TABLET VIEW: RESPONSIVE STACKED CARDS */}
+            <div className="block md:hidden space-y-3">
+              {filteredVehicles.map((vehicle, index) => {
+                const fuel = getVehicleFuel(vehicle.regNumber);
+                const health = vehicle.componentHealth?.engine || 92;
+                const minsAgo = 3 + (index * 4) % 30;
+
+                return (
+                  <div
                     key={vehicle.id}
                     onClick={() => setSelectedVehicle(vehicle)}
-                    className="cursor-pointer transition-colors hover:bg-surface-muted group"
+                    className="rounded-xl border border-border bg-surface p-4 space-y-3 hover:border-cyan-500/50 cursor-pointer transition-colors shadow-xs"
                   >
-                    <td className="py-3.5 px-4 font-mono font-bold text-slate-100">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
-                        <span className="rounded-control border border-border bg-surface-muted px-2.5 py-1 font-mono text-xs text-focus transition-colors">
-                          {vehicle.regNumber}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="py-3.5 px-4 text-slate-300 font-medium">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono font-bold text-sm text-cyan-300">
+                        {vehicle.regNumber}
+                      </span>
+                      <StatusPill
+                        status={
+                          vehicle.maintenanceStatus === 'In Service'
+                            ? 'success'
+                            : vehicle.maintenanceStatus === 'Scheduled Service'
+                            ? 'warning'
+                            : 'danger'
+                        }
+                      >
+                        {vehicle.maintenanceStatus}
+                      </StatusPill>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-xs text-text-secondary">
                       <Badge variant="neutral">{vehicle.category}</Badge>
-                    </td>
-                    <td className="py-3.5 px-4 text-slate-300">
-                      <div className="font-semibold text-slate-100">{vehicle.make}</div>
-                      <div className="text-xs text-text-secondary">{vehicle.model}</div>
-                    </td>
-                    <td className="py-3.5 px-4 font-mono text-slate-300">
-                      <span className="font-bold text-slate-100">{vehicle.capacityTons}</span> Tons
-                    </td>
-                    <td className="py-3.5 px-4">
-                      {vehicle.assignedDriver === 'Unassigned' || !vehicle.assignedDriver ? (
-                        <Badge variant="neutral">Unassigned</Badge>
-                      ) : (
-                        <span className="text-slate-200 font-medium flex items-center gap-1.5">
-                          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-surface-muted text-xs font-bold text-brand-navy">
-                            {vehicle.assignedDriver.charAt(0)}
-                          </span>
-                          {vehicle.assignedDriver}
+                      <span>{vehicle.make} {vehicle.model}</span>
+                      <span>•</span>
+                      <span>{vehicle.capacityTons} T</span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-xs border-y border-border/60 py-2.5">
+                      <div>
+                        <span className="text-[10px] text-text-muted uppercase block">Pilot</span>
+                        <span className="font-medium text-text-primary truncate block">
+                          {vehicle.assignedDriver || 'Standby Pool'}
                         </span>
-                      )}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      {vehicle.docStatus === 'Compliant' && (
-                        <Badge variant="success">
-                          <CheckCircle2 className="w-3 h-3" /> Compliant
-                        </Badge>
-                      )}
-                      {vehicle.docStatus === 'Expiring Soon' && (
-                        <Badge variant="warning">
-                          <AlertTriangle className="w-3 h-3" /> Expiring Soon
-                        </Badge>
-                      )}
-                      {vehicle.docStatus === 'Expired' && (
-                        <Badge variant="danger">
-                          <XCircle className="w-3 h-3" /> Expired
-                        </Badge>
-                      )}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      {vehicle.maintenanceStatus === 'In Service' ? (
-                        <span className="inline-flex items-center gap-1.5 text-green-700 font-medium text-xs">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                          In Service
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 text-amber-700 font-medium text-xs">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                          {vehicle.maintenanceStatus}
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-3.5 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5" onClick={e => e.stopPropagation()}>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          icon={<Eye className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-400" />}
-                          onClick={() => setSelectedVehicle(vehicle)}
-                          title="View Profile"
-                        />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          icon={<Trash2 className="w-3.5 h-3.5 text-slate-500 hover:text-rose-400" />}
-                          onClick={() => deleteVehicle(vehicle.id)}
-                          title="Delete Vehicle"
-                        />
                       </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                      <div>
+                        <span className="text-[10px] text-text-muted uppercase block">Sector</span>
+                        <span className="text-text-secondary truncate block">
+                          {vehicle.lastKnownLocation?.city || 'Transit Corridor'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs pt-1">
+                      <div className="flex items-center gap-3">
+                        <span className="font-mono text-text-muted">Fuel: <strong className="text-text-primary">{fuel}%</strong></span>
+                        <span className="font-mono text-text-muted">Health: <strong className="text-emerald-400">{health}%</strong></span>
+                      </div>
+                      <span className="font-mono text-[11px] text-text-muted">{minsAgo}m ago</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
       </motion.div>
 
       {/* 5. Register Vehicle Modal */}
@@ -375,22 +501,22 @@ export function VehiclesContent() {
         <form onSubmit={handleCreateVehicle} className="space-y-4 text-xs">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-slate-300 mb-1 font-medium">Registration Number *</label>
+              <label className="block text-text-secondary mb-1 font-medium">Registration Number *</label>
               <input
                 type="text"
                 required
                 placeholder="e.g. MH-12-RN-8812"
                 value={regNumber}
                 onChange={e => setRegNumber(e.target.value)}
-                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-text-primary"
+                className="w-full rounded-lg border border-border bg-surface px-3 py-2 font-mono text-sm text-text-primary focus:border-cyan-500 focus:outline-hidden"
               />
             </div>
             <div>
-              <label className="block text-slate-300 mb-1 font-medium">Vehicle Category</label>
+              <label className="block text-text-secondary mb-1 font-medium">Vehicle Category</label>
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value as Vehicle['category'])}
-                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
+                className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-cyan-500 focus:outline-hidden"
               >
                 <option value="Container">Container</option>
                 <option value="Trailer">Trailer</option>
@@ -404,11 +530,11 @@ export function VehiclesContent() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-slate-300 mb-1 font-medium">Commercial Manufacturer</label>
+              <label className="block text-text-secondary mb-1 font-medium">Commercial Manufacturer</label>
               <select
                 value={make}
                 onChange={e => setMake(e.target.value)}
-                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
+                className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-cyan-500 focus:outline-hidden"
               >
                 <option value="Tata Motors">Tata Motors</option>
                 <option value="Ashok Leyland">Ashok Leyland</option>
@@ -418,61 +544,38 @@ export function VehiclesContent() {
               </select>
             </div>
             <div>
-              <label className="block text-slate-300 mb-1 font-medium">Model Specification *</label>
+              <label className="block text-text-secondary mb-1 font-medium">Model Specification *</label>
               <input
                 type="text"
                 required
                 placeholder="e.g. Signa 4825.T Heavy Axle"
                 value={model}
                 onChange={e => setModel(e.target.value)}
-                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
+                className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-cyan-500 focus:outline-hidden"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-slate-300 mb-1 font-medium">Payload Capacity (Metric Tons)</label>
+              <label className="block text-text-secondary mb-1 font-medium">Payload Capacity (Metric Tons)</label>
               <input
                 type="number"
                 min={1}
                 max={60}
                 value={capacityTons}
                 onChange={e => setCapacityTons(Number(e.target.value))}
-                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-text-primary"
+                className="w-full rounded-lg border border-border bg-surface px-3 py-2 font-mono text-sm text-text-primary focus:border-cyan-500 focus:outline-hidden"
               />
             </div>
             <div>
-              <label className="block text-slate-300 mb-1 font-medium">Assigned Driver</label>
+              <label className="block text-text-secondary mb-1 font-medium">Assigned Commercial Pilot</label>
               <input
                 type="text"
                 value={assignedDriver}
                 onChange={e => setAssignedDriver(e.target.value)}
-                placeholder="Unassigned or Driver Name"
-                className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text-primary"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-slate-300 mb-1 font-medium">Chassis VIN Number</label>
-              <input
-                type="text"
-                value={chassisNumber}
-                onChange={e => setChassisNumber(e.target.value)}
-                placeholder="Auto-generated if empty"
-                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-text-primary"
-              />
-            </div>
-            <div>
-              <label className="block text-slate-300 mb-1 font-medium">Engine Serial Number</label>
-              <input
-                type="text"
-                value={engineNumber}
-                onChange={e => setEngineNumber(e.target.value)}
-                placeholder="Auto-generated if empty"
-                className="w-full rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-text-primary"
+                placeholder="Pilot name or Standby"
+                className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-cyan-500 focus:outline-hidden"
               />
             </div>
           </div>
@@ -488,95 +591,151 @@ export function VehiclesContent() {
         </form>
       </Modal>
 
-      {/* 6. Vehicle Detail Modal */}
-      {selectedVehicle && (
-        <Drawer
-          isOpen={!!selectedVehicle}
-          onClose={() => setSelectedVehicle(null)}
-          title={`Asset Dossier: ${selectedVehicle.regNumber}`}
-        >
-          <div className="space-y-4 text-xs">
-            <div className="flex items-center justify-between rounded-control border border-border bg-surface-muted p-4">
+      {/* 6. Comprehensive Asset Drawer */}
+      <Drawer
+        isOpen={Boolean(selectedVehicle)}
+        onClose={() => setSelectedVehicle(null)}
+        title={`Asset Dossier: ${selectedVehicle?.regNumber || ''}`}
+        subtitle={`${selectedVehicle?.make} ${selectedVehicle?.model} • ${selectedVehicle?.category}`}
+      >
+        {selectedVehicle && (
+          <div className="space-y-6 text-sm">
+            {/* Status Strip */}
+            <div className="flex items-center justify-between rounded-xl border border-border bg-surface-muted/30 p-4">
               <div>
-                <span className="text-xs text-text-secondary font-mono">Payload capacity</span>
-                <div className="text-xl font-bold font-mono text-slate-100">{selectedVehicle.capacityTons} Metric Tons</div>
-              </div>
-              <div>
-                <span className="text-xs text-text-secondary font-mono">Assigned driver</span>
-                <div className="text-sm font-semibold text-blue-400">{selectedVehicle.assignedDriver || 'Unassigned'}</div>
-              </div>
-              <div>
-                <span className="text-xs text-text-secondary font-mono">Operational state</span>
-                <div className="mt-0.5">
-                  <Badge variant={selectedVehicle.maintenanceStatus === 'In Service' ? 'success' : 'warning'}>
-                    {selectedVehicle.maintenanceStatus}
-                  </Badge>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-control border border-border bg-surface-muted p-3">
-                <div className="text-text-secondary text-xs font-medium">Chassis VIN number</div>
-                <div className="font-mono text-slate-100 font-bold mt-0.5">{selectedVehicle.chassisNumber || 'MAT78291032'}</div>
-              </div>
-              <div className="rounded-control border border-border bg-surface-muted p-3">
-                <div className="text-text-secondary text-xs font-medium">Engine serial number</div>
-                <div className="font-mono text-slate-100 font-bold mt-0.5">{selectedVehicle.engineNumber || 'ENG99420188'}</div>
-              </div>
-            </div>
-
-            <div className="space-y-2 border-t border-border pt-2">
-              <div className="font-semibold text-text-secondary">Government compliance</div>
-              
-              <div className="flex items-center justify-between rounded-control border border-border bg-surface-muted p-3">
-                <div className="flex items-center gap-2.5">
-                  <FileText className="w-4 h-4 text-blue-400" />
-                  <div>
-                    <div className="text-slate-200 font-medium">Registration Certificate (RC)</div>
-                    <div className="text-xs text-text-muted font-mono">Vahan National Portal ID</div>
-                  </div>
-                </div>
-                <span className="rounded-control border border-border bg-surface px-2 py-1 font-mono text-xs text-text-secondary">
-                  Valid to {selectedVehicle.rcExpiry}
+                <span className="text-[11px] font-bold uppercase text-text-muted block">
+                  Operating State
                 </span>
+                <StatusPill
+                  status={
+                    selectedVehicle.maintenanceStatus === 'In Service'
+                      ? 'success'
+                      : selectedVehicle.maintenanceStatus === 'Scheduled Service'
+                      ? 'warning'
+                      : 'danger'
+                  }
+                >
+                  {selectedVehicle.maintenanceStatus}
+                </StatusPill>
               </div>
-
-              <div className="flex items-center justify-between rounded-control border border-border bg-surface-muted p-3">
-                <div className="flex items-center gap-2.5">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                  <div>
-                    <div className="text-slate-200 font-medium">Comprehensive Commercial Insurance</div>
-                    <div className="text-xs text-text-muted font-mono">Third-Party and cargo coverage</div>
-                  </div>
-                </div>
-                <span className="rounded-control border border-border bg-surface px-2 py-1 font-mono text-xs text-text-secondary">
-                  Valid to {selectedVehicle.insuranceExpiry}
+              <div className="text-right">
+                <span className="text-[11px] font-bold uppercase text-text-muted block">
+                  Sector Hub
                 </span>
-              </div>
-
-              <div className="flex items-center justify-between rounded-control border border-border bg-surface-muted p-3">
-                <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-                  <div>
-                    <div className="text-slate-200 font-medium">RTO Fitness Certificate (FC)</div>
-                    <div className="text-xs text-text-muted font-mono">Mandatory annual inspection</div>
-                  </div>
-                </div>
-                <span className="rounded-control border border-border bg-surface px-2 py-1 font-mono text-xs text-text-secondary">
-                  Valid to {selectedVehicle.fitnessExpiry}
+                <span className="font-semibold text-text-primary text-xs">
+                  {selectedVehicle.lastKnownLocation?.city || 'Transit Corridor'}
                 </span>
               </div>
             </div>
 
-            <div className="flex justify-end border-t border-border pt-3">
-              <Button variant="outline" size="sm" onClick={() => setSelectedVehicle(null)}>
-                Close Dossier
+            {/* Specifications */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-text-secondary">
+                Technical Specifications
+              </h4>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="rounded-lg border border-border bg-surface p-2.5">
+                  <span className="text-text-muted block text-[11px]">Chassis Number:</span>
+                  <span className="font-mono font-bold text-text-primary text-xs">{selectedVehicle.chassisNumber}</span>
+                </div>
+                <div className="rounded-lg border border-border bg-surface p-2.5">
+                  <span className="text-text-muted block text-[11px]">Engine Number:</span>
+                  <span className="font-mono font-semibold text-text-primary text-xs">{selectedVehicle.engineNumber}</span>
+                </div>
+                <div className="rounded-lg border border-border bg-surface p-2.5">
+                  <span className="text-text-muted block text-[11px]">Payload Capacity:</span>
+                  <span className="font-mono font-bold text-text-primary text-xs">{selectedVehicle.capacityTons} Metric Tons</span>
+                </div>
+                <div className="rounded-lg border border-border bg-surface p-2.5">
+                  <span className="text-text-muted block text-[11px]">Assigned Pilot:</span>
+                  <span className="font-semibold text-cyan-300 text-xs">{selectedVehicle.assignedDriver || 'Standby Pool'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Component Diagnostics */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-text-secondary">
+                OBD-II Telematics & Component Health
+              </h4>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="rounded-lg border border-border bg-surface p-2.5">
+                  <div className="flex justify-between text-text-secondary mb-1">
+                    <span>Engine Block:</span>
+                    <span className="font-mono font-bold text-emerald-400">{selectedVehicle.componentHealth?.engine || 94}%</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-surface-muted rounded-full overflow-hidden">
+                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${selectedVehicle.componentHealth?.engine || 94}%` }} />
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-border bg-surface p-2.5">
+                  <div className="flex justify-between text-text-secondary mb-1">
+                    <span>Air Brakes:</span>
+                    <span className="font-mono font-bold text-emerald-400">{selectedVehicle.componentHealth?.brakes || 88}%</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-surface-muted rounded-full overflow-hidden">
+                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${selectedVehicle.componentHealth?.brakes || 88}%` }} />
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-border bg-surface p-2.5">
+                  <div className="flex justify-between text-text-secondary mb-1">
+                    <span>Tyres & TPMS:</span>
+                    <span className="font-mono font-bold text-cyan-400">{selectedVehicle.componentHealth?.tyres || 82}%</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-surface-muted rounded-full overflow-hidden">
+                    <div className="h-full bg-cyan-500 rounded-full" style={{ width: `${selectedVehicle.componentHealth?.tyres || 82}%` }} />
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-border bg-surface p-2.5">
+                  <div className="flex justify-between text-text-secondary mb-1">
+                    <span>24V Alternator:</span>
+                    <span className="font-mono font-bold text-emerald-400">{selectedVehicle.componentHealth?.battery || 95}%</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-surface-muted rounded-full overflow-hidden">
+                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${selectedVehicle.componentHealth?.battery || 95}%` }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Parivahan Document Compliance */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-text-secondary">
+                Parivahan Document Vault
+              </h4>
+              <div className="divide-y divide-border rounded-lg border border-border bg-surface text-xs">
+                <div className="flex items-center justify-between p-2.5">
+                  <span className="text-text-secondary">Vehicle RC Expiry</span>
+                  <span className="font-mono font-semibold text-text-primary">{selectedVehicle.rcExpiry}</span>
+                </div>
+                <div className="flex items-center justify-between p-2.5">
+                  <span className="text-text-secondary">Insurance Policy Expiry</span>
+                  <span className="font-mono font-semibold text-text-primary">{selectedVehicle.insuranceExpiry}</span>
+                </div>
+                <div className="flex items-center justify-between p-2.5">
+                  <span className="text-text-secondary">Fitness Certificate Expiry</span>
+                  <span className="font-mono font-semibold text-text-primary">{selectedVehicle.fitnessExpiry}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="pt-2 flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={() => setSelectedVehicle(null)}
+              >
+                Close Inspector
               </Button>
             </div>
           </div>
-        </Drawer>
-      )}
+        )}
+      </Drawer>
     </AnimatedPage>
   );
 }
