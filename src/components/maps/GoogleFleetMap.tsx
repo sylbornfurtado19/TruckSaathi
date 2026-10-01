@@ -8,7 +8,7 @@ import { Radio, AlertTriangle, ExternalLink, RefreshCw, CheckCircle2 } from 'luc
 import { OsmFleetFallback } from './OsmFleetFallback';
 
 const GOOGLE_MAPS_API_KEY =
-  process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyAOVYRIgupAurZup5y1PRh8Ismb1A3lLao';
+  process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyBUKlWA9uV6ZfftXPfiR-w2Hvg_mPQm8Xc';
 
 // Custom dark control-room theme for Google Maps
 const DARK_MAP_STYLE: google.maps.MapTypeStyle[] = [
@@ -325,7 +325,7 @@ export function GoogleFleetMap({
           <div className="flex items-center gap-2 text-xs text-amber-200">
             <AlertTriangle className="h-4 w-4 shrink-0 text-amber-400" />
             <span>
-              <strong>Google Maps Activation Required:</strong> {loadError ? `${loadError}. ` : ''}Enable &quot;Maps JavaScript API&quot; in Google Cloud Console for key <code className="bg-black/50 px-1 py-0.5 rounded font-mono text-[10px] text-amber-300">AIzaSy...Lao</code>.
+              <strong>Google Maps Activation Required:</strong> {loadError ? `${loadError}. ` : ''}Enable &quot;Maps JavaScript API&quot; in Google Cloud Console for key <code className="bg-black/50 px-1 py-0.5 rounded font-mono text-[10px] text-amber-300">{GOOGLE_MAPS_API_KEY.slice(0, 6)}...{GOOGLE_MAPS_API_KEY.slice(-4)}</code>.
             </span>
           </div>
           <div className="flex items-center gap-2">
