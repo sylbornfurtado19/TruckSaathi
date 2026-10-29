@@ -2,7 +2,16 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { ArrowDown, ArrowUp, Loader2, X, AlertTriangle } from 'lucide-react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { springs, durations, easings } from '@/lib/motion';
+import { OdometerNumber } from './OdometerNumber';
+import { ShimmerSkeleton } from './ShimmerSkeleton';
+
+export * from './MagneticButton';
+export * from './OdometerNumber';
+export * from './SpotlightCard';
+export * from './ShimmerSkeleton';
+export * from './Sparkline';
 
 export const focusRing = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-1 focus-visible:ring-offset-surface';
 
@@ -27,13 +36,13 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const variants = {
-    primary: 'bg-brand-orange text-white hover:bg-orange-600 border border-brand-orange shadow-sm',
-    secondary: 'bg-surface-muted text-text-primary hover:bg-slate-800 border border-border shadow-sm',
-    outline: 'bg-transparent text-text-primary hover:bg-surface-muted border border-border',
+    primary: 'bg-brand-orange text-white hover:bg-orange-600 border border-brand-orange/90 shadow-sm shadow-orange-950/40 active:bg-orange-700',
+    secondary: 'bg-surface-muted text-text-primary hover:bg-slate-800 border border-border shadow-sm active:bg-slate-900',
+    outline: 'bg-transparent text-text-primary hover:bg-surface-muted border border-border active:bg-surface',
     ghost: 'bg-transparent text-text-secondary hover:text-text-primary hover:bg-surface-muted border border-transparent',
-    danger: 'bg-red-600 text-white hover:bg-red-500 border border-red-600 shadow-sm',
-    amber: 'bg-amber-600 text-white hover:bg-amber-500 border border-amber-600 shadow-sm',
-    cyan: 'bg-sky-600 text-white hover:bg-sky-500 border border-sky-600 shadow-sm'
+    danger: 'bg-rose-600 text-white hover:bg-rose-500 border border-rose-600 shadow-sm shadow-rose-950/40',
+    amber: 'bg-amber-600 text-white hover:bg-amber-500 border border-amber-600 shadow-sm shadow-amber-950/40',
+    cyan: 'bg-sky-600 text-white hover:bg-sky-500 border border-sky-600 shadow-sm shadow-cyan-950/40'
   };
 
   const sizes = {
@@ -46,7 +55,7 @@ export const Button: React.FC<ButtonProps> = ({
   return (
     <button
       disabled={disabled || loading}
-      className={`inline-flex items-center justify-center transition-all duration-150 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 ${focusRing} ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`inline-flex items-center justify-center transition-all duration-150 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer ${focusRing} ${variants[variant]} ${sizes[size]} ${className}`}
       {...props}
     >
       {loading ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : icon ? <span className="shrink-0">{icon}</span> : null}
@@ -113,10 +122,10 @@ export const HoldToActivateButton: React.FC<{
   }, []);
 
   return (
-    <div className={`relative overflow-hidden rounded-xl border border-red-500/30 bg-red-950/20 select-none ${className}`}>
-      {/* Progress fill bar */}
+    <div className={`relative overflow-hidden rounded-xl border border-rose-500/30 bg-rose-950/20 select-none shadow-lg shadow-rose-950/30 ${className}`}>
+      {/* Progress fill bar with glowing edge */}
       <div
-        className="absolute inset-y-0 left-0 bg-red-600/40 transition-[width] ease-linear"
+        className="absolute inset-y-0 left-0 bg-rose-600/50 transition-[width] ease-linear shadow-[0_0_16px_rgba(239,68,68,0.7)]"
         style={{ width: `${progress}%` }}
       />
 
@@ -127,7 +136,7 @@ export const HoldToActivateButton: React.FC<{
         onMouseLeave={cancelHold}
         onTouchStart={startHold}
         onTouchEnd={cancelHold}
-        className="relative z-10 flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 px-5 py-3.5 text-center text-sm font-black tracking-wider text-rose-300 transition-colors hover:text-white"
+        className="relative z-10 flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 px-5 py-3.5 text-center text-sm font-black tracking-wider text-rose-300 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-rose-400"
       >
         <AlertTriangle className={`h-4 w-4 text-rose-400 ${holding ? 'animate-bounce' : ''}`} />
         <span>{holding ? `HOLDING... ${Math.round(progress)}%` : label}</span>
@@ -147,11 +156,11 @@ export const Card: React.FC<{
 }> = ({ children, className = '', onClick, header }) => (
   <div
     onClick={onClick}
-    className={`rounded-xl border border-border bg-surface shadow-sm ${
-      onClick ? 'cursor-pointer hover:border-border/80 transition-colors' : ''
+    className={`rounded-xl border border-white/8 bg-surface shadow-sm transition-all duration-200 ${
+      onClick ? 'cursor-pointer hover:border-white/16 hover:shadow-md' : ''
     } ${className}`}
   >
-    {header && <div className="border-b border-border/80 px-4 py-3 sm:px-5">{header}</div>}
+    {header && <div className="border-b border-white/8 px-4 py-3 sm:px-5">{header}</div>}
     {children}
   </div>
 );
@@ -164,8 +173,8 @@ export const Panel: React.FC<{
   children: React.ReactNode;
   className?: string;
 }> = ({ title, subtitle, badge, actions, children, className = '' }) => (
-  <div className={`rounded-xl border border-border bg-surface shadow-sm ${className}`}>
-    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 px-4 py-3 sm:px-5">
+  <div className={`rounded-xl border border-white/8 bg-surface shadow-sm ${className}`}>
+    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/8 px-4 py-3 sm:px-5">
       <div>
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-bold text-text-primary tracking-tight">{title}</h3>
@@ -291,7 +300,7 @@ export const Table: React.FC<React.TableHTMLAttributes<HTMLTableElement>> = ({
   className = '',
   ...props
 }) => (
-  <div className="overflow-x-auto rounded-xl border border-border bg-surface">
+  <div className="overflow-x-auto rounded-xl border border-white/8 bg-surface">
     <table className={`w-full border-collapse text-left text-sm ${className}`} {...props} />
   </div>
 );
@@ -301,7 +310,7 @@ export const TableHeader: React.FC<React.HTMLAttributes<HTMLTableSectionElement>
   ...props
 }) => (
   <thead
-    className={`sticky top-0 bg-surface-muted/80 backdrop-blur-sm text-xs font-semibold uppercase tracking-wider text-text-secondary border-b border-border ${className}`}
+    className={`sticky top-0 bg-surface-muted/90 backdrop-blur-sm text-xs font-semibold uppercase tracking-wider text-text-secondary border-b border-white/8 ${className}`}
     {...props}
   />
 );
@@ -309,7 +318,7 @@ export const TableHeader: React.FC<React.HTMLAttributes<HTMLTableSectionElement>
 export const TableBody: React.FC<React.HTMLAttributes<HTMLTableSectionElement>> = ({
   className = '',
   ...props
-}) => <tbody className={`divide-y divide-border/60 ${className}`} {...props} />;
+}) => <tbody className={`divide-y divide-white/6 ${className}`} {...props} />;
 
 export const TableRow: React.FC<React.HTMLAttributes<HTMLTableRowElement>> = ({
   className = '',
@@ -341,7 +350,7 @@ export const PageHeader: React.FC<{
   badge?: React.ReactNode;
   actions?: React.ReactNode;
 }> = ({ title, description, subtitle, badge, actions }) => (
-  <div className="flex flex-col gap-3 pb-2 sm:flex-row sm:items-center sm:justify-between border-b border-border/60">
+  <div className="flex flex-col gap-3 pb-2 sm:flex-row sm:items-center sm:justify-between border-b border-white/8">
     <div>
       <div className="flex flex-wrap items-center gap-2.5">
         <h1 className="text-xl font-bold tracking-tight text-text-primary sm:text-2xl">{title}</h1>
@@ -358,7 +367,7 @@ export const PageHeader: React.FC<{
 );
 
 export const AnimatedNumber: React.FC<{ value: number }> = ({ value }) => (
-  <span className="tabular-nums font-semibold">{value}</span>
+  <OdometerNumber value={value} />
 );
 
 interface KpiProps {
@@ -388,8 +397,11 @@ export const KpiCard: React.FC<KpiProps> = ({
 }) => {
   const change = delta || trend?.value;
   const positive = trend?.isPositive ?? (trend?.direction ? trend.direction === 'up' : true);
+  const rawValue = number ?? value;
+  const isNumeric = typeof rawValue === 'number' || (typeof rawValue === 'string' && !isNaN(Number(rawValue)) && rawValue.trim() !== '');
+
   return (
-    <div className="flex flex-col justify-between rounded-xl border border-border bg-surface p-4 shadow-sm hover:border-border/80 transition-colors">
+    <div className="flex flex-col justify-between rounded-xl border border-white/8 bg-surface p-4 shadow-sm hover:border-white/16 transition-all duration-200">
       <div className="flex items-center justify-between gap-2">
         <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
           {label || title}
@@ -398,7 +410,7 @@ export const KpiCard: React.FC<KpiProps> = ({
       </div>
       <div className="mt-2.5 flex items-baseline justify-between gap-2">
         <span className="font-mono text-2xl font-black text-text-primary tracking-tight">
-          {number ?? value}
+          {isNumeric ? <OdometerNumber value={Number(rawValue)} /> : rawValue}
         </span>
         {change && (
           <span
@@ -412,7 +424,7 @@ export const KpiCard: React.FC<KpiProps> = ({
         )}
       </div>
       {subtext && <span className="mt-1 text-[11px] text-text-muted truncate">{subtext}</span>}
-      {sparkline}
+      {sparkline && <div className="mt-2">{sparkline}</div>}
     </div>
   );
 };
@@ -420,7 +432,7 @@ export const KpiCard: React.FC<KpiProps> = ({
 export const KPICard: React.FC<KpiProps> = props => <KpiCard {...props} />;
 
 /* =========================================================================
-   8. UNIFIED KPI COMMAND STRIP (NOT GIANT SEPARATE BALLOON CARDS)
+   8. UNIFIED KPI COMMAND STRIP
    ========================================================================= */
 export interface KpiStripItem {
   label: string;
@@ -437,7 +449,7 @@ export const KpiStrip: React.FC<{ items: KpiStripItem[]; className?: string }> =
 }) => {
   return (
     <div
-      className={`grid grid-cols-2 divide-y divide-border border border-border bg-surface sm:grid-cols-3 sm:divide-y-0 sm:divide-x lg:grid-cols-6 rounded-xl shadow-sm overflow-hidden ${className}`}
+      className={`grid grid-cols-2 divide-y divide-white/8 border border-white/8 bg-surface sm:grid-cols-3 sm:divide-y-0 sm:divide-x lg:grid-cols-6 rounded-xl shadow-sm overflow-hidden ${className}`}
     >
       {items.map((item, idx) => (
         <div
@@ -455,7 +467,7 @@ export const KpiStrip: React.FC<{ items: KpiStripItem[]; className?: string }> =
           </div>
           <div className="mt-1.5 flex items-baseline gap-2">
             <span className="font-mono text-xl sm:text-2xl font-black tracking-tight text-text-primary">
-              {item.value}
+              {typeof item.value === 'number' ? <OdometerNumber value={item.value} /> : item.value}
             </span>
             {item.status && (
               <span
@@ -474,7 +486,7 @@ export const KpiStrip: React.FC<{ items: KpiStripItem[]; className?: string }> =
 };
 
 /* =========================================================================
-   9. MODAL & DRAWER
+   9. MODAL & DRAWER (ANIMATED WITH FRAMER MOTION)
    ========================================================================= */
 export const Modal: React.FC<{
   isOpen: boolean;
@@ -485,6 +497,8 @@ export const Modal: React.FC<{
   size?: 'sm' | 'md' | 'lg' | 'xl' | string;
   maxWidth?: string;
 }> = ({ isOpen, onClose, title, description, children, size = 'lg', maxWidth }) => {
+  const shouldReduce = useReducedMotion();
+
   useEffect(() => {
     const key = (event: KeyboardEvent) => event.key === 'Escape' && onClose();
     if (isOpen) {
@@ -497,7 +511,6 @@ export const Modal: React.FC<{
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
   const sizes: Record<string, string> = {
     sm: 'max-w-md',
     md: 'max-w-lg',
@@ -506,29 +519,48 @@ export const Modal: React.FC<{
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-      <button className="absolute inset-0 cursor-default" aria-label="Close modal" onClick={onClose} />
-      <div
-        className={`relative z-10 w-full rounded-2xl border border-border bg-surface p-6 shadow-2xl ${
-          maxWidth || sizes[size] || sizes.lg
-        }`}
-      >
-        <div className="mb-4 flex items-start justify-between border-b border-border pb-3">
-          <div>
-            <h2 className="text-base font-bold text-text-primary tracking-tight">{title}</h2>
-            {description && <p className="mt-0.5 text-xs text-text-secondary">{description}</p>}
-          </div>
-          <button
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: durations.fast }}
+            className="absolute inset-0 bg-black/75 backdrop-blur-xs cursor-default"
             onClick={onClose}
-            className={`rounded-md p-1.5 text-text-secondary hover:bg-surface-muted hover:text-white ${focusRing}`}
-            aria-label="Close"
+            aria-label="Close modal"
+          />
+
+          {/* Modal Panel */}
+          <motion.div
+            initial={shouldReduce ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={shouldReduce ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 10 }}
+            transition={springs.snappy}
+            className={`relative z-10 w-full rounded-2xl border border-white/12 bg-surface p-6 shadow-2xl ${
+              maxWidth || sizes[size] || sizes.lg
+            }`}
           >
-            <X className="h-4 w-4" />
-          </button>
+            <div className="mb-4 flex items-start justify-between border-b border-white/8 pb-3">
+              <div>
+                <h2 className="text-base font-bold text-text-primary tracking-tight">{title}</h2>
+                {description && <p className="mt-0.5 text-xs text-text-secondary">{description}</p>}
+              </div>
+              <button
+                onClick={onClose}
+                className={`rounded-md p-1.5 text-text-secondary hover:bg-surface-muted hover:text-white transition-colors cursor-pointer ${focusRing}`}
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="max-h-[75vh] overflow-y-auto pr-1">{children}</div>
+          </motion.div>
         </div>
-        <div className="max-h-[75vh] overflow-y-auto pr-1">{children}</div>
-      </div>
-    </div>
+      )}
+    </AnimatePresence>
   );
 };
 
@@ -539,6 +571,8 @@ export const Drawer: React.FC<{
   subtitle?: string;
   children: React.ReactNode;
 }> = ({ isOpen, onClose, title, subtitle, children }) => {
+  const shouldReduce = useReducedMotion();
+
   useEffect(() => {
     const key = (event: KeyboardEvent) => event.key === 'Escape' && onClose();
     if (isOpen) {
@@ -551,28 +585,47 @@ export const Drawer: React.FC<{
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs">
-      <button className="absolute inset-0 cursor-default" aria-label="Close drawer" onClick={onClose} />
-      <aside className="absolute right-0 top-0 h-full w-full max-w-xl overflow-y-auto border-l border-border bg-surface p-6 shadow-2xl">
-        <div className="mb-5 flex items-center justify-between border-b border-border pb-4">
-          <div>
-            <h2 className="text-lg font-bold text-text-primary tracking-tight">{title}</h2>
-            {subtitle && <p className="mt-0.5 text-xs text-text-secondary">{subtitle}</p>}
-          </div>
-          <button
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50">
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: durations.fast }}
+            className="absolute inset-0 bg-black/75 backdrop-blur-xs cursor-default"
             onClick={onClose}
-            className={`rounded-md p-1.5 text-text-secondary hover:bg-surface-muted hover:text-white ${focusRing}`}
-            aria-label="Close"
+            aria-label="Close drawer"
+          />
+
+          {/* Drawer Body */}
+          <motion.aside
+            initial={shouldReduce ? { opacity: 0 } : { x: '100%', opacity: 0.6 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={shouldReduce ? { opacity: 0 } : { x: '100%', opacity: 0 }}
+            transition={springs.smooth}
+            className="absolute right-0 top-0 h-full w-full max-w-xl overflow-y-auto border-l border-white/12 bg-surface p-6 shadow-2xl"
           >
-            <X className="h-4 w-4" />
-          </button>
+            <div className="mb-5 flex items-center justify-between border-b border-white/8 pb-4">
+              <div>
+                <h2 className="text-lg font-bold text-text-primary tracking-tight">{title}</h2>
+                {subtitle && <p className="mt-0.5 text-xs text-text-secondary">{subtitle}</p>}
+              </div>
+              <button
+                onClick={onClose}
+                className={`rounded-md p-1.5 text-text-secondary hover:bg-surface-muted hover:text-white transition-colors cursor-pointer ${focusRing}`}
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div>{children}</div>
+          </motion.aside>
         </div>
-        <div>{children}</div>
-      </aside>
-    </div>
+      )}
+    </AnimatePresence>
   );
 };
 
@@ -582,7 +635,7 @@ export const EmptyState: React.FC<{
   description: string;
   action?: React.ReactNode;
 }> = ({ icon, title, description, action }) => (
-  <div className="flex flex-col items-center justify-center gap-2.5 rounded-xl border border-dashed border-border p-10 text-center">
+  <div className="flex flex-col items-center justify-center gap-2.5 rounded-xl border border-dashed border-white/12 p-10 text-center">
     <div className="text-brand-orange">{icon}</div>
     <h3 className="text-sm font-semibold text-text-primary">{title}</h3>
     <p className="max-w-sm text-xs text-text-secondary">{description}</p>
@@ -591,12 +644,12 @@ export const EmptyState: React.FC<{
 );
 
 export const Skeleton: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <div className={`rounded-md bg-surface-muted animate-pulse ${className}`} aria-hidden="true" />
+  <ShimmerSkeleton className={className} />
 );
 
 export const itemVariants = {
-  hidden: { opacity: 0, y: 6 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.15 } }
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: durations.fast } }
 };
 
 export const RouteDivider: React.FC<{ className?: string }> = ({ className = '' }) => (
@@ -604,12 +657,13 @@ export const RouteDivider: React.FC<{ className?: string }> = ({ className = '' 
 );
 
 export const AnimatedPage: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const reduce = useReducedMotion();
+  const shouldReduce = useReducedMotion();
   return (
     <motion.div
-      initial={reduce ? false : { opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.15 }}
+      initial={shouldReduce ? false : { opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -6 }}
+      transition={{ duration: durations.fast, ease: easings.easeOut }}
       className="space-y-5"
     >
       {children}
