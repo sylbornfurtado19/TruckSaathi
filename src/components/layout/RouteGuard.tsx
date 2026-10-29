@@ -7,7 +7,6 @@ import { useApp } from '@/context/AppContext';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
 
 export const MANAGEMENT_ROUTES = [
-  '/',
   '/dashboard',
   '/trips',
   '/ai-dispatch',
@@ -30,8 +29,8 @@ export const DRIVER_ROUTES = [
 
 export function isManagementRoute(pathname: string): boolean {
   return (
-    pathname === '/' ||
-    MANAGEMENT_ROUTES.some(r => r !== '/' && (pathname === r || pathname.startsWith(`${r}/`)))
+    pathname !== '/' &&
+    MANAGEMENT_ROUTES.some(r => pathname === r || pathname.startsWith(`${r}/`))
   );
 }
 
@@ -48,6 +47,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
 
   // Purely derive authorization status synchronously
   const isAuthorized = useMemo(() => {
+    if (pathname === '/') return true;
     if (authLoading) return false;
     if (!isConfigured) return true;
     if (!session) return false;
@@ -64,6 +64,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
 
   // Handle side-effect navigation redirects only
   useEffect(() => {
+    if (pathname === '/') return;
     if (authLoading || !isConfigured) return;
 
     if (!session) {

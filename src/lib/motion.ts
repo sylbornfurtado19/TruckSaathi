@@ -159,8 +159,14 @@ export function useMotionSafe() {
     return normalTransition;
   };
 
+  const safe = <T extends Record<string, unknown>>(normal: T, reducedFallback: Partial<T> = {}): T => {
+    if (shouldReduce) return { ...normal, ...reducedFallback, x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, rotateY: 0 };
+    return normal;
+  };
+
   return {
     shouldReduce,
+    safe,
     springs: shouldReduce
       ? {
           snappy: { duration: 0.01 },

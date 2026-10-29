@@ -157,7 +157,10 @@ async function run() {
 
     await sleep(waitMs);
 
-    const shot = await send('Page.captureScreenshot', { format: 'png' });
+    const shot = await send('Page.captureScreenshot', {
+      format: 'png',
+      captureBeyondViewport: action === 'fullpage'
+    });
     const buffer = Buffer.from(shot.data, 'base64');
     writeFileSync(outputPath, buffer);
 
