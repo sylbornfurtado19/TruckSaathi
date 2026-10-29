@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   Bell,
   Bot,
@@ -25,14 +26,15 @@ import {
   Truck,
   UserCheck,
   Users,
-  Wrench,
-  Radio,
-  Clock
+  Wrench
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { CommandPalette } from './CommandPalette';
 import { NotificationsPanel } from './NotificationsPanel';
-import { Button, focusRing } from '@/components/ui';
+import { RouteProgressBar } from './RouteProgressBar';
+import { PageTransition } from './PageTransition';
+import { MagneticButton, ToastProvider, focusRing } from '@/components/ui';
+import { springs } from '@/lib/motion';
 
 const getInitials = (name?: string) => {
   if (!name) return 'TS';
@@ -101,6 +103,7 @@ export const Sidebar: React.FC<{
   const pathname = usePathname();
   const router = useRouter();
   const { currentUser, signOut, simState } = useApp();
+  const shouldReduce = useReducedMotion();
 
   const isDriver = currentUser?.role === 'Driver';
   const isFleetManager = currentUser?.role === 'Fleet Manager';
@@ -126,12 +129,12 @@ export const Sidebar: React.FC<{
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-[#090d16] text-text-primary transition-all duration-200 ${
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-white/8 bg-[#070d18] text-text-primary transition-all duration-200 ${
           collapsed ? 'w-16' : 'w-64'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
       >
         {/* Sidebar Header with single logo & collapse button */}
-        <div className="flex h-14 items-center justify-between border-b border-border/80 px-3.5">
+        <div className="flex h-14 items-center justify-between border-b border-white/8 px-3.5 bg-surface-muted/20">
           <Link
             href={isDriver ? '/driver-portal' : '/dashboard'}
             onClick={() => setMobileOpen(false)}
@@ -162,7 +165,7 @@ export const Sidebar: React.FC<{
 
         {/* Live Operational Status Strip in Sidebar */}
         {!collapsed && (
-          <div className="border-b border-border/60 bg-surface-muted/40 px-4 py-2 flex items-center justify-between text-[11px]">
+          <div className="border-b border-white/8 bg-surface-muted/40 px-4 py-2 flex items-center justify-between text-[11px]">
             <span className="flex items-center gap-1.5 font-medium text-emerald-400">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
               <span>{isDriver ? 'Cockpit Connected' : 'Telemetry Linked'}</span>
@@ -173,12 +176,12 @@ export const Sidebar: React.FC<{
           </div>
         )}
 
-        {/* Navigation Links */}
+        {/* Navigation Links with Gliding Active Pill */}
         <nav className="flex-1 space-y-4 overflow-y-auto px-2.5 py-4">
           {visibleSections.map(section => (
             <div key={section.title} className="space-y-1">
               {!collapsed && (
-                <div className="px-2.5 pb-1 text-[11px] font-bold uppercase tracking-wider text-text-muted">
+                <div className="px-2.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-text-muted">
                   {section.title}
                 </div>
               )}
@@ -195,14 +198,25 @@ export const Sidebar: React.FC<{
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
                     title={collapsed ? item.name : undefined}
-                    className={`relative flex h-9 items-center gap-3 rounded-lg px-2.5 text-xs font-semibold transition-all duration-150 ${
-                      active
-                        ? 'bg-brand-orange text-white shadow-sm'
-                        : 'text-text-secondary hover:bg-surface-muted hover:text-white'
-                    }`}
+                    className="relative flex h-9 items-center gap-3 rounded-lg px-2.5 text-xs font-semibold transition-colors duration-150 text-text-secondary hover:text-white group"
                   >
-                    <Icon className="h-4 w-4 shrink-0" />
-                    {!collapsed && <span className="truncate">{item.name}</span>}
+                    {active && (
+                      <motion.span
+                        layoutId={shouldReduce ? undefined : 'sidebar-active-pill'}
+                        className="absolute inset-0 rounded-lg bg-gradient-to-r from-brand-orange to-orange-600 shadow-sm shadow-orange-950/40"
+                        transition={springs.snappy}
+                      />
+                    )}
+                    <Icon
+                      className={`relative z-10 h-4 w-4 shrink-0 transition-colors ${
+                        active ? 'text-white' : 'text-text-muted group-hover:text-white'
+                      }`}
+                    />
+                    {!collapsed && (
+                      <span className={`relative z-10 truncate ${active ? 'text-white font-bold' : ''}`}>
+                        {item.name}
+                      </span>
+                    )}
                   </Link>
                 );
               })}
@@ -211,13 +225,13 @@ export const Sidebar: React.FC<{
         </nav>
 
         {/* Footer Profile */}
-        <div className="border-t border-border/80 p-3 bg-surface-muted/20">
+        <div className="border-t border-white/8 p-3 bg-surface-muted/20">
           <div className={`flex items-center gap-2.5 ${collapsed ? 'justify-center' : ''}`}>
             <div
               className="flex items-center gap-2.5 min-w-0 flex-1 rounded-lg p-1 text-left"
               title={currentUser?.email || currentUser?.name || 'Logged in user'}
             >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface border border-border text-xs font-bold text-brand-orange shadow-xs">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface border border-white/10 text-xs font-bold text-brand-orange shadow-xs">
                 {getInitials(currentUser?.name)}
               </div>
               {!collapsed && (
@@ -254,15 +268,36 @@ export const Header: React.FC<{
   collapsed: boolean;
   onOpenMobile?: () => void;
 }> = ({ collapsed, onOpenMobile = () => {} }) => {
-  const pathname = usePathname();
   const router = useRouter();
-  const { currentUser, signOut, simState } = useApp();
+  const { currentUser, signOut, simState, activeEmergency } = useApp();
   const [commandOpen, setCommandOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState('');
+  const shouldReduce = useReducedMotion();
 
   const isDriver = currentUser?.role === 'Driver';
 
+  // Live IST Digital Clock
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentTime(
+        now.toLocaleTimeString('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+        })
+      );
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Ctrl+K Shortcut
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
@@ -279,10 +314,12 @@ export const Header: React.FC<{
     router.push('/login');
   };
 
+  const hasAlerts = activeEmergency?.status === 'ACTIVE' || simState.sosActive;
+
   return (
     <>
       <header
-        className={`sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-[#090d16]/90 backdrop-blur-md px-4 transition-all duration-200 sm:px-6 ${
+        className={`sticky top-0 z-30 flex h-14 items-center justify-between border-b border-white/8 bg-[#070d18]/90 backdrop-blur-md px-4 transition-all duration-200 sm:px-6 ${
           collapsed ? 'lg:ml-16' : 'lg:ml-64'
         }`}
       >
@@ -290,7 +327,7 @@ export const Header: React.FC<{
         <div className="flex min-w-0 items-center gap-3">
           <button
             onClick={onOpenMobile}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-text-muted hover:bg-surface-muted hover:text-white lg:hidden cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-text-muted hover:bg-surface-muted hover:text-white lg:hidden cursor-pointer"
             aria-label="Open mobile menu"
           >
             <Menu className="h-4 w-4" />
@@ -319,23 +356,23 @@ export const Header: React.FC<{
                   Live Fleet Link
                 </span>
               </div>
-              <p className="hidden text-[11px] text-text-muted sm:block">
-                {currentUser?.companyName || 'Mahindra Logistics India'} • Active Control Deck
+              <p className="hidden text-[11px] text-text-muted sm:block font-mono">
+                {currentUser?.companyName || 'Apex Freight Lines India'} • {currentTime} IST
               </p>
             </div>
           )}
         </div>
 
-        {/* Center: Command Palette Trigger (Hidden for Driver to maintain clean cockpit focus) */}
+        {/* Center: Command Palette Trigger */}
         {!isDriver && (
           <div className="hidden w-full max-w-xs md:block">
             <button
               onClick={() => setCommandOpen(true)}
-              className={`flex w-full items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5 text-left text-xs text-text-muted hover:border-border/80 transition-colors ${focusRing}`}
+              className={`flex w-full items-center gap-2 rounded-lg border border-white/8 bg-surface/80 px-3 py-1.5 text-left text-xs text-text-muted hover:border-white/16 transition-colors cursor-pointer ${focusRing}`}
             >
-              <Search className="h-3.5 w-3.5" />
+              <Search className="h-3.5 w-3.5 text-brand-orange" />
               <span className="flex-1 truncate">Search vehicles, drivers, trips...</span>
-              <kbd className="rounded border border-border bg-surface-muted px-1.5 py-0.5 text-[10px] font-mono">
+              <kbd className="rounded border border-white/10 bg-surface-muted px-1.5 py-0.5 text-[10px] font-mono">
                 Ctrl K
               </kbd>
             </button>
@@ -346,7 +383,7 @@ export const Header: React.FC<{
         <div className="flex items-center gap-2">
           {!isDriver && (
             <>
-              <Button
+              <MagneticButton
                 variant="ghost"
                 size="sm"
                 icon={<Bot className="h-4 w-4 text-cyan-400" />}
@@ -354,24 +391,33 @@ export const Header: React.FC<{
                 onClick={() => router.push('/ai-dispatch')}
               >
                 Ask AI
-              </Button>
+              </MagneticButton>
 
               <Link href="/trips" className="hidden sm:inline-flex">
-                <Button size="sm" icon={<Plus className="h-3.5 w-3.5" />} className="text-xs">
+                <MagneticButton size="sm" icon={<Plus className="h-3.5 w-3.5" />} className="text-xs">
                   New dispatch
-                </Button>
+                </MagneticButton>
               </Link>
             </>
           )}
 
-          {/* Notifications */}
+          {/* Notifications Bell with Swing Animation */}
           <button
             onClick={() => setNotificationsOpen(true)}
             className="relative rounded-lg p-2 text-text-secondary hover:bg-surface hover:text-white transition-colors cursor-pointer"
             aria-label="Notifications"
           >
-            <Bell className="h-4 w-4" />
-            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-brand-orange ring-2 ring-[#090d16]" />
+            <motion.div
+              animate={hasAlerts && !shouldReduce ? { rotate: [0, -14, 14, -10, 10, 0] } : {}}
+              transition={{ repeat: Infinity, repeatDelay: 3.5, duration: 0.6 }}
+            >
+              <Bell className="h-4 w-4" />
+            </motion.div>
+            <span
+              className={`absolute right-1.5 top-1.5 h-2 w-2 rounded-full ${
+                hasAlerts ? 'bg-rose-500 animate-ping' : 'bg-brand-orange'
+              } ring-2 ring-[#070d18]`}
+            />
           </button>
 
           {/* Profile Dropdown */}
@@ -381,7 +427,7 @@ export const Header: React.FC<{
               className="flex items-center gap-2 rounded-lg p-1 hover:bg-surface transition-colors cursor-pointer"
               aria-label="Open profile menu"
             >
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-surface border border-border text-xs font-bold text-brand-orange">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-surface border border-white/10 text-xs font-bold text-brand-orange">
                 {getInitials(currentUser?.name)}
               </span>
               <span className="hidden max-w-32 truncate text-xs font-semibold text-text-primary lg:block">
@@ -390,8 +436,8 @@ export const Header: React.FC<{
             </button>
 
             {profileOpen && (
-              <div className="absolute right-0 top-11 z-50 w-52 rounded-xl border border-border bg-surface p-1.5 shadow-2xl space-y-1">
-                <div className="px-3 py-2 border-b border-border text-xs">
+              <div className="absolute right-0 top-11 z-50 w-52 rounded-xl border border-white/12 bg-surface p-1.5 shadow-2xl space-y-1">
+                <div className="px-3 py-2 border-b border-white/8 text-xs">
                   <p className="font-bold text-white truncate">{currentUser?.name}</p>
                   <p className="text-[11px] text-text-muted truncate">{currentUser?.email}</p>
                   <span className="mt-1 inline-block rounded bg-brand-orange/20 text-brand-orange px-1.5 py-0.5 text-[10px] font-bold">
@@ -430,21 +476,26 @@ export const LayoutShell: React.FC<{ children: React.ReactNode }> = ({ children 
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-canvas text-text-primary">
-      <Sidebar
-        collapsed={collapsed}
-        setCollapsed={setCollapsed}
-        mobileOpen={mobileOpen}
-        setMobileOpen={setMobileOpen}
-      />
-      <Header collapsed={collapsed} onOpenMobile={() => setMobileOpen(true)} />
-      <main
-        className={`min-h-[calc(100vh-56px)] p-4 transition-all duration-200 sm:p-6 ${
-          collapsed ? 'lg:ml-16' : 'lg:ml-64'
-        }`}
-      >
-        <div className="mx-auto w-full max-w-[1520px] space-y-5">{children}</div>
-      </main>
-    </div>
+    <ToastProvider>
+      <div className="min-h-screen bg-canvas text-text-primary">
+        <RouteProgressBar />
+        <Sidebar
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          mobileOpen={mobileOpen}
+          setMobileOpen={setMobileOpen}
+        />
+        <Header collapsed={collapsed} onOpenMobile={() => setMobileOpen(true)} />
+        <main
+          className={`min-h-[calc(100vh-56px)] p-4 transition-all duration-200 sm:p-6 ${
+            collapsed ? 'lg:ml-16' : 'lg:ml-64'
+          }`}
+        >
+          <div className="mx-auto w-full max-w-[1520px]">
+            <PageTransition>{children}</PageTransition>
+          </div>
+        </main>
+      </div>
+    </ToastProvider>
   );
 };

@@ -4,9 +4,10 @@ import http from 'http';
 
 const url = process.argv[2] || 'http://localhost:3000/login';
 const outputPath = process.argv[3] || 'screenshot.png';
-const waitMs = parseInt(process.argv[4] || '1500', 10);
-const width = parseInt(process.argv[5] || '1440', 10);
-const height = parseInt(process.argv[6] || '900', 10);
+const action = process.argv[4] || 'none'; // 'none' | 'login' | 'command_palette' | 'notifications'
+const waitMs = parseInt(process.argv[5] || '2000', 10);
+const width = parseInt(process.argv[6] || '1440', 10);
+const height = parseInt(process.argv[7] || '900', 10);
 
 const chromePaths = [
   'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
@@ -85,6 +86,7 @@ async function run() {
     };
 
     await send('Page.enable');
+    await send('Runtime.enable');
     await send('Emulation.setDeviceMetricsOverride', {
       width,
       height,
@@ -92,9 +94,67 @@ async function run() {
       mobile: width < 600
     });
 
-    await send('Page.navigate', { url });
+    // 1. Initial Navigation
+    await send('Page.navigate', { url: 'http://localhost:3000/login' });
+    await sleep(1500);
 
-    // Wait for animations and hydration
+    // 2. Perform Login if requested or if attempting to view internal routes (unless layout-preview)
+    const isLayoutPreview = url.includes('layout-preview');
+    if (!isLayoutPreview && (action === 'login' || action === 'command_palette' || action === 'notifications' || url.includes('/dashboard'))) {
+      await send('Runtime.evaluate', {
+        expression: `
+          (() => {
+            const emailInput = document.querySelector('input[type="email"]');
+            const passInput = document.querySelector('input[type="password"]');
+            const submitBtn = document.querySelector('button[type="submit"]');
+            if (emailInput && passInput && submitBtn) {
+              const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+              nativeInputValueSetter.call(emailInput, 'sylborn@trucksaathi.in');
+              emailInput.dispatchEvent(new Event('input', { bubbles: true }));
+              nativeInputValueSetter.call(passInput, 'TruckSaathi@2026');
+              passInput.dispatchEvent(new Event('input', { bubbles: true }));
+              submitBtn.click();
+              return true;
+            }
+            return false;
+          })()
+        `
+      });
+
+      // Wait for login redirect to dashboard
+      await sleep(2500);
+
+      if (url !== 'http://localhost:3000/login' && url !== 'http://localhost:3000/dashboard') {
+        await send('Page.navigate', { url });
+        await sleep(1500);
+      }
+    } else {
+      await send('Page.navigate', { url });
+      await sleep(1200);
+    }
+
+    // 3. Actions like Command Palette or Notifications
+    if (action === 'command_palette') {
+      await send('Runtime.evaluate', {
+        expression: `
+          (() => {
+            window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }));
+          })()
+        `
+      });
+      await sleep(600);
+    } else if (action === 'notifications') {
+      await send('Runtime.evaluate', {
+        expression: `
+          (() => {
+            const bell = document.querySelector('button[aria-label="Notifications"]');
+            if (bell) bell.click();
+          })()
+        `
+      });
+      await sleep(600);
+    }
+
     await sleep(waitMs);
 
     const shot = await send('Page.captureScreenshot', { format: 'png' });
