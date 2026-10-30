@@ -30,7 +30,6 @@ import dynamic from 'next/dynamic';
 import { useApp } from '@/context/AppContext';
 import { EmergencyTakeoverModal } from '@/features/driver/EmergencyTakeoverModal';
 import { PODScanner } from '@/features/driver/PODScanner';
-import { OfflineSyncDemo } from '@/features/driver/OfflineSyncDemo';
 import {
   Badge,
   Button,
@@ -148,6 +147,7 @@ export function DriverPortalContent() {
 
   return (
     <AnimatedPage>
+      <div className="max-w-4xl mx-auto space-y-4 pb-20 sm:pb-8">
       {/* =========================================================================
           1. COMPACT DRIVER PORTAL COCKPIT HEADER
           ========================================================================= */}
@@ -216,16 +216,13 @@ export function DriverPortalContent() {
               type="button"
               onClick={() => resetSimulation()}
               className="rounded-lg border border-border bg-surface p-1.5 text-text-muted hover:text-white hover:bg-surface-muted transition-colors cursor-pointer"
-              title="Reset corridor test run"
+              title="Reset trip position to hub"
             >
               <RotateCcw className="h-4 w-4" />
             </button>
           </div>
         </div>
       </div>
-
-      {/* Offline Mode & Synchronization Demo */}
-      <OfflineSyncDemo />
 
       {/* Real-time Lifecycle Callout 1: New Assignment Awaiting Driver Acceptance */}
       {activeTrip && activeTrip.status === 'Assigned' && (
@@ -734,8 +731,6 @@ export function DriverPortalContent() {
         </div>
       </div>
 
-      {/* Offline Mode & Synchronization Demo */}
-      <OfflineSyncDemo />
 
       {/* =========================================================================
           4. BOTTOM SECTION: POD UPLOAD + DRIVER DOCUMENTS + RECENT TIMELINE
@@ -769,7 +764,7 @@ export function DriverPortalContent() {
         </div>
 
         {/* Driver & Vehicle Compliance Documents */}
-        <div className="lg:col-span-1">
+        <div id="compliance" className="lg:col-span-1">
           <Panel
             title="Trip & Compliance Documents"
             subtitle="Verified enterprise credentials"
@@ -875,6 +870,52 @@ export function DriverPortalContent() {
         </div>
       </div>
 
+      {/* Mobile Sticky Thumb-Action Dock */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-xl border-t border-white/10 px-4 py-2 sm:hidden shadow-2xl">
+        <div className="flex items-center justify-around gap-2 max-w-md mx-auto">
+          <a
+            href="#route"
+            className="flex flex-col items-center gap-1 text-[10px] font-bold text-text-muted hover:text-cyan-400"
+          >
+            <Navigation className="w-4 h-4 text-cyan-400" />
+            <span>Route</span>
+          </a>
+
+          <a
+            href="#pod-upload"
+            className="flex flex-col items-center gap-1 text-[10px] font-bold text-text-muted hover:text-brand-orange"
+          >
+            <Camera className="w-4 h-4 text-brand-orange" />
+            <span>Scan POD</span>
+          </a>
+
+          <button
+            type="button"
+            onClick={handleTriggerSOS}
+            className="flex flex-col items-center gap-0.5 -mt-4 px-3 py-1.5 rounded-2xl bg-rose-600 text-white shadow-[0_0_15px_rgba(225,29,72,0.5)] active:scale-95 transition-all cursor-pointer"
+          >
+            <AlertOctagon className="w-5 h-5 animate-pulse" />
+            <span className="text-[10px] font-black uppercase">SOS</span>
+          </button>
+
+          <a
+            href="#vehicle-health"
+            className="flex flex-col items-center gap-1 text-[10px] font-bold text-text-muted hover:text-emerald-400"
+          >
+            <Gauge className="w-4 h-4 text-emerald-400" />
+            <span>Diagnostics</span>
+          </a>
+
+          <a
+            href="#compliance"
+            className="flex flex-col items-center gap-1 text-[10px] font-bold text-text-muted hover:text-indigo-400"
+          >
+            <FileText className="w-4 h-4 text-indigo-400" />
+            <span>Docs</span>
+          </a>
+        </div>
+      </div>
+
       {/* Full-screen Emergency Takeover Modal */}
       <EmergencyTakeoverModal
         isOpen={Boolean(activeEmergency?.status === 'ACTIVE' || activeEmergency?.status === 'ACKNOWLEDGED' || simState.sosActive)}
@@ -884,6 +925,7 @@ export function DriverPortalContent() {
         locationCity={simState.location.city}
         isAcknowledged={activeEmergency?.status === 'ACKNOWLEDGED'}
       />
+      </div>
     </AnimatedPage>
   );
 }

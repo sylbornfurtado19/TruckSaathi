@@ -147,6 +147,31 @@ const AppProviderInner: React.FC<{ children: React.ReactNode }> = ({ children })
         )
       );
 
+      // Sync emergency status in state
+      if (newSimState.sosActive) {
+        setActiveEmergency((prev) => {
+          if (prev && prev.status === 'ACTIVE') return prev;
+          return {
+            id: 'sim-emerg-active',
+            companyId: 'comp-1',
+            vehicleId: newSimState.vehicleId,
+            vehicleReg: newSimState.vehicleReg,
+            driverId: newSimState.driverId,
+            driverName: newSimState.driverName,
+            tripId: newSimState.tripId,
+            tripCode: newSimState.tripCode,
+            latitude: newSimState.location.lat,
+            longitude: newSimState.location.lng,
+            locationName: newSimState.location.city,
+            status: 'ACTIVE',
+            triggeredAt: new Date().toISOString(),
+            createdAt: new Date().toISOString()
+          };
+        });
+      } else {
+        setActiveEmergency((prev) => (prev?.id === 'sim-emerg-active' ? null : prev));
+      }
+
       // If new simulation event occurred, log it
       if (newSimState.lastEvent && newSimState.lastEvent.text !== lastEventRef.current) {
         lastEventRef.current = newSimState.lastEvent.text;
@@ -533,10 +558,9 @@ const AppProviderInner: React.FC<{ children: React.ReactNode }> = ({ children })
   };
 
   const acknowledgeSOS = async (emergencyId: string) => {
+    simulationService.clearSOS();
+    setActiveEmergency(null);
     const res = await emergencyService.acknowledgeSOS(emergencyId);
-    if (res.success) {
-      setActiveEmergency((prev) => (prev?.id === emergencyId ? { ...prev, status: 'ACKNOWLEDGED' } : prev));
-    }
     return res;
   };
 
@@ -643,8 +667,30 @@ const AppProviderInner: React.FC<{ children: React.ReactNode }> = ({ children })
         resetSimulation: () => simulationService.reset(),
         toggleSimulation: () => simulationService.toggle(),
         setSimulationSpeed: (m) => simulationService.setSpeed(m),
-        triggerSOS: (name) => simulationService.triggerSOS(name),
-        clearSOS: () => simulationService.clearSOS(),
+        triggerSOS: (name) => {
+          simulationService.triggerSOS(name);
+          const state = simulationService.getState();
+          setActiveEmergency({
+            id: 'sim-emerg-active',
+            companyId: 'comp-1',
+            vehicleId: state.vehicleId,
+            vehicleReg: state.vehicleReg,
+            driverId: state.driverId,
+            driverName: name || state.driverName,
+            tripId: state.tripId,
+            tripCode: state.tripCode,
+            latitude: state.location.lat,
+            longitude: state.location.lng,
+            locationName: state.location.city,
+            status: 'ACTIVE',
+            triggeredAt: new Date().toISOString(),
+            createdAt: new Date().toISOString()
+          });
+        },
+        clearSOS: () => {
+          simulationService.clearSOS();
+          setActiveEmergency(null);
+        },
         uploadSimulationPOD: (notes) => simulationService.uploadPOD(notes)
       }}
     >

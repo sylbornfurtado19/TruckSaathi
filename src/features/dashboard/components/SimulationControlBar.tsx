@@ -48,12 +48,12 @@ export function SimulationControlBar({
             {simState.isRunning ? (
               <>
                 <Pause className="h-4 w-4" />
-                <span>Pause Sim</span>
+                <span>Pause Stream</span>
               </>
             ) : (
               <>
                 <Play className="h-4 w-4" />
-                <span>Play Sim</span>
+                <span>Resume Stream</span>
               </>
             )}
           </button>
@@ -62,7 +62,7 @@ export function SimulationControlBar({
             type="button"
             onClick={onReset}
             className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-surface-muted/60 text-text-secondary hover:text-white hover:bg-surface transition-colors cursor-pointer"
-            title="Reset Simulation to Initial State"
+            title="Reset Fleet Telemetry to Base"
           >
             <RotateCcw className="h-3.5 w-3.5" />
           </button>
@@ -126,10 +126,10 @@ export function SimulationControlBar({
               type="button"
               onClick={onTriggerSOS}
               className="flex h-9 items-center gap-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 text-xs font-bold text-rose-400 hover:bg-rose-500/20 hover:border-rose-500/50 transition-colors cursor-pointer"
-              title="Test Emergency Broadcast across Fleet"
+              title="Trigger Emergency Broadcast across Fleet"
             >
               <AlertOctagon className="h-4 w-4" />
-              <span>Trigger Test SOS</span>
+              <span>Trigger Emergency SOS</span>
             </button>
           )}
         </div>
