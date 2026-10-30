@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   CheckCircle2,
@@ -24,7 +25,9 @@ import {
   FileText,
   Check,
   Activity,
-  AlertTriangle
+  AlertTriangle,
+  LogOut,
+  ArrowLeftRight
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useApp } from '@/context/AppContext';
@@ -56,6 +59,7 @@ const GoogleFleetMap = dynamic(
 );
 
 export function DriverPortalContent() {
+  const router = useRouter();
   const {
     trips,
     currentUser,
@@ -72,8 +76,14 @@ export function DriverPortalContent() {
     startTrip,
     completeTripWithPOD,
     activeEmergency,
-    realtimeConnected
+    realtimeConnected,
+    signOut
   } = useApp();
+
+  const handleLogout = async () => {
+    await signOut();
+    router.push('/login');
+  };
 
   const [podNotes, setPodNotes] = useState('');
   const [uploaded, setUploaded] = useState(false);
@@ -219,6 +229,30 @@ export function DriverPortalContent() {
               title="Reset trip position to hub"
             >
               <RotateCcw className="h-4 w-4" />
+            </button>
+
+            {/* Back to Fleet Command for Management Roles */}
+            {currentUser && currentUser.role !== 'Driver' && (
+              <button
+                type="button"
+                onClick={() => router.push('/dashboard')}
+                className="flex items-center gap-1.5 rounded-lg border border-cyan-500/40 bg-cyan-950/40 px-2.5 py-1.5 text-xs font-bold text-cyan-300 hover:bg-cyan-900/50 transition-colors cursor-pointer"
+                title="Return to Fleet Command Dashboard"
+              >
+                <ArrowLeftRight className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Fleet Command</span>
+              </button>
+            )}
+
+            {/* Prominent Sign Out / Logout Button */}
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 rounded-lg border border-rose-500/40 bg-rose-500/15 px-3 py-1.5 text-xs font-bold text-rose-300 hover:bg-rose-500/30 hover:text-white transition-all cursor-pointer shadow-sm active:scale-98"
+              title="Sign Out of TruckSaathi"
+            >
+              <LogOut className="h-3.5 w-3.5 text-rose-400" />
+              <span>Sign Out</span>
             </button>
           </div>
         </div>
