@@ -33,6 +33,7 @@ import { tripService, mapDbTripToTrip } from '@/lib/services/tripService';
 import { emergencyService, mapDbEmergencyToModel } from '@/lib/services/emergencyService';
 import { telemetryService, mapDbLiveStateToModel } from '@/lib/services/telemetryService';
 import { activityService } from '@/lib/services/activityService';
+import { driverService, mapDbDriverToDriver } from '@/lib/services/driverService';
 
 // Helper for unique IDs
 const createId = (prefix: string) => `${prefix}-${crypto.randomUUID()}`;
@@ -49,7 +50,7 @@ interface AppContextType {
   addVehicle: (vehicle: Omit<Vehicle, 'id'>) => void;
   updateVehicle: (id: string, updated: Partial<Vehicle>) => void;
   deleteVehicle: (id: string) => void;
-  addDriver: (driver: Omit<Driver, 'id'>) => void;
+  addDriver: (driver: Omit<Driver, 'id'>) => Promise<{ success: boolean; driver?: Driver; error?: string }>;
   updateDriver: (id: string, updated: Partial<Driver>) => void;
   addUser: (user: Omit<User, 'id'>) => void;
   addBranch: (branch: Omit<Branch, 'id'>) => void;
@@ -139,10 +140,10 @@ const AppProviderInner: React.FC<{ children: React.ReactNode }> = ({ children })
         prev.map((t) =>
           t.id === newSimState.tripId
             ? {
-                ...t,
-                status: newSimState.tripStatus,
-                podReceived: newSimState.podUploaded
-              }
+              ...t,
+              status: newSimState.tripStatus,
+              podReceived: newSimState.podUploaded
+            }
             : t
         )
       );
@@ -311,8 +312,8 @@ const AppProviderInner: React.FC<{ children: React.ReactNode }> = ({ children })
               row.maintenance_status === 'scheduled_maintenance'
                 ? 'Scheduled Service'
                 : row.maintenance_status === 'breakdown'
-                ? 'Breakdown'
-                : 'In Service',
+                  ? 'Breakdown'
+                  : 'In Service',
             chassisNumber: String(row.chassis_number || 'MAT-100200'),
             engineNumber: String(row.engine_number || 'ENG-100200'),
             rcExpiry: String(row.rc_expiry || '2028-12-31'),
@@ -431,13 +432,13 @@ const AppProviderInner: React.FC<{ children: React.ReactNode }> = ({ children })
               prev.map((v) =>
                 v.id === live.vehicleId
                   ? {
-                      ...v,
-                      lastKnownLocation: {
-                        lat: live.latitude,
-                        lng: live.longitude,
-                        city: live.currentCheckpoint
-                      }
+                    ...v,
+                    lastKnownLocation: {
+                      lat: live.latitude,
+                      lng: live.longitude,
+                      city: live.currentCheckpoint
                     }
+                  }
                   : v
               )
             );
@@ -484,6 +485,25 @@ const AppProviderInner: React.FC<{ children: React.ReactNode }> = ({ children })
             module: row.module
           };
           setActivityLogs((prev) => [newLog, ...prev.slice(0, 25)]);
+        }
+      )
+      // 5. Commercial Driver Roster Synchronization
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'drivers' },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            const newDriver = mapDbDriverToDriver(payload.new);
+            setDrivers((prev) => {
+              if (prev.some((d) => d.id === newDriver.id)) return prev;
+              return [newDriver, ...prev];
+            });
+          } else if (payload.eventType === 'UPDATE') {
+            const updated = mapDbDriverToDriver(payload.new);
+            setDrivers((prev) => prev.map((d) => (d.id === updated.id ? updated : d)));
+          } else if (payload.eventType === 'DELETE') {
+            setDrivers((prev) => prev.filter((d) => d.id !== payload.old.id));
+          }
         }
       )
       .subscribe((status) => {
@@ -578,131 +598,148 @@ const AppProviderInner: React.FC<{ children: React.ReactNode }> = ({ children })
     setVehicles((prev) => prev.filter((v) => v.id !== id));
   };
 
-  const addDriver = (driverData: Omit<Driver, 'id'>) => {
-    const newDriver: Driver = { ...driverData, id: createId('d') };
-    setDrivers((prev) => [newDriver, ...prev]);
+    const addDriver = async (driverData: Omit<Driver, 'id'>) => {
+      const res = await driverService.createDriver(driverData, currentUser?.companyId || undefined);
+      const newDriver = res.driver || { ...driverData, id: createId('d') };
+
+      setDrivers((prev) => {
+        if (prev.some((d) => d.id === newDriver.id)) return prev;
+        return [newDriver, ...prev];
+      });
+
+      const newLog: ActivityLog = {
+        id: createId('act'),
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        user: currentUser?.name || 'Fleet Manager',
+        role: currentUser?.role || 'Management',
+        action: `Onboarded commercial pilot ${driverData.fullName} (DL: ${driverData.licenseNumber})`,
+        module: 'Fleet Operations'
+      };
+      setActivityLogs((prev) => [newLog, ...prev.slice(0, 25)]);
+
+      return res;
+    };
+
+    const updateDriver = (id: string, updated: Partial<Driver>) => {
+      setDrivers((prev) => prev.map((d) => (d.id === id ? { ...d, ...updated } : d)));
+    };
+
+    const addUser = (userData: Omit<User, 'id'>) => {
+      const newUser: User = { ...userData, id: createId('u') };
+      setUsers((prev) => [newUser, ...prev]);
+    };
+
+    const addBranch = (branchData: Omit<Branch, 'id'>) => {
+      const newBranch: Branch = { ...branchData, id: createId('b') };
+      setBranches((prev) => [newBranch, ...prev]);
+    };
+
+    const addTrip = async (tripData: Omit<Trip, 'id'>) => {
+      const res = await tripService.createTrip(tripData);
+      if (res.success && res.trip) {
+        setTrips((prev) => [res.trip!, ...prev]);
+      } else {
+        const newTrip: Trip = { ...tripData, id: createId('trp') };
+        setTrips((prev) => [newTrip, ...prev]);
+      }
+    };
+
+    const updateTrip = (id: string, updated: Partial<Trip>) => {
+      setTrips((prev) => prev.map((t) => (t.id === id ? { ...t, ...updated } : t)));
+    };
+
+    const deleteTrip = (id: string) => {
+      setTrips((prev) => prev.filter((t) => t.id !== id));
+    };
+
+    const addFuelLog = (logData: Omit<FuelLog, 'id'>) => {
+      const newLog: FuelLog = { ...logData, id: createId('fl') };
+      setFuelLogs((prev) => [newLog, ...prev]);
+    };
+
+    return (
+      <AppContext.Provider
+        value={{
+          vehicles,
+          drivers,
+          users,
+          branches,
+          activityLogs,
+          trips,
+          fuelLogs,
+          expenses,
+          addVehicle,
+          updateVehicle,
+          deleteVehicle,
+          addDriver,
+          updateDriver,
+          addUser,
+          addBranch,
+          addTrip,
+          updateTrip,
+          deleteTrip,
+          addFuelLog,
+
+          // Real Database Operations
+          assignTrip,
+          acceptTrip,
+          startTrip,
+          completeTripWithPOD,
+          acknowledgeSOS,
+
+          currentUser,
+          currentDriver,
+          session,
+          user,
+          authLoading,
+          signOut,
+          refreshProfile,
+          realtimeConnected,
+
+          // Simulation
+          simState,
+          activeEmergency,
+          startSimulation: (m) => simulationService.start(m),
+          pauseSimulation: () => simulationService.pause(),
+          resetSimulation: () => simulationService.reset(),
+          toggleSimulation: () => simulationService.toggle(),
+          setSimulationSpeed: (m) => simulationService.setSpeed(m),
+          triggerSOS: (name) => {
+            simulationService.triggerSOS(name);
+            const state = simulationService.getState();
+            setActiveEmergency({
+              id: 'sim-emerg-active',
+              companyId: 'comp-1',
+              vehicleId: state.vehicleId,
+              vehicleReg: state.vehicleReg,
+              driverId: state.driverId,
+              driverName: name || state.driverName,
+              tripId: state.tripId,
+              tripCode: state.tripCode,
+              latitude: state.location.lat,
+              longitude: state.location.lng,
+              locationName: state.location.city,
+              status: 'ACTIVE',
+              triggeredAt: new Date().toISOString(),
+              createdAt: new Date().toISOString()
+            });
+          },
+          clearSOS: () => {
+            simulationService.clearSOS();
+            setActiveEmergency(null);
+          },
+          uploadSimulationPOD: (notes) => simulationService.uploadPOD(notes)
+        }}
+      >
+        {children}
+      </AppContext.Provider>
+    );
   };
 
-  const updateDriver = (id: string, updated: Partial<Driver>) => {
-    setDrivers((prev) => prev.map((d) => (d.id === id ? { ...d, ...updated } : d)));
-  };
-
-  const addUser = (userData: Omit<User, 'id'>) => {
-    const newUser: User = { ...userData, id: createId('u') };
-    setUsers((prev) => [newUser, ...prev]);
-  };
-
-  const addBranch = (branchData: Omit<Branch, 'id'>) => {
-    const newBranch: Branch = { ...branchData, id: createId('b') };
-    setBranches((prev) => [newBranch, ...prev]);
-  };
-
-  const addTrip = async (tripData: Omit<Trip, 'id'>) => {
-    const res = await tripService.createTrip(tripData);
-    if (res.success && res.trip) {
-      setTrips((prev) => [res.trip!, ...prev]);
-    } else {
-      const newTrip: Trip = { ...tripData, id: createId('trp') };
-      setTrips((prev) => [newTrip, ...prev]);
+  export const useApp = () => {
+    const context = useContext(AppContext);
+    if (!context) {
+      throw new Error('useApp must be used within an AppProvider');
     }
+    return context;
   };
-
-  const updateTrip = (id: string, updated: Partial<Trip>) => {
-    setTrips((prev) => prev.map((t) => (t.id === id ? { ...t, ...updated } : t)));
-  };
-
-  const deleteTrip = (id: string) => {
-    setTrips((prev) => prev.filter((t) => t.id !== id));
-  };
-
-  const addFuelLog = (logData: Omit<FuelLog, 'id'>) => {
-    const newLog: FuelLog = { ...logData, id: createId('fl') };
-    setFuelLogs((prev) => [newLog, ...prev]);
-  };
-
-  return (
-    <AppContext.Provider
-      value={{
-        vehicles,
-        drivers,
-        users,
-        branches,
-        activityLogs,
-        trips,
-        fuelLogs,
-        expenses,
-        addVehicle,
-        updateVehicle,
-        deleteVehicle,
-        addDriver,
-        updateDriver,
-        addUser,
-        addBranch,
-        addTrip,
-        updateTrip,
-        deleteTrip,
-        addFuelLog,
-
-        // Real Database Operations
-        assignTrip,
-        acceptTrip,
-        startTrip,
-        completeTripWithPOD,
-        acknowledgeSOS,
-
-        currentUser,
-        currentDriver,
-        session,
-        user,
-        authLoading,
-        signOut,
-        refreshProfile,
-        realtimeConnected,
-
-        // Simulation
-        simState,
-        activeEmergency,
-        startSimulation: (m) => simulationService.start(m),
-        pauseSimulation: () => simulationService.pause(),
-        resetSimulation: () => simulationService.reset(),
-        toggleSimulation: () => simulationService.toggle(),
-        setSimulationSpeed: (m) => simulationService.setSpeed(m),
-        triggerSOS: (name) => {
-          simulationService.triggerSOS(name);
-          const state = simulationService.getState();
-          setActiveEmergency({
-            id: 'sim-emerg-active',
-            companyId: 'comp-1',
-            vehicleId: state.vehicleId,
-            vehicleReg: state.vehicleReg,
-            driverId: state.driverId,
-            driverName: name || state.driverName,
-            tripId: state.tripId,
-            tripCode: state.tripCode,
-            latitude: state.location.lat,
-            longitude: state.location.lng,
-            locationName: state.location.city,
-            status: 'ACTIVE',
-            triggeredAt: new Date().toISOString(),
-            createdAt: new Date().toISOString()
-          });
-        },
-        clearSOS: () => {
-          simulationService.clearSOS();
-          setActiveEmergency(null);
-        },
-        uploadSimulationPOD: (notes) => simulationService.uploadPOD(notes)
-      }}
-    >
-      {children}
-    </AppContext.Provider>
-  );
-};
-
-export const useApp = () => {
-  const context = useContext(AppContext);
-  if (!context) {
-    throw new Error('useApp must be used within an AppProvider');
-  }
-  return context;
-};
