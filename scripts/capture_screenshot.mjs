@@ -100,7 +100,8 @@ async function run() {
 
     // 2. Perform Login if requested or if attempting to view internal routes (unless layout-preview)
     const isLayoutPreview = url.includes('layout-preview');
-    if (!isLayoutPreview && (action === 'login' || action === 'command_palette' || action === 'notifications' || url.includes('/dashboard'))) {
+    const isPublic = url === 'http://localhost:3000/login' || url === 'http://localhost:3000/' || url === 'http://localhost:3000';
+    if (!isLayoutPreview && !isPublic) {
       await send('Runtime.evaluate', {
         expression: `
           (() => {
