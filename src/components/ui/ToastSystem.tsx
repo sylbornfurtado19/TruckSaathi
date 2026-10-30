@@ -50,7 +50,7 @@ export const useToast = () => {
     // Return graceful fallback so components don't crash if used outside provider
     return {
       showToast: (t: Omit<ToastItem, 'id'>) => console.log('Toast:', t),
-      dismissToast: () => {},
+      dismissToast: () => { },
       toasts: []
     };
   }

@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { Activity, MapPin, Radio, Layers } from 'lucide-react';
+import { Activity, MapPin, Radio, Layers, Radar } from 'lucide-react';
 import { Vehicle } from '@/types';
 
 const GoogleFleetMap = dynamic(
@@ -12,7 +12,7 @@ const GoogleFleetMap = dynamic(
     loading: () => (
       <div className="flex h-[400px] w-full flex-col items-center justify-center gap-2 rounded-xl bg-canvas border border-border/70 text-text-muted">
         <Radio className="h-6 w-6 animate-pulse text-cyan-400" />
-        <span className="font-mono text-xs tracking-wider uppercase">Initializing Google Maps Fleet Radar...</span>
+        <span className="font-mono text-xs tracking-wider uppercase">Initializing Highway Fleet Radar...</span>
       </div>
     )
   }
@@ -32,6 +32,7 @@ export function LiveFleetMap({
   className = ''
 }: LiveFleetMapProps) {
   const [filter, setFilter] = useState<'all' | 'active' | 'service' | 'critical'>('all');
+  const [radarSweepEnabled, setRadarSweepEnabled] = useState(false);
 
   const activeCount = vehicles.filter(v => v.maintenanceStatus === 'In Service').length;
   const serviceCount = vehicles.filter(v => v.maintenanceStatus === 'Scheduled Service').length;
@@ -45,9 +46,9 @@ export function LiveFleetMap({
   }, [vehicles, filter]);
 
   return (
-    <div className={`overflow-hidden rounded-xl border border-border bg-surface shadow-sm ${className}`}>
+    <div className={`overflow-hidden rounded-xl border border-white/[0.08] bg-surface shadow-2xl ${className}`}>
       {/* Map Control Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 px-4 py-3 bg-surface-muted/30">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.08] px-4 py-3 bg-surface-muted/30">
         <div className="flex items-center gap-2.5">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-cyan-500/30 bg-cyan-500/10 text-cyan-400">
             <MapPin className="h-3.5 w-3.5" />
@@ -68,54 +69,72 @@ export function LiveFleetMap({
           </div>
         </div>
 
-        {/* Quick Filter Buttons */}
-        <div className="flex items-center gap-1 rounded-lg border border-border bg-canvas/60 p-1">
+        {/* Quick Filter Buttons & Radar Sweep Toggle */}
+        <div className="flex items-center gap-2">
+          {/* Radar Sweep Toggle */}
           <button
             type="button"
-            onClick={() => setFilter('all')}
-            className={`rounded px-2.5 py-1 text-xs font-semibold transition-all ${
-              filter === 'all'
-                ? 'bg-cyan-500/20 text-cyan-300 shadow-xs'
-                : 'text-text-muted hover:text-text-primary'
+            onClick={() => setRadarSweepEnabled(!radarSweepEnabled)}
+            className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-mono font-bold transition-all cursor-pointer ${
+              radarSweepEnabled
+                ? 'border-cyan-500/60 bg-cyan-500/20 text-cyan-300 shadow-glow-cyan'
+                : 'border-white/[0.08] bg-canvas/60 text-text-muted hover:text-text-primary hover:border-white/20'
             }`}
+            title="Toggle rotating mission control sweep radar"
           >
-            All ({vehicles.length})
+            <Radar className={`w-3.5 h-3.5 ${radarSweepEnabled ? 'animate-spin text-cyan-400' : ''}`} />
+            <span>Radar Sweep</span>
           </button>
-          <button
-            type="button"
-            onClick={() => setFilter('active')}
-            className={`rounded px-2.5 py-1 text-xs font-semibold transition-all ${
-              filter === 'active'
-                ? 'bg-emerald-500/20 text-emerald-300 shadow-xs'
-                : 'text-text-muted hover:text-text-primary'
-            }`}
-          >
-            On Road ({activeCount})
-          </button>
-          <button
-            type="button"
-            onClick={() => setFilter('service')}
-            className={`rounded px-2.5 py-1 text-xs font-semibold transition-all ${
-              filter === 'service'
-                ? 'bg-amber-500/20 text-amber-300 shadow-xs'
-                : 'text-text-muted hover:text-text-primary'
-            }`}
-          >
-            Service ({serviceCount})
-          </button>
-          {criticalCount > 0 && (
+
+          {/* Status filters */}
+          <div className="flex items-center gap-1 rounded-lg border border-white/[0.08] bg-canvas/60 p-1">
             <button
               type="button"
-              onClick={() => setFilter('critical')}
-              className={`rounded px-2.5 py-1 text-xs font-semibold transition-all ${
-                filter === 'critical'
-                  ? 'bg-rose-500/20 text-rose-300 shadow-xs'
-                  : 'text-rose-400/80 hover:text-rose-300'
+              onClick={() => setFilter('all')}
+              className={`rounded px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
+                filter === 'all'
+                  ? 'bg-cyan-500/20 text-cyan-300 shadow-xs'
+                  : 'text-text-muted hover:text-text-primary'
               }`}
             >
-              Alerts ({criticalCount})
+              All ({vehicles.length})
             </button>
-          )}
+            <button
+              type="button"
+              onClick={() => setFilter('active')}
+              className={`rounded px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
+                filter === 'active'
+                  ? 'bg-emerald-500/20 text-emerald-300 shadow-xs'
+                  : 'text-text-muted hover:text-text-primary'
+              }`}
+            >
+              On Road ({activeCount})
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilter('service')}
+              className={`rounded px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
+                filter === 'service'
+                  ? 'bg-amber-500/20 text-amber-300 shadow-xs'
+                  : 'text-text-muted hover:text-text-primary'
+              }`}
+            >
+              Service ({serviceCount})
+            </button>
+            {criticalCount > 0 && (
+              <button
+                type="button"
+                onClick={() => setFilter('critical')}
+                className={`rounded px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
+                  filter === 'critical'
+                    ? 'bg-rose-500/20 text-rose-300 shadow-xs'
+                    : 'text-rose-400/80 hover:text-rose-300'
+                }`}
+              >
+                Alerts ({criticalCount})
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -125,10 +144,11 @@ export function LiveFleetMap({
           vehicles={filteredVehicles}
           selectedVehicleId={selectedVehicleId}
           onSelectVehicle={onSelectVehicle}
+          radarSweepEnabled={radarSweepEnabled}
         />
 
         {/* Overlay corridor badge */}
-        <div className="pointer-events-none absolute bottom-3 left-3 z-[400] flex items-center gap-2 rounded-lg border border-border/80 bg-canvas/90 px-3 py-1.5 shadow-lg backdrop-blur-md">
+        <div className="pointer-events-none absolute bottom-3 left-3 z-[400] flex items-center gap-2 rounded-lg border border-white/[0.1] bg-canvas/90 px-3 py-1.5 shadow-lg backdrop-blur-md">
           <Layers className="h-3.5 w-3.5 text-cyan-400" />
           <span className="font-mono text-[11px] font-semibold text-text-primary">
             Corridor: Mumbai Bhiwandi ↔ Pune Chakan Auto Belt
@@ -137,7 +157,7 @@ export function LiveFleetMap({
       </div>
 
       {/* Bottom Status Legend */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-2.5 text-xs bg-surface">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.08] px-4 py-2.5 text-xs bg-surface">
         <div className="flex items-center gap-4 text-text-muted text-[11px]">
           <span className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-emerald-400" />

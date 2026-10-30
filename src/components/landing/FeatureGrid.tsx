@@ -101,18 +101,18 @@ export function FeatureGrid() {
       <div className="absolute bottom-10 left-10 w-96 h-96 bg-blue-500/10 blur-[130px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
+
         {/* Section Heading */}
         <div className="max-w-3xl mx-auto text-center space-y-4 mb-16">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-surface px-3.5 py-1 text-xs font-mono font-medium text-text-secondary">
             <Sparkles className="w-3.5 h-3.5 text-brand-orange" />
             <span>ENTERPRISE CAPABILITIES</span>
           </div>
-          
+
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-text-primary">
             Built for the Rigors of Indian Fleet Logistics
           </h2>
-          
+
           <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
             Eliminate spreadsheets, endless phone calls, and manual paperwork with a centralized operations platform that connects managers and drivers.
           </p>
@@ -136,7 +136,7 @@ export function FeatureGrid() {
               >
                 <SpotlightCard className="h-full flex flex-col justify-between p-7 bg-surface/80 border-white/[0.08] hover:border-brand-orange/40 transition-colors">
                   <div className="space-y-4">
-                    
+
                     {/* Header: Icon + Badge */}
                     <div className="flex items-center justify-between">
                       <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-surface-muted border border-white/[0.08] text-brand-orange group-hover:scale-105 transition-transform">
