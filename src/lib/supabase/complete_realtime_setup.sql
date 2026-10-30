@@ -243,3 +243,4 @@ BEGIN
         ALTER PUBLICATION supabase_realtime ADD TABLE public.activity_logs;
     EXCEPTION WHEN duplicate_object THEN END;
 END $$;
+
