@@ -161,3 +161,4 @@ export function DashboardKpiStrip({ vehicles, trips, drivers }: DashboardKpiStri
     </div>
   );
 }
+

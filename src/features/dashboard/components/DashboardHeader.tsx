@@ -82,3 +82,4 @@ export function DashboardHeader({ currentUser, totalVehicles }: DashboardHeaderP
     </div>
   );
 }
+

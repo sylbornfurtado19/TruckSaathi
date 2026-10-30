@@ -52,7 +52,7 @@ export function OsmFleetFallback({
 
         // Corridor Flow Polyline
         const coords = CORRIDOR_WAYPOINTS.map((p) => [p.lat, p.lng] as [number, number]);
-        
+
         // Base outer glow polyline
         L.polyline(coords, {
           color: '#ff6b00',
@@ -170,7 +170,7 @@ export function OsmFleetFallback({
           <div className="absolute w-[460px] h-[460px] rounded-full border border-cyan-500/20" />
           <div className="absolute w-[300px] h-[300px] rounded-full border border-cyan-500/15" />
           <div className="absolute w-[160px] h-[160px] rounded-full border border-cyan-500/10" />
-          
+
           {/* Rotating Beam */}
           <div className="absolute w-[500px] h-[500px] rounded-full animate-radar origin-center">
             <div
