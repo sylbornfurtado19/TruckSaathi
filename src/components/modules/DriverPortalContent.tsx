@@ -28,6 +28,9 @@ import {
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useApp } from '@/context/AppContext';
+import { EmergencyTakeoverModal } from '@/features/driver/EmergencyTakeoverModal';
+import { PODScanner } from '@/features/driver/PODScanner';
+import { OfflineSyncDemo } from '@/features/driver/OfflineSyncDemo';
 import {
   Badge,
   Button,
@@ -220,6 +223,9 @@ export function DriverPortalContent() {
           </div>
         </div>
       </div>
+
+      {/* Offline Mode & Synchronization Demo */}
+      <OfflineSyncDemo />
 
       {/* Real-time Lifecycle Callout 1: New Assignment Awaiting Driver Acceptance */}
       {activeTrip && activeTrip.status === 'Assigned' && (
@@ -728,6 +734,9 @@ export function DriverPortalContent() {
         </div>
       </div>
 
+      {/* Offline Mode & Synchronization Demo */}
+      <OfflineSyncDemo />
+
       {/* =========================================================================
           4. BOTTOM SECTION: POD UPLOAD + DRIVER DOCUMENTS + RECENT TIMELINE
           ========================================================================= */}
@@ -745,53 +754,17 @@ export function DriverPortalContent() {
               )
             }
           >
-            {uploaded || simState.podUploaded ? (
-              <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-5 text-center space-y-2">
-                <CheckCircle2 className="h-8 w-8 text-emerald-400 mx-auto" />
-                <h4 className="font-bold text-emerald-300 text-sm">Signed POD Receipt Uploaded!</h4>
-                <p className="text-xs text-text-secondary">
-                  Delivery timestamped and synced to fleet manager in real time.
-                </p>
-                <div className="pt-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setUploaded(false)}
-                    className="text-xs"
-                  >
-                    Upload Additional Page
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={handleUploadPOD} className="space-y-3.5">
-                <div>
-                  <label className="block text-xs font-semibold text-text-secondary mb-1">
-                    Consignee Remarks / Gate Pass #
-                  </label>
-                  <input
-                    type="text"
-                    value={podNotes}
-                    onChange={e => setPodNotes(e.target.value)}
-                    placeholder="e.g. Received 28.5 MT by Warehouse Supervisor"
-                    className="w-full rounded-lg border border-border bg-surface-muted px-3 py-2 text-xs text-white placeholder:text-text-muted focus:border-focus focus:outline-none"
-                  />
-                </div>
-
-                <div className="rounded-xl border-2 border-dashed border-border/80 bg-surface-muted/30 p-5 text-center hover:border-brand-orange/60 transition-colors cursor-pointer">
-                  <Camera className="h-8 w-8 text-brand-orange mx-auto mb-2" />
-                  <p className="text-xs font-bold text-white">Tap to Scan LR Copy or Gate Stamp</p>
-                  <p className="text-[11px] text-text-muted mt-0.5">
-                    Supports high-resolution camera capture or PDF
-                  </p>
-                </div>
-
-                <Button type="submit" variant="primary" size="md" className="w-full">
-                  <FileCheck className="h-4 w-4 mr-2" />
-                  Transmit Signed POD to Fleet
-                </Button>
-              </form>
-            )}
+            <PODScanner
+              onComplete={notes => {
+                if (activeTrip) {
+                  completeTripWithPOD(activeTrip.id, notes);
+                } else {
+                  uploadSimulationPOD(notes);
+                }
+                setUploaded(true);
+              }}
+              isCompleted={uploaded || Boolean(simState.podUploaded)}
+            />
           </Panel>
         </div>
 
@@ -901,6 +874,16 @@ export function DriverPortalContent() {
           </Panel>
         </div>
       </div>
+
+      {/* Full-screen Emergency Takeover Modal */}
+      <EmergencyTakeoverModal
+        isOpen={Boolean(activeEmergency?.status === 'ACTIVE' || activeEmergency?.status === 'ACKNOWLEDGED' || simState.sosActive)}
+        onDismiss={clearSOS}
+        driverName={driverDisplayName}
+        vehicleReg={simState.vehicleReg}
+        locationCity={simState.location.city}
+        isAcknowledged={activeEmergency?.status === 'ACKNOWLEDGED'}
+      />
     </AnimatedPage>
   );
 }

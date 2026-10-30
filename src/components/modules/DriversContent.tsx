@@ -35,6 +35,8 @@ import {
   Modal,
   EmptyState,
   StatusPill,
+  SafetyScoreRing,
+  MorphingExportButton,
   itemVariants
 } from '@/components/ui';
 import { exportToCSV } from '@/lib/csvExport';
@@ -143,14 +145,7 @@ export function DriversContent() {
           description="Sarathi DL verification status, telematics behavior monitoring, route assignments, and emergency contact protocols."
           actions={
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExportCSV}
-                icon={<Download className="w-3.5 h-3.5" />}
-              >
-                Export Roster
-              </Button>
+              <MorphingExportButton onExport={handleExportCSV} label="Export Pilots CSV" />
               <Button
                 variant="primary"
                 size="sm"
@@ -502,10 +497,17 @@ export function DriversContent() {
             </div>
 
             {/* Safety Score & Violations */}
-            <div className="space-y-2">
+            {/* Telematics Safety & Behavior with Score Ring */}
+            <div className="space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-wider text-text-secondary">
                 Telematics Safety & Behavior
               </h4>
+              <SafetyScoreRing
+                score={selectedDriver.safetyScore || 92}
+                rankDelta={2}
+                label="Commercial Pilot Safety Index"
+                subtext="Corridor Safety Performance"
+              />
               <div className="rounded-xl border border-border bg-surface p-4">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-text-primary">Safety Rating Score</span>

@@ -29,6 +29,7 @@ import {
   KPICard,
   Modal,
   EmptyState,
+  WearBar,
   itemVariants
 } from '@/components/ui';
 
@@ -371,26 +372,14 @@ export function MaintenanceContent() {
               </div>
             </div>
 
-            {/* Subsystem Health Grid */}
+            {/* Subsystem Health Grid with Animated Wear Bars */}
             <div className="space-y-2">
-              <div className="font-mono text-xs font-bold uppercase tracking-wider text-text-secondary">Subsystem Telemetry</div>
-              <div className="grid grid-cols-2 gap-2.5">
-                <div className="rounded-control border border-border bg-surface p-3">
-                  <div className="text-xs text-text-secondary">Brake Disc & Hydraulics</div>
-                  <div className="font-mono text-base font-bold text-slate-100 mt-0.5">{selectedVehicle.componentHealth.brakes}%</div>
-                </div>
-                <div className="rounded-control border border-border bg-surface p-3">
-                  <div className="text-xs text-text-secondary">Battery & Alternator</div>
-                  <div className="font-mono text-base font-bold text-slate-100 mt-0.5">{selectedVehicle.componentHealth.battery}%</div>
-                </div>
-                <div className="rounded-control border border-border bg-surface p-3">
-                  <div className="text-xs text-text-secondary">Engine & Compression</div>
-                  <div className="font-mono text-base font-bold text-slate-100 mt-0.5">{selectedVehicle.componentHealth.engine}%</div>
-                </div>
-                <div className="rounded-control border border-border bg-surface p-3">
-                  <div className="text-xs text-text-secondary">Tyre Tread Depth</div>
-                  <div className="font-mono text-base font-bold text-slate-100 mt-0.5">{selectedVehicle.componentHealth.tyres}%</div>
-                </div>
+              <div className="font-mono text-xs font-bold uppercase tracking-wider text-text-secondary">Subsystem Telemetry Wear Index</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <WearBar label="Brake Disc & Hydraulics" percent={selectedVehicle.componentHealth.brakes} predictedIssue="Air pressure stable at 8.2 bar" />
+                <WearBar label="Battery & Alternator" percent={selectedVehicle.componentHealth.battery} predictedIssue="Cold-crank voltage 24.2V" />
+                <WearBar label="Engine & Compression" percent={selectedVehicle.componentHealth.engine} predictedIssue="Oil viscosity within normal range" />
+                <WearBar label="Tyre Tread Depth" percent={selectedVehicle.componentHealth.tyres} predictedIssue="Minimum tread depth 4.8mm" />
               </div>
             </div>
 

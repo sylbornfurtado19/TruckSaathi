@@ -13,6 +13,13 @@ export * from './SpotlightCard';
 export * from './ShimmerSkeleton';
 export * from './Sparkline';
 export * from './ToastSystem';
+export * from './GaugeCluster';
+export * from './FuelTankWave';
+export * from './WaterfallChart';
+export * from './MorphingExportButton';
+export * from './SafetyScoreRing';
+export * from './WearBar';
+export * from './HoldToActivateButton';
 
 export const focusRing = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-1 focus-visible:ring-offset-surface';
 

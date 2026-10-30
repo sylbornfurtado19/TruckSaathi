@@ -43,6 +43,8 @@ import {
   TableRow,
   TableHead,
   TableCell,
+  GaugeCluster,
+  MorphingExportButton,
   itemVariants
 } from '@/components/ui';
 import { exportToCSV } from '@/lib/csvExport';
@@ -165,14 +167,7 @@ export function VehiclesContent() {
           description="Live telematics state, Parivahan document compliance, payload metrics, and OBD-II health diagnostics."
           actions={
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExportCSV}
-                icon={<Download className="w-3.5 h-3.5" />}
-              >
-                Export CSV
-              </Button>
+              <MorphingExportButton onExport={handleExportCSV} label="Export Fleet CSV" />
               <Button
                 variant="primary"
                 size="sm"
@@ -651,6 +646,19 @@ export function VehiclesContent() {
                   <span className="font-semibold text-cyan-300 text-xs">{selectedVehicle.assignedDriver || 'Standby Pool'}</span>
                 </div>
               </div>
+            </div>
+
+            {/* Live Cockpit Gauge Cluster */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-text-secondary">
+                Live Cockpit Telemetry HUD
+              </h4>
+              <GaugeCluster
+                speed={selectedVehicle.maintenanceStatus === 'In Service' ? 58 : 0}
+                rpm={selectedVehicle.maintenanceStatus === 'In Service' ? 1750 : 0}
+                fuelPercent={getVehicleFuel(selectedVehicle.regNumber)}
+                temperature={selectedVehicle.componentHealth?.engine ? 84 : 94}
+              />
             </div>
 
             {/* Component Diagnostics */}

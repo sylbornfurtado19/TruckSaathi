@@ -22,6 +22,7 @@ import {
   Badge,
   AnimatedPage,
   AnimatedNumber,
+  SafetyScoreRing,
   itemVariants
 } from '@/components/ui';
 
@@ -100,12 +101,13 @@ export function SafetyContent() {
                 <p className="mt-0.5 text-sm text-text-secondary">Calculated from harsh braking, highway overspeed, rapid acceleration, and DMS fatigue sensors.</p>
               </div>
             </div>
-            <div className="shrink-0 rounded-card border border-border bg-surface-muted px-6 py-3 text-right">
-              <div className="text-3xl font-extrabold font-mono text-emerald-400 flex items-center gap-1 justify-end">
-                <AnimatedNumber value={aggregateSafetyScore} />
-                <span className="text-lg text-slate-500">/100</span>
-              </div>
-              <div className="text-xs font-medium text-status-green">Top Tier Commercial Safety</div>
+            <div className="shrink-0">
+              <SafetyScoreRing
+                score={aggregateSafetyScore}
+                rankDelta={1}
+                label="Aggregate Safety Index"
+                subtext="Top Tier Commercial Safety"
+              />
             </div>
           </div>
         </Card>

@@ -24,6 +24,8 @@ import {
   AnimatedPage,
   Modal,
   EmptyState,
+  FuelTankWave,
+  MorphingExportButton,
   itemVariants
 } from '@/components/ui';
 import { exportToCSV } from '@/lib/csvExport';
@@ -104,9 +106,7 @@ export function FuelContent() {
           description="OBD-II fuel level monitoring, highway KMPL consumption metrics, and automated fuel pilferage alerts."
           actions={
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={handleExportCSV} icon={<Download className="w-3.5 h-3.5" />}>
-                Export CSV
-              </Button>
+              <MorphingExportButton onExport={handleExportCSV} label="Export Fuel CSV" />
               <Button variant="primary" size="sm" onClick={() => setIsModalOpen(true)} icon={<Plus className="w-3.5 h-3.5" />}>
                 Log Refueling
               </Button>
@@ -171,6 +171,31 @@ export function FuelContent() {
           </div>
         </motion.div>
       )}
+
+      {/* Ultrasonic Fuel Sensor Monitor */}
+      <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="rounded-2xl border border-white/8 bg-surface-muted/50 p-5 backdrop-blur-md flex flex-col items-center">
+          <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider mb-3">
+            MH-12-Q-4521 • Ultrasonic Sensor Feed
+          </h3>
+          <FuelTankWave levelPercent={74} capacityLiters={400} />
+        </div>
+        <div className="rounded-2xl border border-white/8 bg-surface-muted/50 p-5 backdrop-blur-md flex flex-col items-center">
+          <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider mb-3">
+            KA-01-EA-9011 • Rapid Drain Telemetry
+          </h3>
+          <FuelTankWave
+            levelPercent={18}
+            capacityLiters={450}
+            theftAlert={true}
+            theftDetails={{
+              lossLiters: 28,
+              durationMins: 14,
+              location: 'Hosur RTO Checkpost'
+            }}
+          />
+        </div>
+      </motion.div>
 
       {/* 4. Fuel Data Table */}
       <motion.div variants={itemVariants} className="overflow-hidden rounded-card border border-border bg-surface">

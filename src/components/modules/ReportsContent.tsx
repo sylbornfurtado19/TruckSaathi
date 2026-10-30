@@ -17,6 +17,7 @@ import {
   Badge,
   AnimatedPage,
   Modal,
+  MorphingExportButton,
   itemVariants
 } from '@/components/ui';
 import { exportToCSV } from '@/lib/csvExport';
@@ -213,14 +214,11 @@ export function ReportsContent() {
                   <td className="px-4 py-3.5 font-mono text-text-secondary">{rep.generatedDate}</td>
                   <td className="px-4 py-3.5 text-text-secondary">{rep.generatedBy}</td>
                   <td className="py-3.5 px-4 text-right">
-                    <Button
-                      variant="outline"
+                    <MorphingExportButton
+                      onExport={() => handleTriggerExport(rep.type)}
+                      label="Download CSV"
                       size="sm"
-                      onClick={() => handleTriggerExport(rep.type)}
-                      icon={<Download className="w-3.5 h-3.5" />}
-                    >
-                      Download CSV
-                    </Button>
+                    />
                   </td>
                 </tr>
               ))}

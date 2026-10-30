@@ -20,6 +20,8 @@ import {
   KPICard,
   AnimatedPage,
   EmptyState,
+  WaterfallChart,
+  MorphingExportButton,
   itemVariants
 } from '@/components/ui';
 import { exportToCSV } from '@/lib/csvExport';
@@ -71,9 +73,7 @@ export function ExpensesContent() {
           title="Trip Expense & Settlement P&L"
           description="Commercial freight revenue reconciliation, automated FASTag toll deduction auditing, fuel cards, and trip margin analytics."
           actions={
-            <Button variant="outline" size="sm" onClick={handleExportCSV} icon={<Download className="w-3.5 h-3.5" />}>
-              Export P&L CSV
-            </Button>
+            <MorphingExportButton onExport={handleExportCSV} label="Export P&L CSV" />
           }
         />
       </motion.div>
@@ -108,6 +108,21 @@ export function ExpensesContent() {
           subtext="NHAI automated electronic tolls"
           icon={<CreditCard className="w-4 h-4 text-amber-400" />}
           iconBg="bg-amber-600/15 border border-amber-500/30 text-amber-400"
+        />
+      </motion.div>
+
+      {/* P&L Waterfall Progression */}
+      <motion.div variants={itemVariants}>
+        <WaterfallChart
+          title="Fleet Corridor Operating Profit & Loss Waterfall"
+          items={[
+            { label: 'Gross Freight', amount: totalFreightRevenue, type: 'revenue' },
+            { label: 'Diesel Fuel', amount: -totalFuelExpenses, type: 'expense' },
+            { label: 'FASTag Tolls', amount: -totalTollExpenses, type: 'expense' },
+            { label: 'Driver Pay', amount: -expenses.reduce((a, b) => a + (b.driverAllowance || 0), 0), type: 'expense' },
+            { label: 'Other/Spares', amount: -expenses.reduce((a, b) => a + (b.otherExpenses || 0), 0), type: 'expense' },
+            { label: 'Net Profit', amount: totalNetProfit, type: 'total' }
+          ]}
         />
       </motion.div>
 
