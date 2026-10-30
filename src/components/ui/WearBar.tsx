@@ -63,3 +63,4 @@ export function WearBar({ label, percent, predictedIssue, icon }: WearBarProps) 
     </div>
   );
 }
+

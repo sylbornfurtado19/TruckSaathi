@@ -203,3 +203,4 @@ export function PODScanner({ onComplete, isCompleted = false }: PODScannerProps)
     </div>
   );
 }
+
